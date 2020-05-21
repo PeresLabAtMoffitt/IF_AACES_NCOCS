@@ -8,8 +8,7 @@ path <- fs::path("","Volumes","Peres_Research")
 clinical_data <-
   read_csv(paste0(path,
       "/K99_R00/Image analysis data/AACES and NCOCS data/aaces_ncocs_03042020.csv"
-    )) %>% 
-  select(c("avatar_id","TCC_ID","Date_of_Birth", "Gender", "Ethnicity", "Race"))
+    ))
 #-----------------------------------------------------------------------------------------------------------------
 cases_match <-
   readxl::read_xlsx(paste0(path,
