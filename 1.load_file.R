@@ -2,7 +2,8 @@
 library(tidyverse)
 
 
-# I REALLY need to change the var name !!! :|
+# Need create draek
+# Change var name aka remove spaces
 
 
 
@@ -81,59 +82,65 @@ common_ROITMA_IDs <-
 #-----------------------------------------------------------------------------------------------------------------
 
 
-
 # II  ### Data Cleaning
 
 # IIa ### TMA data
 # Fisrt need to 
-# 1-verify that core removed ARE removed from TMA data
-uid <- paste(unique(TMAremove_tumor[1]), collapse = '|')
+## 1-verify that core removed ARE removed from TMA data
+uid <- paste(unique(TMAremove_tumor[1]), collapse = "|")
 TMA_tumor <-
   TMA_tumor[(!grepl(uid, TMA_tumor$`Image Tag`)), ]
 TMA_stroma <-
   TMA_stroma[(!grepl(uid, TMA_stroma$`Image Tag`)),]
 
-uid <- paste(unique(TMA2remove_tumor[1]), collapse = '|')
+uid <- paste(unique(TMA2remove_tumor[1]), collapse = "|")
 TMA2_tumor <-
   TMA2_tumor[(!grepl(uid, TMA2_tumor$`Image Tag`)),]
 TMA2_stroma <-
   TMA2_stroma[(!grepl(uid, TMA2_stroma$`Image Tag`)),]
-
-# 2-bind TMA together
+## 2-bind TMA together
 TMA_tumor <- 
-  bind_rows(TMA_tumor,TMA2_tumor, .id = "TMA")
+  bind_rows(TMA_tumor,TMA2_tumor, .id = "TMA") %>% 
+  rename(image_tag = `Image Tag`)
 TMA_stroma <- 
-  bind_rows(TMA_stroma,TMA2_stroma, .id = "TMA")
+  bind_rows(TMA_stroma,TMA2_stroma, .id = "TMA") %>% 
+  rename(image_tag = `Image Tag`)
 
 
 # IIb ### ROI data
 # 1-verify that core removed ARE removed from ROI data
 ROI_remove <- ROI_remove %>% filter(REMOVED == "REMOVE" | is.na(REMOVED)) # only 84 after removin the to keep tag
-uid <- paste(unique(ROI_remove[1]), collapse = '|')
+uid <- paste(unique(ROI_remove[1]), collapse = "|")
 ROI_tumor <-
-  ROI_tumor[(!grepl(uid, ROI_tumor$`Image Tag`)), ]
+  ROI_tumor[(!grepl(uid, ROI_tumor$`Image Tag`)), ] %>% 
+  rename(image_tag = `Image Tag`)
 ROI_stroma <-
-  ROI_stroma[(!grepl(uid, ROI_stroma$`Image Tag`)),]
+  ROI_stroma[(!grepl(uid, ROI_stroma$`Image Tag`)),] %>% 
+  rename(image_tag = `Image Tag`)
 
 
 # III-Remove the TMA IDs from patient excluded from the study
-uid <- paste(unique(TMAcases_remove$Subject_IDs), collapse = '|')
+# Should only be done for TMAs
+# Remove TMA with no IDs = controls images
+uid <- paste(unique(TMAcases_remove$Subject_IDs), collapse = "|")
 TMA_tumor <-
-  TMA_tumor[(!grepl(uid, TMA_tumor$suid)), ]
+  TMA_tumor[(!grepl(uid, TMA_tumor$suid)), ] %>% 
+  filter(!is.na(suid))
 TMA_stroma <-
-  TMA_stroma[(!grepl(uid, TMA_stroma$suid)),]
+  TMA_stroma[(!grepl(uid, TMA_stroma$suid)),] %>% 
+  filter(!is.na(suid))
 
-
-What are the IDs
-ROI_tumor <-
-  ROI_tumor[(!grepl(uid, ROI_tumor$)), ]
-ROI_stroma <-
-  ROI_stroma[(!grepl(uid, ROI_stroma$)),]
+# Did it for ROIs too in case -> no change / good
+ROI_tumor$suid <- substr(ROI_tumor$image_tag, start = 10, stop = 14)
+# ROI_tumor <-
+#   ROI_tumor[(!grepl(uid, ROI_tumor$suid)), ]
+ROI_stroma$suid <- substr(ROI_stroma$image_tag, start = 10, stop = 14)
+# ROI_stroma <-
+#   ROI_stroma[(!grepl(uid, ROI_stroma$suid)), ]
 
 # Cleaning
 rm(TMAremove_tumor, TMA2remove_tumor, TMA2_tumor, TMA2_stroma, ROI_remove, TMAcases_remove, uid)
 
-colnames(ROI_stroma)
 
 
 
