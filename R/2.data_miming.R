@@ -18,7 +18,7 @@ TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma,
   mutate(total_cell_number = Tumor:_Total_Cells + Stroma:_Total_Cells) %>% 
   mutate(percent_tumor = round((Tumor:_Total_Cells / total_cell_number)*100, 2)) %>% 
   mutate(percent_stroma = round((Stroma:_Total_Cells / total_cell_number)*100, 2)) 
-ROI_global$tu
+
 
 # ROI_global <- ROI_global %>% 
 #   mutate(total_cell_number = Tumor:_Total_Cells + Stroma:_Total_Cells) %>% 
