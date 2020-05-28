@@ -10,7 +10,9 @@ library(tidyverse)
 # I  ### Load data
 
 path <- fs::path("","Volumes","Peres_Research")
-fct_name_repair <- function(colnms) tolower(gsub(" |:", "_", colnms))
+fct_name_repair <- function(colnms) {
+  tolower(gsub("[ ():]", "_", colnms))
+}
 #-----------------------------------------------------------------------------------------------------------------
 clinical_data <-
   read_csv(paste0(path,
@@ -25,13 +27,15 @@ ROI_stroma <-
   readxl::read_xlsx(paste0(path,
       "/K99_R00/Image analysis data/Immune marker count data/Peres P1 ROI Analysis with location_updated 1-24-2020.xlsx"
   ), sheet = "Stroma", .name_repair = fct_name_repair)
-ROI_remove <-
-  readxl::read_xlsx(paste0(path,
-                           "/K99_R00/Image analysis data/Immune marker count data/Peres P1 ROI Analysis with location_updated 1-24-2020.xlsx"
-  ), sheet = "Analysis Info", skip = 24) %>% 
-  select(c(1, 5)) %>% 
-  `colnames<-`(c("image_tag", "REMOVED")) %>% 
-  drop_na("image_tag") # 96 - 6 = 90 tag to remove/keep
+#-----------------------------------------------------------------------------------------------------------------
+# No need to read core removed (already removed from data)
+# ROI_remove <-
+#   readxl::read_xlsx(paste0(path,
+#                            "/K99_R00/Image analysis data/Immune marker count data/Peres P1 ROI Analysis with location_updated 1-24-2020.xlsx"
+#   ), sheet = "Analysis Info", skip = 24) %>% 
+#   select(c(1, 5)) %>% 
+#   `colnames<-`(c("image_tag", "REMOVED")) %>% 
+#   drop_na("image_tag")
 #-----------------------------------------------------------------------------------------------------------------
 TMA_tumor <-
   readxl::read_xlsx(paste0(path,
@@ -52,14 +56,14 @@ TMA2_stroma <-
   ), sheet = "Stroma", .name_repair = fct_name_repair)
 #-----------------------------------------------------------------------------------------------------------------
 # No need to read core removed (already removed from data)
-TMAremove_tumor <-
-  readxl::read_xlsx(paste0(path,
-      "/K99_R00/Image analysis data/Immune marker count data/Peres P1 AACES 2017 TMA Summary.xlsx"
-  ), sheet = "Analysis Information", skip = 19)
-TMA2remove_tumor <-
-  readxl::read_xlsx(paste0(path,
-      "/K99_R00/Image analysis data/Immune marker count data/Peres P1 AACES 2018 TMA Summary.xlsx"
-  ), sheet = "Analysis Information", skip = 19)
+# TMAremove_tumor <-
+#   readxl::read_xlsx(paste0(path,
+#       "/K99_R00/Image analysis data/Immune marker count data/Peres P1 AACES 2017 TMA Summary.xlsx"
+#   ), sheet = "Analysis Information", skip = 19)
+# TMA2remove_tumor <-
+#   readxl::read_xlsx(paste0(path,
+#       "/K99_R00/Image analysis data/Immune marker count data/Peres P1 AACES 2018 TMA Summary.xlsx"
+#   ), sheet = "Analysis Information", skip = 19)
 #-----------------------------------------------------------------------------------------------------------------
 TMAcases_remove <-
   read_csv(paste0(path,
@@ -81,63 +85,6 @@ common_ROITMA_IDs <-
                   "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Subject_IDs common TMA ROI.csv"
   ))
 #-----------------------------------------------------------------------------------------------------------------
-
-
-# II  ### Data Cleaning
-
-# IIa ### TMA data
-# Fisrt need to 
-## 1-verify that core removed ARE removed from TMA data
-uid <- paste(unique(TMAremove_tumor[1]), collapse = "|")
-TMA_tumor <-
-  TMA_tumor[(!grepl(uid, TMA_tumor$image_tag)), ]
-TMA_stroma <-
-  TMA_stroma[(!grepl(uid, TMA_stroma$image_tag)),]
-
-uid <- paste(unique(TMA2remove_tumor[1]), collapse = "|")
-TMA2_tumor <-
-  TMA2_tumor[(!grepl(uid, TMA2_tumor$image_tag)),]
-TMA2_stroma <-
-  TMA2_stroma[(!grepl(uid, TMA2_stroma$image_tag)),]
-## 2-bind TMA together
-TMA_tumor <- 
-  bind_rows(TMA_tumor,TMA2_tumor, .id = "TMA")
-TMA_stroma <- 
-  bind_rows(TMA_stroma,TMA2_stroma, .id = "TMA")
-
-
-# IIb ### ROI data
-# 1-verify that core removed ARE removed from ROI data
-ROI_remove <- ROI_remove %>% filter(REMOVED == "REMOVE" | is.na(REMOVED)) # only 84 after removin the to keep tag
-uid <- paste(unique(ROI_remove[1]), collapse = "|")
-ROI_tumor <-
-  ROI_tumor[(!grepl(uid, ROI_tumor$image_tag)), ]
-ROI_stroma <-
-  ROI_stroma[(!grepl(uid, ROI_stroma$image_tag)),]
-
-
-# III-Remove the TMA IDs from patient excluded from the study
-# Should only be done for TMAs
-# Remove TMA with no IDs = controls images
-uid <- paste(unique(TMAcases_remove$Subject_IDs), collapse = "|")
-TMA_tumor <-
-  TMA_tumor[(!grepl(uid, TMA_tumor$suid)), ] %>% 
-  filter(!is.na(suid))
-TMA_stroma <-
-  TMA_stroma[(!grepl(uid, TMA_stroma$suid)),] %>% 
-  filter(!is.na(suid))
-
-# Did it for ROIs too in case -> no change / good
-ROI_tumor$suid <- substr(ROI_tumor$image_tag, start = 10, stop = 14)
-# ROI_tumor <-
-#   ROI_tumor[(!grepl(uid, ROI_tumor$suid)), ]
-ROI_stroma$suid <- substr(ROI_stroma$image_tag, start = 10, stop = 14)
-# ROI_stroma <-
-#   ROI_stroma[(!grepl(uid, ROI_stroma$suid)), ]
-
-# Cleaning
-rm(TMAremove_tumor, TMA2remove_tumor, TMA2_tumor, TMA2_stroma, ROI_remove, TMAcases_remove, uid, fct_name_repair)
-
 
 
 
