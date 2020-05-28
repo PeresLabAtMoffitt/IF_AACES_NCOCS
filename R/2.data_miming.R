@@ -37,6 +37,12 @@ table <- matrix(c("", "Tumor", "Stroma",
                   "range", 
                   paste(range(TMA_global$percent_tumor)[1],range(TMA_global$percent_tumor)[2], sep = "-"), 
                   paste(range(TMA_global$percent_stroma)[1],range(TMA_global$percent_stroma)[2], sep = "-"),
+                  "variance", 
+                  round(var(x= TMA_global$percent_tumor),2),
+                  round(var(x= TMA_global$percent_stroma),2),
+                  "sd",
+                  round(sd(x= TMA_global$percent_tumor),2),
+                  round(sd(x= TMA_global$percent_stroma),2),
                   "ROIs", "", "",
                   "intratumoral", "", "",
                   "mean",
@@ -56,6 +62,12 @@ table <- matrix(c("", "Tumor", "Stroma",
                     range(x= filter(ROI_global, `Intratumoral (i) vs Peripheral (p).x` == "i")$percent_stroma)[2],
                     sep = "-"
                   ),
+                  "variance", 
+                  round(var(x= filter(ROI_global, `Intratumoral (i) vs Peripheral (p).x` == "i")$percent_tumor),2),
+                  round(var(x= filter(ROI_global, `Intratumoral (i) vs Peripheral (p).x` == "i")$percent_stroma),2),
+                  "sd",
+                  round(sd(x= filter(ROI_global, `Intratumoral (i) vs Peripheral (p).x` == "i")$percent_tumor),2),
+                  round(sd(x= filter(ROI_global, `Intratumoral (i) vs Peripheral (p).x` == "i")$percent_stroma),2),
                   "peripheral", "", "",
                   "mean",
                   round(mean(x= filter(ROI_global, `Intratumoral (i) vs Peripheral (p).x` == "p")$percent_tumor),2),
@@ -73,7 +85,17 @@ table <- matrix(c("", "Tumor", "Stroma",
                     range(x= filter(ROI_global, `Intratumoral (i) vs Peripheral (p).x` == "p")$percent_stroma)[1],
                     range(x= filter(ROI_global, `Intratumoral (i) vs Peripheral (p).x` == "p")$percent_stroma)[2],
                     sep = "-"
-                  )
+                  ),
+                  "variance", 
+                  round(var(x= filter(ROI_global, `Intratumoral (i) vs Peripheral (p).x` == "p")$percent_tumor),2),
+                  round(var(x= filter(ROI_global, `Intratumoral (i) vs Peripheral (p).x` == "p")$percent_stroma),2),
+                  "sd",
+                  round(sd(x= filter(ROI_global, `Intratumoral (i) vs Peripheral (p).x` == "p")$percent_tumor),2),
+                  round(sd(x= filter(ROI_global, `Intratumoral (i) vs Peripheral (p).x` == "p")$percent_stroma),2)
 ), ncol = 3, byrow = TRUE)
 write.csv(table, 
           paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Summary tumor, stroma in TMAs and ROIs.csv"))
+
+
+
+
