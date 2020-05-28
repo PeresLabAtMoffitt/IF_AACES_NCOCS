@@ -10,7 +10,7 @@ library(tidyverse)
 # I  ### Load data
 
 path <- fs::path("","Volumes","Peres_Research")
-fct_name_repair <- function(colnms) tolower(gsub(" ", "_", colnms))
+fct_name_repair <- function(colnms) tolower(gsub(" |:", "_", colnms))
 #-----------------------------------------------------------------------------------------------------------------
 clinical_data <-
   read_csv(paste0(path,
