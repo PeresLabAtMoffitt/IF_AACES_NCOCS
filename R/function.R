@@ -1,7 +1,7 @@
 
 # I  ### Load data
 
-
+path <- fs::path("","Volumes","Peres_Research")
 fct_name_repair <- function(colnms) {
   tolower(gsub("[ ():]", "_", colnms))
 }
