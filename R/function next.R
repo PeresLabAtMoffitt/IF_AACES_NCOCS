@@ -46,10 +46,10 @@ TMA_stroma <-
   filter(!is.na(suid))
 
 # Did it for ROIs too in case  #------------------ All good so not run anymore but still create suid 
-ROI_tumor$suid <- substr(ROI_tumor$image_tag, start = 10, stop = 14)
+ROI_tumor$suid <- substr(ROI_tumor$image_tag, start = 10, stop = 15)
 # ROI_tumor <-
 #   ROI_tumor[(!grepl(uid, ROI_tumor$suid)), ]
-ROI_stroma$suid <- substr(ROI_stroma$image_tag, start = 10, stop = 14)
+ROI_stroma$suid <- substr(ROI_stroma$image_tag, start = 10, stop = 15)
 # ROI_stroma <-
 #   ROI_stroma[(!grepl(uid, ROI_stroma$suid)), ]
 
@@ -89,9 +89,9 @@ TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma,
                                all = TRUE) %>% 
   mutate(total_cell_number = tumor__total_cells + stroma__total_cells
          ) %>% 
-  mutate(g_percent_tumor = round((tumor__total_cells / total_cell_number)*100, 2)
+  mutate(percent_tumor = round((tumor__total_cells / total_cell_number)*100, 2)
          ) %>% 
-  mutate(g_percent_stroma = round((stroma__total_cells / total_cell_number)*100, 2)
+  mutate(percent_stroma = round((stroma__total_cells / total_cell_number)*100, 2)
          ) %>% 
   mutate(suid.x = factor(suid.x))
 
