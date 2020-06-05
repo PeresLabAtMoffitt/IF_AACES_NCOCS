@@ -26,7 +26,7 @@ variations <- merge.data.frame(variations, variations_ROIip,
   mutate(ID = seq(1:nrow(.)))
 
 
-jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_1.jpg"))
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_1.jpg"))
 ggplot(variations, aes(x=suid.x, y=mean_tumor_tma)) +
   geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_tma), color="skyblue") +
   geom_point(color="blue", size=1, alpha=0.6) +
@@ -40,9 +40,9 @@ ggplot(variations, aes(x=suid.x, y=mean_tumor_tma)) +
   ) +
   labs(x=paste(length(variations$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% of Tumor Cell Present in TMAs per Patient",
        subtitle = "Each point represent the mean of up to 3 values")
-dev.off()
+# dev.off()
 
-jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_2.jpg"))
+# peg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_2.jpg"))
 ggplot(variations, aes(x=suid.x, y=mean_tumor_roi)) +
   geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi), color="skyblue") +
   geom_point(color="blue", size=1, alpha=0.6) +
@@ -56,7 +56,7 @@ ggplot(variations, aes(x=suid.x, y=mean_tumor_roi)) +
   ) +
   labs(x=paste(length(variations$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% of Tumor Cell Present in ROIs per Patient",
        subtitle = "Each point represent the mean of up to 3 values")
-dev.off()
+# dev.off()
 
 jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_1.jpg"))
 ggplot(variations, aes(x=ID, y=tumor_variation_tma, colour = tumor_variation_tma>0)) +
@@ -212,12 +212,45 @@ dev.off()
 
 
 #
+# Back to back 
+
+ggplot(variations, aes(x=suid.x)) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_tma), color="skyblue") +
+  geom_point(aes(y=mean_tumor_tma), color="blue", size=1, alpha=0.6) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi), color="#FF9999", 
+                position = position_nudge(x = 0.5, y = 0)) +
+  geom_point(aes(y=mean_tumor_roi) , color="red", size=1, alpha=0.6, 
+             position = position_nudge(x = 0.5, y = 0))# + 
+  # geom_segment(aes(x = 2, y = 15, xend = 2, yend = 25),
+  #                arrow = arrow(length = unit(0.5, "cm")))
+
+
+
+
+variations %>% mutate(mean_tumor_roi = -1*mean_tumor_roi) %>% 
+  ggplot(aes(x=suid.x)) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_tma), color="skyblue") +
+  geom_point(aes(y=mean_tumor_tma), color="blue", size=1, alpha=0.6) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi), color="#FF9999") +
+  geom_point(aes(y=mean_tumor_roi) , color="red", size=1, alpha=0.6) +
+  scale_y_continuous(breaks = c(-100, -50, 0, 50, 100),
+                     labels = abs(c(-100, -50, 0, 50, 100))) +
+  geom_hline(yintercept = 0) +
+  theme_minimal()
+
+
+#
 
 
 
 
 
+  
+  
+  
+  
 
+# End
 
 # Cleaning
 rm(common_ROITMA_IDs, variations_TMA, variations_ROI, variations_ROIip)

@@ -17,10 +17,10 @@
 
 
 ## 2-bind TMA together
-TMA_tumor <- 
-  bind_rows(TMA_tumor,TMA2_tumor, .id = "TMA")
-TMA_stroma <- 
-  bind_rows(TMA_stroma,TMA2_stroma, .id = "TMA")
+# TMA_tumor <- 
+#   bind_rows(TMA_tumor,TMA2_tumor, .id = "TMA")
+# TMA_stroma <- 
+#   bind_rows(TMA_stroma,TMA2_stroma, .id = "TMA")
 
 
 # IIb ### ROI data
