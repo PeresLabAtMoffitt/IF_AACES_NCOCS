@@ -21,4 +21,3 @@ loadd(clinical_data, ROI_tumor ,ROI_stroma ,TMA_tumor ,TMA_stroma,
 
 
 
-

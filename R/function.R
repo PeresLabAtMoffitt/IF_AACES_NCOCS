@@ -59,8 +59,10 @@ common_ROITMA_import <- function(path){
   read_csv(paste0(path,
                   "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Subject_IDs common TMA ROI.csv"))
 }
+#-----------------------------------------------------------------------------------------------------------------
 
-
-
-
+# Start Data Cleaning
+binding <- function(data1, data2){
+  bind_rows(data1, data2, .id = "TMA")
+}
  
