@@ -36,10 +36,6 @@ plan <- drake_plan(
   
   
   ## 2-bind TMA together
-  # TMA_tumor <- 
-  #   bind_rows(TMA_tumor,TMA2_tumor, .id = "TMA")
-  # TMA_stroma <- 
-  #   bind_rows(TMA_stroma,TMA2_stroma, .id = "TMA")
   TMA_tumor = binding(TMA1_tumor,TMA2_tumor),
   TMA_stroma = binding(TMA1_stroma,TMA2_stroma) 
 

@@ -105,9 +105,9 @@ common_ROITMA_IDs <-
 
 ## 2-bind TMA together
 TMA_tumor <-
-  bind_rows(TMA_tumor,TMA2_tumor, .id = "TMA")
+  bind_rows(TMA1_tumor,TMA2_tumor, .id = "TMA")
 TMA_stroma <-
-  bind_rows(TMA_stroma,TMA2_stroma, .id = "TMA")
+  bind_rows(TMA1_stroma,TMA2_stroma, .id = "TMA")
 
 
 # IIb ### ROI data

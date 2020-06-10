@@ -277,8 +277,7 @@ ggplot(variations, aes(x=suid.x)) +
 
   
   
-  
-  
+
 
 # End
 
