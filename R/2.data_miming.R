@@ -64,6 +64,8 @@ table <- matrix(c("", "Tumor", "Stroma",
 # write.csv(table, 
 #           paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Summary tumor, stroma in TMAs and ROIs.csv"))
 # rm(table)
+
+
 # TMA
 jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/hist TMA tumor vs stroma-yaxis.jpg"),
      width = 350, height = 350)
