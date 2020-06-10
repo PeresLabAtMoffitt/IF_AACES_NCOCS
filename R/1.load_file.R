@@ -2,10 +2,7 @@
 library(tidyverse)
 
 
-# Need create draek
-# Change var name aka remove spaces
-
-
+# Do not run if using drake
 
 # I  ### Load data
 
@@ -85,6 +82,43 @@ common_ROITMA_IDs <-
                   "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Subject_IDs common TMA ROI.csv"
   ))
 #-----------------------------------------------------------------------------------------------------------------
+
+# Start Data Cleaning
+
+# II  ### Data Cleaning
+
+# IIa ### TMA data
+
+## 1-verify that core removed ARE removed from TMA data  #-------------- All good so not run anymore
+# uid <- paste(unique(TMAremove_tumor[1]), collapse = "|")
+# TMA_tumor <-
+#   TMA_tumor[(!grepl(uid, TMA_tumor$image_tag)), ]
+# TMA_stroma <-
+#   TMA_stroma[(!grepl(uid, TMA_stroma$image_tag)),]
+# 
+# uid <- paste(unique(TMA2remove_tumor[1]), collapse = "|")
+# TMA2_tumor <-
+#   TMA2_tumor[(!grepl(uid, TMA2_tumor$image_tag)),]
+# TMA2_stroma <-
+#   TMA2_stroma[(!grepl(uid, TMA2_stroma$image_tag)),]
+
+
+## 2-bind TMA together
+TMA_tumor <-
+  bind_rows(TMA_tumor,TMA2_tumor, .id = "TMA")
+TMA_stroma <-
+  bind_rows(TMA_stroma,TMA2_stroma, .id = "TMA")
+
+
+# IIb ### ROI data
+# 1-verify that core removed ARE removed from ROI data  #--------------- All good so not run anymore
+# ROI_remove <- ROI_remove %>% 
+#   filter(REMOVED == "REMOVE" | is.na(REMOVED)) # only 84 after removin the to keep tag
+# uid <- paste(unique(ROI_remove[1]), collapse = "|")
+# ROI_tumor <-
+#   ROI_tumor[(!grepl(uid, ROI_tumor$image_tag)), ]
+# ROI_stroma <-
+#   ROI_stroma[(!grepl(uid, ROI_stroma$image_tag)),]
 
 
 
