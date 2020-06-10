@@ -8,7 +8,7 @@ library(tidyverse)
 
 path <- fs::path("","Volumes","Peres_Research")
 fct_name_repair <- function(colnms) {
-  tolower(gsub("[ ():]", "_", colnms))
+  tolower(gsub("[ ():+²]", "_", colnms))
 }
 #-----------------------------------------------------------------------------------------------------------------
 clinical_data <-

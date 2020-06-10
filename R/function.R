@@ -3,7 +3,7 @@
 
 path <- fs::path("","Volumes","Peres_Research")
 fct_name_repair <- function(colnms) {
-  tolower(gsub("[ ():]", "_", colnms))
+  tolower(gsub("[ ():+²]", "_", colnms))
 }
 data_import <- function(data_path){
   read_csv(paste0(data_path,
