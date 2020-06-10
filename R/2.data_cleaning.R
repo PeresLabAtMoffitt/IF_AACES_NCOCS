@@ -47,7 +47,17 @@ ROI_global <- merge.data.frame(ROI_tumor, ROI_stroma,
     intratumoral__i__vs_peripheral__p_.x == "p" ~ "Peripheral",
     intratumoral__i__vs_peripheral__p_.x == "i" ~ "Intratumoral")
     ) %>% 
-  mutate(suid.x = factor(suid.x))
+  mutate(suid.x = factor(suid.x)) %>% 
+  mutate(CD3_tumor_mm2 = (tumor__cd3__opal_650__positive_cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD3_stroma_mm2 = (stroma__cd3__opal_650__positive_cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD3_CD8_tumor_mm2 = (tumor__cd3__cd8__cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD3_CD8_stroma_mm2 = (stroma__cd3__cd8__cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD3_FoxP3_tumor_mm2 = (tumor__cd3__foxp3__cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD3_FoxP3_stroma_mm2 = (stroma__cd3__foxp3__cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD11b_tumor = (tumor__cd11b__opal_620__positive_cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD11b_stroma = (stroma__cd11b__opal_620__positive_cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD11b_CD15_tumor_mm2 = (tumor__cd11b__cd15__cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD11b_CD15_stroma_mm2 = stroma__cd11b__cd15__cells/tumor__area_analyzed__mm__)
 
 TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma,
                                by.x = "image_tag", by.y = "image_tag",
@@ -58,8 +68,17 @@ TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma,
          ) %>% 
   mutate(percent_stroma = round((stroma__total_cells / total_cell_number)*100, 2)
          ) %>% 
-  mutate(suid.x = factor(suid.x))
-
+  mutate(suid.x = factor(suid.x)) %>% 
+  mutate(CD3_tumor_mm2 = (tumor__cd3__opal_650__positive_cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD3_stroma_mm2 = (stroma__cd3__opal_650__positive_cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD3_CD8_tumor_mm2 = (tumor__cd3__cd8__cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD3_CD8_stroma_mm2 = (stroma__cd3__cd8__cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD3_FoxP3_tumor_mm2 = (tumor__cd3__foxp3__cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD3_FoxP3_stroma_mm2 = (stroma__cd3__foxp3__cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD11b_tumor = (tumor__cd11b__opal_620__positive_cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD11b_stroma = (stroma__cd11b__opal_620__positive_cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD11b_CD15_tumor_mm2 = (tumor__cd11b__cd15__cells/tumor__area_analyzed__mm__)) %>% 
+  mutate(CD11b_CD15_stroma_mm2 = stroma__cd11b__cd15__cells/tumor__area_analyzed__mm__)
 
 variations_TMA <- group_by(TMA_global, suid.x) %>% 
   summarize(mean_tumor = mean(percent_tumor), mean_stroma = mean(percent_stroma)) %>% 
