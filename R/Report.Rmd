@@ -1,0 +1,770 @@
+---
+title: "Report June 11th 2020"
+author: "Christelle M Colin-Leitzinger"
+date: "6/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE,
+                      cache = FALSE,
+                      fig.width = 10, fig.height = 7)
+```
+<br>
+
+***
+# Report
+
+```{r library, include=FALSE}
+library(drake)
+library(tidyverse)
+library(data.table)
+```
+
+```{r}
+loadd(clinical_data, ROI_tumor ,ROI_stroma ,TMA_tumor ,TMA_stroma, 
+      TMA2_tumor, TMA2_stroma, TMAcases_remove,
+      common_ROITMA_IDs)
+```
+## Data
+Loading of clinical data, TMAs and ROIs data.
+**Clinical Data** is not cleaned yet.
+```{r }
+head(clinical_data)
+```
+I separated tumor and stroma in different dataframes.
+```{r}
+dim(TMA_tumor)
+dim(TMA_stroma)
+dim(ROI_tumor)
+dim(ROI_stroma)
+```
+## Cleaning 
+I made sure that all "removed core" the present in the 3rd tab of TMAs and ROIs files were removed.
+I also removed the 4 cases which were excluded in TMAs.
+```{r}
+# III-Remove the TMA IDs from patient excluded from the study
+# Should only be done for TMAs
+# Plus remove TMA with no IDs = controls images
+uid <- paste(unique(TMAcases_remove$Subject_IDs), collapse = "|")
+TMA_tumor <-
+  TMA_tumor[(!grepl(uid, TMA_tumor$suid)), ] %>% 
+  filter(!is.na(suid))
+TMA_stroma <-
+  TMA_stroma[(!grepl(uid, TMA_stroma$suid)),] %>% 
+  filter(!is.na(suid))
+
+# Did it for ROIs too in case  #------------------ All good so don't run anymore but still create suid 
+ROI_tumor$suid <- substr(ROI_tumor$image_tag, start = 10, stop = 15)
+# ROI_tumor <-
+#   ROI_tumor[(!grepl(uid, ROI_tumor$suid)), ]
+ROI_stroma$suid <- substr(ROI_stroma$image_tag, start = 10, stop = 15)
+# ROI_stroma <-
+#   ROI_stroma[(!grepl(uid, ROI_stroma$suid)), ]
+
+# Cleaning
+rm(TMA2_tumor, TMA2_stroma, uid, fct_name_repair, # roir_import,
+   data_import, roit_import, rois_import, tmat_import, tmas_import,
+   tma2t_import, tma2s_import, common_ROITMA_import, # tmar_import, 
+   TMAcases_remove, case_remove_import)
+
+
+#-----------------------------------------------------------------------------------------------------------------
+
+# 1.	Calculate the % tumor and % stroma within each ROI/TMA core. 
+# Provide the mean, median, and range of the % tumor and % stroma 
+# for the TMA cores, intratumoral ROIs, and peripheral ROIs. 
+# Also assess the variation by case in terms of the % tumor and % stroma. 
+
+
+
+ROI_global <- merge.data.frame(ROI_tumor, ROI_stroma,
+                               by.x = "image_tag", by.y = "image_tag",
+                               all = TRUE) %>% 
+  mutate(total_cell_number = tumor__total_cells + stroma__total_cells
+         ) %>% 
+  mutate(percent_tumor = round((tumor__total_cells / total_cell_number)*100, 2)
+         ) %>% 
+  mutate(percent_stroma = round((stroma__total_cells / total_cell_number)*100, 2)
+         ) %>% 
+  mutate_at(("intratumoral__i__vs_peripheral__p_.x"), ~ case_when(
+    intratumoral__i__vs_peripheral__p_.x == "p" ~ "Peripheral",
+    intratumoral__i__vs_peripheral__p_.x == "i" ~ "Intratumoral")
+    ) %>% 
+  mutate(suid.x = factor(suid.x))
+
+TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma,
+                               by.x = "image_tag", by.y = "image_tag",
+                               all = TRUE) %>% 
+  mutate(total_cell_number = tumor__total_cells + stroma__total_cells
+         ) %>% 
+  mutate(percent_tumor = round((tumor__total_cells / total_cell_number)*100, 2)
+         ) %>% 
+  mutate(percent_stroma = round((stroma__total_cells / total_cell_number)*100, 2)
+         ) %>% 
+  mutate(suid.x = factor(suid.x))
+dim(TMA_tumor)
+dim(TMA_stroma)
+dim(ROI_tumor)
+dim(ROI_stroma)
+```
+I merged tumor and stroma data using image_tag into the same dataframe.
+**TMA_global dimension**
+```{r }
+dim(TMA_global)
+print(paste("We have", length(unique(TMA_global$suid.x)), "unique ID in TMA with a total of", 
+             length(TMA_global$image_tag), "samples"
+             ))
+```
+
+**ROI_global dimension**
+```{r }
+dim(ROI_global)
+print(paste("We have", length(unique(ROI_global$suid.x)), "unique ID in ROI with a total of", 
+             length(ROI_global$image_tag), "samples"
+             ))
+```
+
+## Tables
+```{r}
+variations_TMA <- group_by(TMA_global, suid.x) %>% 
+  summarize(mean_tumor = mean(percent_tumor), mean_stroma = mean(percent_stroma)) %>% 
+  mutate(ID = seq(1:nrow(.)))# %>% 
+# mutate(suid.x = factor(suid.x))
+
+variations_ROIip <- group_by(ROI_global, suid.x, intratumoral__i__vs_peripheral__p_.x) %>% 
+  summarize(mean_tumor = mean(percent_tumor), mean_stroma = mean(percent_stroma))
+setDT(variations_ROIip)[, ID := .GRP, .(suid.x)]
+
+variations_ROI <- group_by(variations_ROIip, suid.x) %>% 
+  summarize(mean_tumor = mean(mean_tumor), mean_stroma = mean(mean_stroma)) %>% 
+  mutate(ID = seq(1:nrow(.)))
+
+variations_TMA$tumor_variation <- variations_TMA$mean_tumor - mean(TMA_global$percent_tumor)
+variations_TMA$stroma_variation <- variations_TMA$mean_stroma - mean(TMA_global$percent_stroma)
+variations_ROIip$tumor_variation <- variations_ROIip$mean_tumor - mean(ROI_global$percent_tumor)
+variations_ROIip$stroma_variation <- variations_ROIip$mean_stroma - mean(ROI_global$percent_stroma)
+variations_ROI$tumor_variation <- variations_ROI$mean_tumor - mean(ROI_global$percent_tumor)
+variations_ROI$stroma_variation <- variations_ROI$mean_stroma - mean(ROI_global$percent_stroma)
+
+
+```
+Here is a table with the different characteristics:
+
+```{r table}
+table <- matrix(c("", "Tumor", "Stroma",
+                  "TMA", "", "",
+                  "mean", round(mean(TMA_global$percent_tumor),2), round(mean(TMA_global$percent_stroma),2),
+                  "median", median(TMA_global$percent_tumor), median(TMA_global$percent_stroma),
+                  "range", 
+                  paste(range(TMA_global$percent_tumor)[1],range(TMA_global$percent_tumor)[2], sep = "-"), 
+                  paste(range(TMA_global$percent_stroma)[1],range(TMA_global$percent_stroma)[2], sep = "-"),
+                  "variance", 
+                  round(var(x= TMA_global$percent_tumor),2),
+                  round(var(x= TMA_global$percent_stroma),2),
+                  "sd",
+                  round(sd(x= TMA_global$percent_tumor),2),
+                  round(sd(x= TMA_global$percent_stroma),2),
+                  "ROIs", "", "",
+                  "intratumoral", "", "",
+                  "mean",
+                  round(mean(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Intratumoral")$percent_tumor),2),
+                  round(mean(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Intratumoral")$percent_stroma),2),
+                  "median",
+                  median(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Intratumoral")$percent_tumor),
+                  median(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Intratumoral")$percent_stroma),
+                  "range",
+                  paste(
+                    range(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Intratumoral")$percent_tumor)[1],
+                    range(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Intratumoral")$percent_tumor)[2],
+                    sep = "-"
+                  ),
+                  paste(
+                    range(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Intratumoral")$percent_stroma)[1],
+                    range(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Intratumoral")$percent_stroma)[2],
+                    sep = "-"
+                  ),
+                  "variance", 
+                  round(var(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Intratumoral")$percent_tumor),2),
+                  round(var(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Intratumoral")$percent_stroma),2),
+                  "sd",
+                  round(sd(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Intratumoral")$percent_tumor),2),
+                  round(sd(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Intratumoral")$percent_stroma),2),
+                  "peripheral", "", "",
+                  "mean",
+                  round(mean(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Peripheral")$percent_tumor),2),
+                  round(mean(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Peripheral")$percent_stroma),2),
+                  "median",
+                  median(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Peripheral")$percent_tumor),
+                  median(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Peripheral")$percent_stroma),
+                  "range",
+                  paste(
+                    range(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Peripheral")$percent_tumor)[1],
+                    range(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Peripheral")$percent_tumor)[2],
+                    sep = "-"
+                  ),
+                  paste(
+                    range(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Peripheral")$percent_stroma)[1],
+                    range(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Peripheral")$percent_stroma)[2],
+                    sep = "-"
+                  ),
+                  "variance", 
+                  round(var(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Peripheral")$percent_tumor),2),
+                  round(var(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Peripheral")$percent_stroma),2),
+                  "sd",
+                  round(sd(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Peripheral")$percent_tumor),2),
+                  round(sd(x= filter(ROI_global, intratumoral__i__vs_peripheral__p_.x == "Peripheral")$percent_stroma),2)
+), ncol = 3, byrow = TRUE)
+print(table)
+```
+
+## Plots
+
+```{r}
+p1 <- ggplot(TMA_global) +
+  geom_histogram(aes(tumor__total_cells), color = "grey", fill="darkred") +
+  theme_minimal() +
+  ylim(0,100) +
+  labs(x="Tumor", y="count", title="Cell Type Repartition in TMAs")
+p2 <- ggplot(TMA_global) +
+  geom_histogram(aes(stroma__total_cells), color = "grey", fill="steelblue") +
+  theme_minimal() +
+  labs(x="Stroma", y="count", title="Cell Type Repartition in TMAs")
+p3 <- ggplot(ROI_global) +
+  geom_histogram(aes(tumor__total_cells), color = "grey", fill="darkred") +
+  theme_minimal() +
+  scale_y_continuous(limits=c(0,175)) +
+  labs(x="Tumor", y="count", title="Cell Type Repartition in ROIs")
+p4 <- ggplot(ROI_global) +
+  geom_histogram(aes(stroma__total_cells), color = "grey", fill="steelblue") +
+  theme_minimal() +
+  scale_y_continuous(limits=c(0,175)) +
+  labs(x="Stroma", y="count", title="Cell Type Repartition in ROIs")
+gridExtra::grid.arrange(p1, p2, p3, p4, ncol = 2)
+
+
+
+
+```
+But it is a difference between Intratumoral vs Peripheral ROI.
+```{r}
+p1 <- ggplot(ROI_global) +
+  geom_histogram(aes(tumor__total_cells), color = "grey", fill="darkred") +
+  theme_minimal() +
+  scale_y_continuous(limits=c(0,175)) +
+  labs(x="Tumor", y="count") +
+  facet_grid(.~intratumoral__i__vs_peripheral__p_.x)
+p2 <- ggplot(ROI_global) +
+  geom_histogram(aes(stroma__total_cells), color = "grey", fill="steelblue") +
+  theme_minimal() +
+  scale_y_continuous(limits=c(0,175)) +
+  labs(x="Stroma", y="count") +
+  facet_grid(.~intratumoral__i__vs_peripheral__p_.x)
+gridExtra::grid.arrange(p1, p2, nrow = 2,
+                        top = "Cell Type Repartition in ROIs")
+```
+It is easier to see with density plot
+```{r}
+p1 <- ggplot(ROI_global, aes(tumor__total_cells, colour = intratumoral__i__vs_peripheral__p_.x)) +
+  geom_density(alpha=.3) +
+  # scale_color_discrete(labels = c("intra", "periph")) +
+  theme_minimal() +
+  labs(x="Tumor", y="Sample Count", color='Sample \nPosition')
+p2 <- ggplot(ROI_global, aes(stroma__total_cells, colour = intratumoral__i__vs_peripheral__p_.x)) +
+  geom_density(alpha=.3) +
+  # scale_color_discrete(labels = c("intra", "periph")) +
+  theme_minimal() +
+  labs(x="Stroma", y="Sample Count", color='Sample \nPosition')
+p3 <- ggplot(ROI_global, aes(tumor__total_cells, linetype=intratumoral__i__vs_peripheral__p_.x, color = "tumor")) +
+  geom_density(fill = "darkred", alpha = .3) +
+  geom_density(aes(stroma__total_cells, linetype=intratumoral__i__vs_peripheral__p_.x), color = "steelblue") +
+  theme_minimal() +
+  scale_linetype_manual(name = "Sample \nPosition", labels = c("Intratumoral", "Peripheral"), values = 1:2) +
+  labs(x="Amount of Cell", y="Sample Count", color="Cell Type")
+gridExtra::grid.arrange(p1, p2, p3, ncol = 2,
+                        top = "Cell Type Repartition in ROIs")
+```
+In TMA, it is more simple
+```{r}
+ggplot(TMA_global, aes(tumor__total_cells, color = "Tumor")) +
+  geom_density() +
+  geom_density(aes(stroma__total_cells, color = "Stroma")) +
+  theme_minimal() +
+  scale_linetype_manual(name = "Sample \nPosition", values = 1:2) +
+  labs(x="Amount of Cell", y="Sample Count", title="Cell Type Repartition in TMAs", color="Cell Type")
+```
+***
+## Variations
+
+```{r}
+p1 <- ggplot(variations_TMA, aes(x=suid.x, y=mean_tumor)) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor), color="skyblue") +
+  geom_point(color="blue", size=1, alpha=0.6) +
+  theme_light() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  labs(x=paste(length(variations_TMA$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% of Tumor Cell Present in TMAs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+
+
+p2 <- ggplot(variations_ROI, aes(x=suid.x, y=mean_tumor)) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor), color="skyblue") +
+  geom_point(color="blue", size=1, alpha=0.6) +
+  theme_light() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  labs(x=paste(length(variations_ROI$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% of Tumor Cell Present in ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+gridExtra::grid.arrange(p1, p2, ncol = 2,
+                        top = "Cell Type Repartition in ROIs")
+```
+We may have less variations between patients with the ROI but need to look at intratumoral vs Peripheral.
+I tried to take a look at the variation of samples compare to the mean of all samples.
+
+```{r}
+ggplot(variations_TMA, aes(x=ID, y=tumor_variation, colour = tumor_variation>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=tumor_variation)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations_TMA$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% Tumor Cell Present in TMAs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+
+
+ggplot(variations_TMA, aes(x=ID, y=stroma_variation, colour = stroma_variation>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=stroma_variation)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations_TMA$ID), "Patients IDs"), y="% Stromal Cell (mean)", title="% Stromal Cell Present in TMAs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+
+
+ggplot(variations_ROI, aes(x=ID, y=tumor_variation, colour = tumor_variation>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=tumor_variation)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations_ROI$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% Tumor Cell Present in ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 6 values")
+
+
+ggplot(variations_ROI, aes(x=ID, y=stroma_variation, colour = stroma_variation>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=stroma_variation)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations_ROI$ID), "Patients IDs"), y="% Stromal Cell (mean)", title="% Stromal Cell Present in ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 6 values")
+
+
+variations_ROIip %>% 
+  filter(intratumoral__i__vs_peripheral__p_.x == "Intratumoral") %>% 
+ggplot( aes(x=ID, y=tumor_variation, colour = tumor_variation>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=tumor_variation)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations_ROI$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% Tumor Cell Present in Intratumoral ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+
+
+variations_ROIip %>% 
+  filter(intratumoral__i__vs_peripheral__p_.x == "Peripheral") %>% 
+  ggplot( aes(x=ID, y=tumor_variation, colour = tumor_variation>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=tumor_variation)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations_ROI$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% Tumor Cell Present in Peripheral ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+
+
+variations_ROIip %>% 
+  filter(intratumoral__i__vs_peripheral__p_.x == "Intratumoral") %>% 
+  ggplot( aes(x=ID, y=stroma_variation, colour = stroma_variation>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=stroma_variation)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(nrow(variations_ROIip %>% filter(intratumoral__i__vs_peripheral__p_.x == "Intratumoral")), "Patients IDs"), y="% Stromal Cell (mean)", title="% Stromal Cell Present in Intratumoral ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+
+
+variations_ROIip %>% 
+  filter(intratumoral__i__vs_peripheral__p_.x == "Peripheral") %>% 
+  ggplot( aes(x=ID, y=stroma_variation, colour = stroma_variation>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=stroma_variation)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(nrow(variations_ROIip %>% filter(intratumoral__i__vs_peripheral__p_.x == "Peripheral")), "Patients IDs"), y="% Stromal Cell (mean)", title="% Stromal Cell Present in Peripheral ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+```
+***
+## Comparison for the patients whith ROIs and TMA
+**variations dataframe**
+```{r}
+uid <- paste(unique(common_ROITMA_IDs$Subject_IDs), collapse = '|')
+variations_TMA <- variations_TMA[(grepl(uid, variations_TMA$suid.x)),]
+variations_ROI <- variations_ROI[(grepl(uid, variations_ROI$suid.x)),]
+variations_ROIi <- variations_ROIip[(grepl(uid, variations_ROIip$suid.x)),] %>% 
+  filter(intratumoral__i__vs_peripheral__p_.x == "Intratumoral")
+variations_ROIp <- variations_ROIip[(grepl(uid, variations_ROIip$suid.x)),] %>% 
+  filter(intratumoral__i__vs_peripheral__p_.x == "Peripheral")
+
+variations <- merge.data.frame(variations_TMA %>% 
+                                 select(-ID), 
+                               variations_ROI %>% 
+                                 select(-ID),
+                               by.x = "suid.x", by.y = "suid.x",
+                               all = TRUE, suffixes = c("_tma", "_roi"))
+variations_ROIip <- merge.data.frame(variations_ROIi %>% 
+                                       select(-ID),
+                                     variations_ROIp %>% 
+                                       select(-ID),
+                                     by.x = "suid.x", by.y = "suid.x",
+                                     all = TRUE, suffixes = c("_roi_i", "_roi_p"))
+variations <- merge.data.frame(variations, variations_ROIip,
+                               by.x = "suid.x", by.y = "suid.x",
+                               all = TRUE) %>% 
+  mutate(ID = seq(1:nrow(.)))
+dim(variations)
+```
+### Plots
+```{r}
+ggplot(variations, aes(x=suid.x, y=mean_tumor_tma)) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_tma), color="skyblue") +
+  geom_point(color="blue", size=1, alpha=0.6) +
+  theme_light() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% of Tumor Cell Present in TMAs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+# dev.off()
+
+# peg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_2.jpg"))
+ggplot(variations, aes(x=suid.x, y=mean_tumor_roi)) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi), color="skyblue") +
+  geom_point(color="blue", size=1, alpha=0.6) +
+  theme_light() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% of Tumor Cell Present in ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+# dev.off()
+
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_1.jpg"))
+ggplot(variations, aes(x=ID, y=tumor_variation_tma, colour = tumor_variation_tma>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=tumor_variation_tma)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% Tumor Cell Present in TMAs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+# dev.off()
+
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_3.jpg"))
+ggplot(variations, aes(x=ID, y=stroma_variation_tma, colour = stroma_variation_tma>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=stroma_variation_tma)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Stromal Cell (mean)", title="% Stromal Cell Present in TMAs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+# dev.off()
+
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_4.jpg"))
+ggplot(variations, aes(x=ID, y=tumor_variation_roi, colour = tumor_variation_roi>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=tumor_variation_roi)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% Tumor Cell Present in ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 6 values")
+# dev.off()
+
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_5.jpg"))
+ggplot(variations, aes(x=ID, y=stroma_variation_roi, colour = stroma_variation_roi>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=stroma_variation_roi)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Stromal Cell (mean)", title="% Stromal Cell Present in ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 6 values")
+# dev.off()
+
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_6.jpg"))
+ggplot(variations, aes(x=ID, y=tumor_variation_roi_i, colour = tumor_variation_roi_i>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=tumor_variation_roi_i)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% Tumor Cell Present in Intratumoral ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+# dev.off()
+
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_7.jpg"))
+ggplot(variations, aes(x=ID, y=stroma_variation_roi_i, colour = stroma_variation_roi_i>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=stroma_variation_roi_i)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Stromal Cell (mean)", title="% Stromal Cell Present in Intratumoral ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+# dev.off()
+
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_8.jpg"))
+ggplot(variations, aes(x=ID, y=tumor_variation_roi_p, colour = tumor_variation_roi_p>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=tumor_variation_roi_p)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% Tumor Cell Present in Peripheral ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+# dev.off()
+
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_9.jpg"))
+ggplot(variations, aes(x=ID, y=stroma_variation_roi_p, colour = stroma_variation_roi_p>0)) +
+  annotate("text", x = .25, y = "mean", label = "High", color = "#8707A6FF", size = 3, hjust = 0, vjust = 1) +
+  annotate("text", x = .25, y = "", label = "Low", color = "#00204DFF", size = 3, hjust = 2, vjust = 1) +
+  geom_segment(aes(x=ID, xend=ID, y=0, yend=stroma_variation_roi_p)) +
+  geom_point(size=1, alpha=0.6) +
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank()
+  ) +
+  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Stromal Cell (mean)", title="% Stromal Cell Present in Peripheral ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values")
+# dev.off()
+
+
+#
+# Back to back 
+  # geom_segment(aes(x = 2, y = 15, xend = 2, yend = 25),
+  #                arrow = arrow(length = unit(0.5, "cm")))
+
+ggplot(variations, aes(x=suid.x)) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_tma, color="TMA"))+
+  geom_point(aes(y=mean_tumor_tma), color="blue", size=1, alpha=0.6) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi, color="ROI"), 
+                position = position_nudge(x = 0.5, y = 0))+
+  geom_point(aes(y=mean_tumor_roi) , color="red", size=1, alpha=0.6, 
+             position = position_nudge(x = 0.5, y = 0)) + 
+  theme_minimal() + 
+  coord_flip()+
+  scale_color_discrete(name="Samples from")+
+  scale_color_manual(values = c("#FF9999", "skyblue")) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% Tumor Cell Present in TMAs vs ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values for TMA, 6 values fro ROI")
+
+
+variations %>% mutate(mean_tumor_roi = -1*mean_tumor_roi) %>% 
+  ggplot(aes(x=suid.x)) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_tma, color="TMA")) +
+  geom_point(aes(y=mean_tumor_tma), color="blue", size=1, alpha=0.6) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi, color="ROI")) +
+  geom_point(aes(y=mean_tumor_roi) , color="red", size=1, alpha=0.6) +
+  scale_y_continuous(breaks = c(-100, -50, 0, 50, 100),
+                     labels = abs(c(-100, -50, 0, 50, 100))) +
+  geom_hline(yintercept = 0) +
+  theme_minimal() + 
+  coord_flip()+
+  scale_color_discrete(name="Samples from")+
+  scale_color_manual(values = c("#FF9999", "skyblue")) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% Tumor Cell Present in TMAs vs ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values for TMA, 6 values fro ROI")
+```
+The next plot is probably the most informative
+
+```{r}
+# TMA vs ROI vs I vs P
+par(mar=c(5, 5, 20, 3.1)) # bottom left top right
+ggplot(variations, aes(x=suid.x)) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_tma, color="TMA")) +
+  geom_point(aes(y=mean_tumor_tma), color="blue", size=1, alpha=0.6) +
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi_i, color="ROIi"), 
+                position = position_nudge(x = 0.25, y = 0)) +
+  geom_point(aes(y=mean_tumor_roi_i) , color="limegreen", size=1, alpha=0.6, 
+             position = position_nudge(x = 0.25, y = 0)) + 
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi_p, color="ROIp"), 
+                position = position_nudge(x = 0.5, y = 0)) +
+  geom_point(aes(y=mean_tumor_roi_p) , color="purple", size=1, alpha=0.6, 
+             position = position_nudge(x = 0.5, y = 0)) + 
+  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi, color="ROI"), 
+                position = position_nudge(x = 0.75, y = 0)) +
+  geom_point(aes(y=mean_tumor_roi) , color="red", size=1, alpha=0.6, 
+             position = position_nudge(x = 0.75, y = 0)) + 
+  theme_minimal() + 
+  coord_flip()+
+  scale_x_discrete(expand=c(0.05, 0)) +
+  scale_color_manual(name="Samples \nfrom", values = c("skyblue", "palegreen", "plum1", "#FF9999"), breaks=c("TMA","ROIi", "ROIp","ROI")) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% Tumor Cell Present in TMAs vs ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values for TMA, 6 values fro ROI")
+```
+
+## Immune Markers
+
+
