@@ -117,7 +117,9 @@ gridExtra::grid.arrange(p1, p2, nrow = 2,
                         top = "Cell Type Repartition in ROIs")
 # dev.off()
 
+
 # Density plot
+
 # jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/density ROI tumor.jpg"))
 ggplot(ROI_global, aes(tumor__total_cells, colour = intratumoral__i__vs_peripheral__p_.x)) +
   geom_density(alpha=.3) +

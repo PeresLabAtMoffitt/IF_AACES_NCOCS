@@ -14,9 +14,8 @@ knitr::opts_chunk$set(echo = FALSE,
 ```
 <br>
 
-***
 # Report
-
+***
 ```{r library, include=FALSE}
 library(drake)
 library(tidyverse)
@@ -29,7 +28,7 @@ loadd(clinical_data, ROI_tumor ,ROI_stroma ,TMA_tumor ,TMA_stroma,
       common_ROITMA_IDs)
 ```
 ## Data
-Loading of clinical data, TMAs and ROIs data.
+Loading of clinical data, TMAs and ROIs data.  
 **Clinical Data** is not cleaned yet.
 ```{r }
 head(clinical_data)
@@ -42,7 +41,7 @@ dim(ROI_tumor)
 dim(ROI_stroma)
 ```
 ## Cleaning 
-I made sure that all "removed core" the present in the 3rd tab of TMAs and ROIs files were removed.
+I made sure that all "removed core" the present in the 3rd tab of TMAs and ROIs files were removed.  
 I also removed the 4 cases which were excluded in TMAs.
 ```{r}
 # III-Remove the TMA IDs from patient excluded from the study
@@ -110,7 +109,7 @@ dim(TMA_stroma)
 dim(ROI_tumor)
 dim(ROI_stroma)
 ```
-I merged tumor and stroma data using image_tag into the same dataframe.
+I merged tumor and stroma data using image_tag into the same dataframe.  
 **TMA_global dimension**
 ```{r }
 dim(TMA_global)
@@ -330,7 +329,7 @@ p2 <- ggplot(variations_ROI, aes(x=suid.x, y=mean_tumor)) +
 gridExtra::grid.arrange(p1, p2, ncol = 2,
                         top = "Cell Type Repartition in ROIs")
 ```
-We may have less variations between patients with the ROI but need to look at intratumoral vs Peripheral.
+We may have less variations between patients with the ROI but need to look at intratumoral vs Peripheral.  
 I tried to take a look at the variation of samples compare to the mean of all samples.
 
 ```{r}
