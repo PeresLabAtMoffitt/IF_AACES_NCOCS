@@ -2,9 +2,9 @@ plan <- drake_plan(
 
   clinical_data = data_import(fs::path("","Volumes","Peres_Research")),
   #-----------------------------------------------------------------------------------------------------------------
-  ROI_tumor = roit_import(fs::path("","Volumes","Peres_Research")),
+  ROI_tumor_ = roit_import(fs::path("","Volumes","Peres_Research")),
   
-  ROI_stroma = rois_import(fs::path("","Volumes","Peres_Research")),
+  ROI_stroma_ = rois_import(fs::path("","Volumes","Peres_Research")),
   
   # ROI_remove = roir_import(fs::path("","Volumes","Peres_Research")),
   #-----------------------------------------------------------------------------------------------------------------
@@ -36,7 +36,12 @@ plan <- drake_plan(
   
   
   ## 2-bind TMA together
-  TMA_tumor = binding(TMA1_tumor,TMA2_tumor),
-  TMA_stroma = binding(TMA1_stroma,TMA2_stroma) 
+  TMA_tumor_ = binding(TMA1_tumor,TMA2_tumor),
+  TMA_stroma_ = binding(TMA1_stroma,TMA2_stroma), 
+  # Update variable names
+  TMA_tumor = var_names(TMA_tumor_),
+  TMA_stroma = var_names(TMA_stroma_),
+  ROI_tumor = var_names(ROI_tumor_),
+  ROI_stroma = var_names(ROI_stroma_)
 
 )

@@ -2,8 +2,9 @@
 # I  ### Load data
 
 path <- fs::path("","Volumes","Peres_Research")
+
 fct_name_repair <- function(colnms) {
-  tolower(gsub("[ ():+²]", "_", colnms))
+  tolower(gsub("[ ():]", "_", colnms))
 }
 data_import <- function(data_path){
   read_csv(paste0(data_path,
@@ -65,4 +66,21 @@ common_ROITMA_import <- function(path){
 binding <- function(data1, data2){
   bind_rows(data1, data2, .id = "TMA")
 }
- 
+
+# Update variable names
+# var_names <- function(data){
+#   rename_all(data %>% gsub("__", "_", .) %>% gsub("%", "percent", .))
+# }
+var_names <- function(data) {
+  names <- names(data) %<>%
+    tolower() %>%
+    str_replace_all("__", "_") %>%
+    gsub("%", "percent", .) %>%
+    gsub("²", "2", .) %>%
+    gsub("\\+", "plus", .)
+  data %>% `colnames<-`(names)
+}
+
+
+
+

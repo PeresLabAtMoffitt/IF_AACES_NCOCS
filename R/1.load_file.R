@@ -8,7 +8,7 @@ library(tidyverse)
 
 path <- fs::path("","Volumes","Peres_Research")
 fct_name_repair <- function(colnms) {
-  tolower(gsub("[ ():+²]", "_", colnms))
+  tolower(gsub("[ ():]", "_", colnms))
 }
 #-----------------------------------------------------------------------------------------------------------------
 clinical_data <-
@@ -108,6 +108,29 @@ TMA_tumor <-
   bind_rows(TMA1_tumor,TMA2_tumor, .id = "TMA")
 TMA_stroma <-
   bind_rows(TMA1_stroma,TMA2_stroma, .id = "TMA")
+
+
+# Update variable names
+TMA_tumor <- TMA_tumor %>%
+  rename_all(. %>% gsub("__", "_", .) %>%
+               gsub("%", "percent", .) %>%
+               gsub("²", "2", .) %>%
+               gsub("\\+", "plus", .))
+TMA_stroma <- TMA_stroma %>%
+  rename_all(. %>% gsub("__", "_", .) %>%
+               gsub("%", "percent", .) %>%
+               gsub("²", "2", .) %>%
+               gsub("\\+", "plus", .))
+ROI_tumor <- ROI_tumor %>%
+  rename_all(. %>% gsub("__", "_", .) %>%
+               gsub("%", "percent", .) %>%
+               gsub("²", "2", .) %>%
+               gsub("\\+", "plus", .))
+ROI_stroma <- ROI_stroma %>%
+  rename_all(. %>% gsub("__", "_", .) %>%
+               gsub("%", "percent", .) %>%
+               gsub("²", "2", .) %>%
+               gsub("\\+", "plus", .))
 
 
 # IIb ### ROI data
