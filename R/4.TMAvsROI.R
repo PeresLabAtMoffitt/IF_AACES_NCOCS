@@ -1,34 +1,34 @@
 # Limiting to the 28 patients we have ROIs and TMAs
 
 uid <- paste(unique(common_ROITMA_IDs$Subject_IDs), collapse = '|')
-variations_TMA <- variations_TMA[(grepl(uid, variations_TMA$suid.x)),]
-variations_ROI <- variations_ROI[(grepl(uid, variations_ROI$suid.x)),]
-variations_ROIi <- variations_ROIip[(grepl(uid, variations_ROIip$suid.x)),] %>% 
-  filter(intratumoral__i__vs_peripheral__p_.x == "Intratumoral")
-variations_ROIp <- variations_ROIip[(grepl(uid, variations_ROIip$suid.x)),] %>% 
-  filter(intratumoral__i__vs_peripheral__p_.x == "Peripheral")
+variations_TMA <- variations_TMA[(grepl(uid, variations_TMA$suid)),]
+variations_ROI <- variations_ROI[(grepl(uid, variations_ROI$suid)),]
+variations_ROIi <- variations_ROIip[(grepl(uid, variations_ROIip$suid)),] %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral")
+variations_ROIp <- variations_ROIip[(grepl(uid, variations_ROIip$suid)),] %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral")
 
 variations <- merge.data.frame(variations_TMA %>% 
                                  select(-ID), 
                                variations_ROI %>% 
                                  select(-ID),
-                               by.x = "suid.x", by.y = "suid.x",
+                               by.x = "suid", by.y = "suid",
                                all = TRUE, suffixes = c("_tma", "_roi"))
 variations_ROIip <- merge.data.frame(variations_ROIi %>% 
                                        select(-ID),
                                      variations_ROIp %>% 
                                        select(-ID),
-                                     by.x = "suid.x", by.y = "suid.x",
+                                     by.x = "suid", by.y = "suid",
                                      all = TRUE, suffixes = c("_roi_i", "_roi_p"))
 variations <- merge.data.frame(variations, variations_ROIip,
-                               by.x = "suid.x", by.y = "suid.x",
+                               by.x = "suid", by.y = "suid",
                                all = TRUE) %>% 
   mutate(ID = seq(1:nrow(.)))
 
 
 # jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_1.jpg"))
-ggplot(variations, aes(x=suid.x, y=mean_tumor_tma)) +
-  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_tma), color="skyblue") +
+ggplot(variations, aes(x=suid, y=mean_tumor_tma)) +
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_tumor_tma), color="skyblue") +
   geom_point(color="blue", size=1, alpha=0.6) +
   theme_light() +
   coord_flip() +
@@ -43,8 +43,8 @@ ggplot(variations, aes(x=suid.x, y=mean_tumor_tma)) +
 # dev.off()
 
 # peg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/variation 28 patients_2.jpg"))
-ggplot(variations, aes(x=suid.x, y=mean_tumor_roi)) +
-  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi), color="skyblue") +
+ggplot(variations, aes(x=suid, y=mean_tumor_roi)) +
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_tumor_roi), color="skyblue") +
   geom_point(color="blue", size=1, alpha=0.6) +
   theme_light() +
   coord_flip() +
@@ -167,6 +167,7 @@ ggplot(variations, aes(x=ID, y=stroma_variation_roi_i, colour = stroma_variation
     axis.ticks.y = element_blank(),
     axis.text.y = element_blank()
   ) +
+  geom_hline(yintercept = 0) +
   scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
   labs(x=paste(length(variations$ID), "Patients IDs"), y="% Stromal Cell (mean)", title="% Stromal Cell Present in Intratumoral ROIs per Patient",
        subtitle = "Each point represent the mean of up to 3 values")
@@ -216,10 +217,10 @@ ggplot(variations, aes(x=ID, y=stroma_variation_roi_p, colour = stroma_variation
   # geom_segment(aes(x = 2, y = 15, xend = 2, yend = 25),
   #                arrow = arrow(length = unit(0.5, "cm")))
 
-ggplot(variations, aes(x=suid.x)) +
-  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_tma, color="TMA"))+
+ggplot(variations, aes(x=suid)) +
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_tumor_tma, color="TMA"))+
   geom_point(aes(y=mean_tumor_tma), color="blue", size=1, alpha=0.6) +
-  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi, color="ROI"), 
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_tumor_roi, color="ROI"), 
                 position = position_nudge(x = 0.5, y = 0))+
   geom_point(aes(y=mean_tumor_roi) , color="red", size=1, alpha=0.6, 
              position = position_nudge(x = 0.5, y = 0)) + 
@@ -232,10 +233,10 @@ ggplot(variations, aes(x=suid.x)) +
 
 
 variations %>% mutate(mean_tumor_roi = -1*mean_tumor_roi) %>% 
-  ggplot(aes(x=suid.x)) +
-  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_tma, color="TMA")) +
+  ggplot(aes(x=suid)) +
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_tumor_tma, color="TMA")) +
   geom_point(aes(y=mean_tumor_tma), color="blue", size=1, alpha=0.6) +
-  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi, color="ROI")) +
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_tumor_roi, color="ROI")) +
   geom_point(aes(y=mean_tumor_roi) , color="red", size=1, alpha=0.6) +
   scale_y_continuous(breaks = c(-100, -50, 0, 50, 100),
                      labels = abs(c(-100, -50, 0, 50, 100))) +
@@ -250,18 +251,18 @@ variations %>% mutate(mean_tumor_roi = -1*mean_tumor_roi) %>%
 
 # TMA vs ROI vs I vs P
 par(mar=c(5, 5, 20, 3.1)) # bottom left top right
-ggplot(variations, aes(x=suid.x)) +
-  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_tma, color="TMA")) +
+ggplot(variations, aes(x=suid)) +
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_tumor_tma, color="TMA")) +
   geom_point(aes(y=mean_tumor_tma), color="blue", size=1, alpha=0.6) +
-  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi_i, color="ROIi"), 
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_tumor_roi_i, color="ROIi"), 
                 position = position_nudge(x = 0.25, y = 0)) +
   geom_point(aes(y=mean_tumor_roi_i) , color="limegreen", size=1, alpha=0.6, 
              position = position_nudge(x = 0.25, y = 0)) + 
-  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi_p, color="ROIp"), 
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_tumor_roi_p, color="ROIp"), 
                 position = position_nudge(x = 0.5, y = 0)) +
   geom_point(aes(y=mean_tumor_roi_p) , color="purple", size=1, alpha=0.6, 
              position = position_nudge(x = 0.5, y = 0)) + 
-  geom_segment( aes(x=suid.x, xend=suid.x, y=0, yend=mean_tumor_roi, color="ROI"), 
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_tumor_roi, color="ROI"), 
                 position = position_nudge(x = 0.75, y = 0)) +
   geom_point(aes(y=mean_tumor_roi) , color="red", size=1, alpha=0.6, 
              position = position_nudge(x = 0.75, y = 0)) + 
