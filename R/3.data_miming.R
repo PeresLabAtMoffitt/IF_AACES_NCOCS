@@ -1,3 +1,51 @@
+# Intraclass Correlation Coefficient
+
+ROI_ICCi <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>%
+  select(c("suid", "tumor_total_cells"))
+ROI_ICCi <- dcast(setDT(ROI_ICCi), suid ~ rowid(suid), 
+                 value.var = "tumor_total_cells") %>% 
+  select(c(2:4))
+
+ROI_ICCp <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>%
+  select(c("suid", "tumor_total_cells"))
+ROI_ICCp <- dcast(setDT(ROI_ICCp), suid ~ rowid(suid), 
+                  value.var = "tumor_total_cells") %>% 
+  select(c(2:4))
+
+TMA_ICC <- TMA_global[, c("suid", "tumor_total_cells")] 
+TMA_ICC <- dcast(setDT(TMA_ICC), suid ~ rowid(suid), 
+                 value.var = "tumor_total_cells") %>% 
+  select(c(2:4))
+
+# If test for intra-rater (because for each patient the 3 TMA/ROI was done by the same person)
+# If test for inter-rater (because not the same rater between patients)
+# Two-way mixed effect, fixed raters are defined. Each subject is measured by the k raters.
+library(psych) # Koo and Li (2016)
+ICC(TMA_ICC)  # between 0.75 and 0.90: good
+ICC(ROI_ICCi)
+ICC(ROI_ICCp) #between 0.50 and 0.75: moderate
+library(irr) # Does not count patient with NA
+icc(
+  TMA_ICC, model = "twoway", 
+  type = "consistency", unit = "average"
+)
+icc(
+  ROI_ICCi, model = "twoway", 
+  type = "consistency", unit = "average"# Reliability applied where measures of k raters will be averaged for each subject.
+)
+icc(
+  ROI_ICCp, model = "twoway", 
+  type = "consistency", unit = "average" # Consistency: for repeated measurements by the same rater,
+)
+
+
+
+
+rm(TMA_ICC, ROI_ICCi, ROI_ICCp)
+
+
 table <- matrix(c("", "Tumor", "Stroma",
                   "TMA", "", "",
                   "mean", round(mean(TMA_global$percent_tumor),2), round(mean(TMA_global$percent_stroma),2),
