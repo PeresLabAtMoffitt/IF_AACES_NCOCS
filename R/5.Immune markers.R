@@ -81,14 +81,14 @@ markers_perc_ROIip <- group_by(ROI_global, suid, intratumoral_i_vs_peripheral_p_
             mean_CD11b_CD15_stroma = mean(CD11b_CD15_stroma_mm2))
 setDT(markers_ROIip)[, ID := .GRP, .(suid)]
 
-ggplot(markers_perc_TMA, aes(x=suid, y=mean_CD3_tumor, color = "tumor")) +
+ggplot(markers_perc_TMA, aes(x=suid, y=mean_CD3_tumor, color = " CD3 tumor")) +
   geom_bar(stat="identity") +
-  geom_bar(aes(y=mean_CD3_stroma, color="stroma"), stat="identity",
-           position = position_stack()) +
+  geom_bar(aes(y=mean_CD3_stroma, color="CD3 stroma"), stat="identity",
+           position = position_dodge()) +
   geom_bar(aes(y=mean_CD3_CD8_tumor, color="CD38"), stat="identity",
-           position = position_stack()) +
+           position = position_dodge()) +
   geom_bar(aes(y=mean_CD3_CD8_stroma, color="CD38 str"), stat="identity",
-           position = position_stack())
+           position = position_dodge())
 
 
 

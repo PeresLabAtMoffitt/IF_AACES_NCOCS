@@ -31,7 +31,6 @@ rm(uid, fct_name_repair, # roir_import,
 # Provide the mean, median, and range of the % tumor and % stroma 
 # for the TMA cores, intratumoral ROIs, and peripheral ROIs. 
 # Also assess the variation by case in terms of the % tumor and % stroma. 
-ROI_global$stroma_area_analyzed_mm2_
 
 ROI_global <- merge.data.frame(ROI_tumor, ROI_stroma %>% select(-c("intratumoral_i_vs_peripheral_p_", "suid")),
                                by.x = "image_tag", by.y = "image_tag",

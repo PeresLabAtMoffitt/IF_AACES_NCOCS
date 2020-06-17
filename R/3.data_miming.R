@@ -1,3 +1,49 @@
+# Intraclass Correlation Coefficient
+
+ICC_ROIi <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>%
+  select(c("suid", "tumor_total_cells"))
+ICC_ROIi <- dcast(setDT(ICC_ROIi), suid ~ rowid(suid), 
+                 value.var = "tumor_total_cells") %>% 
+  select(c(2:4))
+
+ICC_ROIp <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>%
+  select(c("suid", "tumor_total_cells"))
+ICC_ROIp <- dcast(setDT(ICC_ROIp), suid ~ rowid(suid), 
+                  value.var = "tumor_total_cells") %>% 
+  select(c(2:4))
+
+ICC_TMA <- TMA_global[, c("suid", "tumor_total_cells")] 
+ICC_TMA <- dcast(setDT(ICC_TMA), suid ~ rowid(suid), 
+                 value.var = "tumor_total_cells") %>% 
+  select(c(2:4))
+
+# If test for intra-rater (because for each patient the 3 TMA/ROI was done by the same person)
+# If test for inter-rater (because not the same rater between patients)
+# Two-way mixed effect, fixed raters are defined. Each subject is measured by the k raters.
+library(psych) # Koo and Li (2016)
+ICC(ICC_TMA)  # between 0.75 and 0.90: good
+ICC(ICC_ROIi)
+ICC(ICC_ROIp) #between 0.50 and 0.75: moderate
+library(irr) # Does not count patient with NA
+icc(
+  ICC_TMA, model = "twoway", 
+  type = "consistency", unit = "average"
+)
+icc(
+  ICC_ROIi, model = "twoway", 
+  type = "consistency", unit = "average"# Reliability applied where measures of k raters will be averaged for each subject.
+)
+icc(
+  ICC_ROIp, model = "twoway", 
+  type = "consistency", unit = "average" # Consistency: for repeated measurements by the same rater,
+)
+
+# Cleaning
+rm(ICC_TMA, ICC_ROIi, ICC_ROIp)
+
+# Create a general table of the data with mean, median, range, ...
 table <- matrix(c("", "Tumor", "Stroma",
                   "TMA", "", "",
                   "mean", round(mean(TMA_global$percent_tumor),2), round(mean(TMA_global$percent_stroma),2),
@@ -65,6 +111,8 @@ table <- matrix(c("", "Tumor", "Stroma",
 #           paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Summary tumor, stroma in TMAs and ROIs.csv"))
 # rm(table)
 
+
+# Plots data (number of tumoral and stromal cell in TMAs and ROIs)
 
 # TMA
 # jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/hist TMA tumor vs stroma-yaxis.jpg"),
