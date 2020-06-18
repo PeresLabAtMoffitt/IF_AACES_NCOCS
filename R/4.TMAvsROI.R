@@ -1,5 +1,46 @@
 # Limiting to the 28 patients we have ROIs and TMAs
 
+venn.diagram(
+  x = list(variations_ROI$suid, variations_TMA$suid),
+  category.names = c("ROI" , "TMA"),
+  filename = 'Patient who had Germline sequenced.png',
+  output=TRUE,
+  
+  # Output features
+  imagetype="png" ,
+  height = 700 , 
+  width = 700 , 
+  resolution = 300,
+  compression = "lzw",
+  
+  # Title
+  # main = NULL, sub = NULL, 
+  # # main.pos = c(0.5, 1.05), main.fontface = "plain",
+  # # main.fontfamily = "serif", main.col = "black",
+  # # main.cex = 1, main.just = c(0.5, 1), sub.pos = c(0.5, 1.05), sub.fontface = "plain", sub.fontfamily = "serif", sub.col = "black", sub.cex = 1, sub.just = c(0.5, 1), 
+  # # ,
+  
+  # Circles
+  lwd = 2,
+  lty = 'blank',
+  fill = c("darkgrey", "#FEA873FF"), 
+  margin = 0.05,
+  
+  # Numbers
+  cex = .6,
+  fontface = "bold",
+  fontfamily = "sans",
+  cat.pos = c(-20, 160), # Position legend arounf circle
+  cat.dist = c(0.055, 0.055), # Distance legend from circle
+  #ext.percent = 2,
+  rotation.degree = -90
+  # cex = 3.5,
+  # cat.cex = 3,
+  # cat.fontface = "bold",
+  # cat.default.pos = "outer",
+  # cat.fontfamily = "sans",
+)
+
 uid <- paste(unique(common_ROITMA_IDs$Subject_IDs), collapse = '|')
 variations_TMA <- variations_TMA[(grepl(uid, variations_TMA$suid)),]
 variations_ROI <- variations_ROI[(grepl(uid, variations_ROI$suid)),]
@@ -271,7 +312,29 @@ ggplot(variations, aes(x=suid)) +
   scale_x_discrete(expand=c(0.05, 0)) +
   scale_color_manual(name="Samples \nfrom", values = c("skyblue", "palegreen", "plum1", "#FF9999"), breaks=c("TMA","ROIi", "ROIp","ROI")) +
   labs(x=paste(length(variations$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% Tumor Cell Present in TMAs vs ROIs per Patient",
-       subtitle = "Each point represent the mean of up to 3 values for TMA, 6 values fro ROI")
+       subtitle = "Each point represent the mean of up to 3 values for TMA, ROIi, Roip, 6 values fro ROI")
+
+ggplot(variations, aes(x=suid)) +
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_stroma_tma, color="TMA")) +
+  geom_point(aes(y=mean_stroma_tma), color="blue", size=1, alpha=0.6) +
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_stroma_roi_i, color="ROIi"), 
+                position = position_nudge(x = 0.25, y = 0)) +
+  geom_point(aes(y=mean_stroma_roi_i) , color="limegreen", size=1, alpha=0.6, 
+             position = position_nudge(x = 0.25, y = 0)) + 
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_stroma_roi_p, color="ROIp"), 
+                position = position_nudge(x = 0.5, y = 0)) +
+  geom_point(aes(y=mean_stroma_roi_p) , color="purple", size=1, alpha=0.6, 
+             position = position_nudge(x = 0.5, y = 0)) + 
+  geom_segment( aes(x=suid, xend=suid, y=0, yend=mean_stroma_roi, color="ROI"), 
+                position = position_nudge(x = 0.75, y = 0)) +
+  geom_point(aes(y=mean_stroma_roi) , color="red", size=1, alpha=0.6, 
+             position = position_nudge(x = 0.75, y = 0)) + 
+  theme_minimal() + 
+  coord_flip()+
+  scale_x_discrete(expand=c(0.05, 0)) +
+  scale_color_manual(name="Samples \nfrom", values = c("skyblue", "palegreen", "plum1", "#FF9999"), breaks=c("TMA","ROIi", "ROIp","ROI")) +
+  labs(x=paste(length(variations$ID), "Patients IDs"), y="% Stroma Cell (mean)", title="% Stroma Cell Present in TMAs vs ROIs per Patient",
+       subtitle = "Each point represent the mean of up to 3 values for TMA, ROIi, Roip, 6 values fro ROI")
 
 
 # Correlation
