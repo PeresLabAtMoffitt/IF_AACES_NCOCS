@@ -72,10 +72,10 @@ TMAcases_remove <-
 #       "/K99_R00/Image analysis data/Per-Cell Object Data Table - Image Analysis/TMA AACES 2017/Peres_P1_AACES_TMA 2017_[1,A].tif_51355_job32199.object_results.csv"
 #   ))
 #-----------------------------------------------------------------------------------------------------------------
-# cases_match <-
-#   readxl::read_xlsx(paste0(path,
-#       "/K99_R00/Image analysis data/AACES and NCOCS data/Case matches_12312019.xlsx"
-#     ))
+cases_match <-
+  readxl::read_xlsx(paste0(path,
+      "/K99_R00/Image analysis data/AACES and NCOCS data/Case matches_12312019.xlsx"
+    ))
 #-----------------------------------------------------------------------------------------------------------------
 common_ROITMA_IDs <-
   read_csv(paste0(path,

@@ -61,6 +61,11 @@ common_ROITMA_import <- function(path){
                   "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Subject_IDs common TMA ROI.csv"))
 }
 #-----------------------------------------------------------------------------------------------------------------
+match_cases_import <- function(path){
+  readxl::read_xlsx(paste0(path,
+                           "/K99_R00/Image analysis data/AACES and NCOCS data/Case matches_12312019.xlsx"))
+}
+#-----------------------------------------------------------------------------------------------------------------
 
 # Start Data Cleaning
 binding <- function(data1, data2){

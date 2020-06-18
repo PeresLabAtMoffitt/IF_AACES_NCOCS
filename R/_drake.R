@@ -17,7 +17,7 @@ if (!interactive()) config
 make(plan)
 loadd(clinical_data, ROI_tumor ,ROI_stroma ,TMA_tumor ,TMA_stroma, 
       TMAcases_remove,
-      common_ROITMA_IDs)
+      common_ROITMA_IDs, cases_match)
 
 
 
