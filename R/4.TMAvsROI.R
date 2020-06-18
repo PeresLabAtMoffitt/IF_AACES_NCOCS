@@ -336,11 +336,11 @@ ggplot(variations, aes(x=suid)) +
   labs(x=paste(length(variations$ID), "Patients IDs"), y="% Stroma Cell (mean)", title="% Stroma Cell Present in TMAs vs ROIs per Patient",
        subtitle = "Each point represent the mean of up to 3 values for TMA, ROIi, Roip, 6 values fro ROI")
 
-
+# Test normality
+qqnorm(variations$mean_tumor_tma)
+qqnorm(variations$mean_tumor_roi_i)
 # Correlation
-
 library(psych)
-
 pairs.panels(variations)
 pairs.panels(variations[c("mean_tumor_tma", "mean_tumor_roi_i")])
 
@@ -355,7 +355,7 @@ corrplot.mixed(mat)
 mat1 <- cor(variations[, c("tumor_variation_tma", "tumor_variation_roi_i", "tumor_variation_roi_p", 
                            "stroma_variation_tma", "stroma_variation_roi_i", "stroma_variation_roi_p")], 
             use = "pairwise.complete.obs")
-variations$mean_stroma_roi_i
+
 corrplot(mat1)
 corrplot.mixed(mat1)
 ggcorrplot(mat, hc.order = TRUE, method = "circle", 
@@ -373,8 +373,28 @@ ggcorrplot(mat, hc.order = TRUE, method = "circle",
            digits = 1
 )
 
+m1 <- variations[,"mean_tumor_tma"]
+m2 <- variations[,"mean_tumor_roi_i"]
+mat2 <- cor(x=m1, y=m2, use = "all.obs")
+corrplot(mat2)
+sapply(seq.int(dim(m1)[1]), function(i) cor(m2[i,], m1[i,]))
+d <- as.data.frame(cbind(m1,m2))
+cor(d$m1, as.matrix(d[sapply(d, is.numeric)]))
 
-
+tvariations <- as.data.frame(base::t(variations)) %>% 
+  `colnames<-`(tvariations[1,])
+tvariations <- tvariations[c("mean_tumor_tma", "mean_tumor_roi_i"),]
+tvariations <- mutate_all(tvariations, function(x) as.numeric(as.character(x)))
+mat <- cor(tvariations["mean_tumor_tma", ], 
+           use = "pairwise.complete.obs")
+corrplot(mat)
+corrplot.mixed(mat)
+install.packages("polyPK")
+library(polyPK)
+m1 <- tvariations[1,]
+m2 <- tvariations[2,]
+cor(x=m1, y=m2, use = "all.obs")
+corrplot(m1)
 
 # End
 

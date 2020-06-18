@@ -7,29 +7,29 @@
 # Cell density
 
 markers_TMA <- group_by(TMA_global, suid) %>% 
-  summarize(mean_CD3_tumor = mean(CD3_tumor_mm2), 
-            mean_CD3_stroma = mean(CD3_stroma_mm2),
-            mean_CD3_CD8_tumor = mean(CD3_CD8_tumor_mm2),
-            mean_CD3_CD8_stroma = mean(CD3_CD8_stroma_mm2),
-            mean_CD3_FoxP3 = mean(CD3_FoxP3_tumor_mm2),
-            mean_stroma = mean(CD3_FoxP3_stroma_mm2),
-            mean_CD11b = mean(CD11b_tumor), 
-            mean_stroma = mean(CD11b_stroma),
-            mean_CD11b_CD15 = mean(CD11b_CD15_tumor_mm2), 
-            mean_stroma = mean(CD11b_CD15_stroma_mm2)) %>%
+  summarize(mean_CD3_tumor = mean(CD3perc_tumor_mm2), 
+            mean_CD3_stroma = mean(CD3perc_stroma_mm2),
+            mean_CD3_CD8_tumor = mean(CD3_CD8perc_tumor_mm2),
+            mean_CD3_CD8_stroma = mean(CD3_CD8perc_stroma_mm2),
+            mean_CD3_FoxP3_tumor = mean(CD3_FoxP3perc_tumor_mm2),
+            mean_CD3_FoxP3_stroma = mean(CD3_FoxP3perc_stroma_mm2),
+            mean_CD11b_tumor = mean(CD11bperc_tumor), 
+            mean_CD11b_stroma = mean(CD11bperc_stroma),
+            mean_CD11b_CD15_tumor = mean(CD11b_CD15perc_tumor_mm2), 
+            mean_CD11b_CD15_stroma = mean(CD11b_CD15perc_stroma_mm2)) %>%
   mutate(ID = seq(1:nrow(.)))
 
 markers_ROIip <- group_by(ROI_global, suid, intratumoral_i_vs_peripheral_p_) %>% 
-  summarize(mean_CD3_tumor = mean(CD3_tumor_mm2), 
-            mean_CD3_stroma = mean(CD3_stroma_mm2),
-            mean_CD3_CD8_tumor = mean(CD3_CD8_tumor_mm2),
-            mean_CD3_CD8_stroma = mean(CD3_CD8_stroma_mm2),
-            mean_CD3_FoxP3_tumor = mean(CD3_FoxP3_tumor_mm2),
-            mean_CD3_FoxP3_stroma = mean(CD3_FoxP3_stroma_mm2),
-            mean_CD11b_tumor = mean(CD11b_tumor), 
-            mean_CD11b_stroma = mean(CD11b_stroma),
-            mean_CD11b_CD15_tumor = mean(CD11b_CD15_tumor_mm2), 
-            mean_CD11b_CD15_stroma = mean(CD11b_CD15_stroma_mm2))
+  summarize(mean_CD3_tumor = mean(CD3perc_tumor_mm2), 
+            mean_CD3_stroma = mean(CD3perc_stroma_mm2),
+            mean_CD3_CD8_tumor = mean(CD3_CD8perc_tumor_mm2),
+            mean_CD3_CD8_stroma = mean(CD3_CD8perc_stroma_mm2),
+            mean_CD3_FoxP3_tumor = mean(CD3_FoxP3perc_tumor_mm2),
+            mean_CD3_FoxP3_stroma = mean(CD3_FoxP3perc_stroma_mm2),
+            mean_CD11b_tumor = mean(CD11bperc_tumor), 
+            mean_CD11b_stroma = mean(CD11bperc_stroma),
+            mean_CD11b_CD15_tumor = mean(CD11b_CD15perc_tumor_mm2), 
+            mean_CD11b_CD15_stroma = mean(CD11b_CD15perc_stroma_mm2))
 setDT(markers_ROIip)[, ID := .GRP, .(suid)]
 
 markers_ROI <- group_by(markers_ROIip, suid) %>% 
