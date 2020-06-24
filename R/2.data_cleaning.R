@@ -11,10 +11,10 @@ TMA_stroma <-
   filter(!is.na(suid))
 
 # Did it for ROIs too in case  #------------------ All good so don't run anymore but still create suid 
-ROI_tumor$suid <- substr(ROI_tumor$image_tag, start = 10, stop = 15)
+ROI_tumor$suid <- str_match(ROI_tumor$image_tag, "Peres_P1_([:digit:]*)")[,2]
 # ROI_tumor <-
 #   ROI_tumor[(!grepl(uid, ROI_tumor$suid)), ]
-ROI_stroma$suid <- substr(ROI_stroma$image_tag, start = 10, stop = 15)
+ROI_stroma$suid <- str_match(ROI_stroma$image_tag, "Peres_P1_([:digit:]*)")[,2]
 # ROI_stroma <-
 #   ROI_stroma[(!grepl(uid, ROI_stroma$suid)), ]
 
@@ -56,18 +56,18 @@ ROI_global <- merge.data.frame(ROI_tumor, ROI_stroma %>% select(-c("intratumoral
   mutate(CD11b_tumor = (tumor_cd11b_opal_620_positive_cells/tumor_area_analyzed_mm2_)) %>% 
   mutate(CD11b_stroma = (stroma_cd11b_opal_620_positive_cells/stroma_area_analyzed_mm2_)) %>% 
   mutate(CD11b_CD15_tumor_mm2 = (tumor_cd11bplus_cd15plus_cells/tumor_area_analyzed_mm2_)) %>% 
-  mutate(CD11b_CD15_stroma_mm2 = stroma_cd11bplus_cd15plus_cells/stroma_area_analyzed_mm2_) %>% 
+  mutate(CD11b_CD15_stroma_mm2 = stroma_cd11bplus_cd15plus_cells/stroma_area_analyzed_mm2_) # %>% 
   
-  mutate(CD3perc_tumor_mm2 = (tumor_percent_cd3_opal_650_positive_cells/tumor_area_analyzed_mm2_)) %>% # percent of marker per mm2
-  mutate(CD3perc_stroma_mm2 = (stroma_percent_cd3_opal_650_positive_cells/stroma_area_analyzed_mm2_)) %>%
-  mutate(CD3_CD8perc_tumor_mm2 = (tumor_percent_cd3plus_cd8plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
-  mutate(CD3_CD8perc_stroma_mm2 = (stroma_percent_cd3plus_cd8plus_positive_cells/stroma_area_analyzed_mm2_)) %>%
-  mutate(CD3_FoxP3perc_tumor_mm2 = (tumor_percent_cd3plus_foxp3plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
-  mutate(CD3_FoxP3perc_stroma_mm2 = (stroma_percent_cd3plus_foxp3plus_positive_cells/stroma_area_analyzed_mm2_)) %>%
-  mutate(CD11bperc_tumor = (tumor_percent_cd11b_opal_620_positive_cells/tumor_area_analyzed_mm2_)) %>%
-  mutate(CD11bperc_stroma = (stroma_percent_cd11b_opal_620_positive_cells/stroma_area_analyzed_mm2_)) %>%
-  mutate(CD11b_CD15perc_tumor_mm2 = (tumor_percent_cd11bplus_cd15plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
-  mutate(CD11b_CD15perc_stroma_mm2 = stroma_percent_cd11bplus_cd15plus_positive_cells/stroma_area_analyzed_mm2_)
+  # mutate(CD3perc_tumor_mm2 = (tumor_percent_cd3_opal_650_positive_cells/tumor_area_analyzed_mm2_)) %>% # percent of marker per mm2
+  # mutate(CD3perc_stroma_mm2 = (stroma_percent_cd3_opal_650_positive_cells/stroma_area_analyzed_mm2_)) %>%
+  # mutate(CD3_CD8perc_tumor_mm2 = (tumor_percent_cd3plus_cd8plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
+  # mutate(CD3_CD8perc_stroma_mm2 = (stroma_percent_cd3plus_cd8plus_positive_cells/stroma_area_analyzed_mm2_)) %>%
+  # mutate(CD3_FoxP3perc_tumor_mm2 = (tumor_percent_cd3plus_foxp3plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
+  # mutate(CD3_FoxP3perc_stroma_mm2 = (stroma_percent_cd3plus_foxp3plus_positive_cells/stroma_area_analyzed_mm2_)) %>%
+  # mutate(CD11bperc_tumor = (tumor_percent_cd11b_opal_620_positive_cells/tumor_area_analyzed_mm2_)) %>%
+  # mutate(CD11bperc_stroma = (stroma_percent_cd11b_opal_620_positive_cells/stroma_area_analyzed_mm2_)) %>%
+  # mutate(CD11b_CD15perc_tumor_mm2 = (tumor_percent_cd11bplus_cd15plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
+  # mutate(CD11b_CD15perc_stroma_mm2 = stroma_percent_cd11bplus_cd15plus_positive_cells/stroma_area_analyzed_mm2_)
 
 
 TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma %>% select(-suid),
@@ -90,18 +90,18 @@ TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma %>% select(-suid),
   mutate(CD11b_tumor = (tumor_cd11b_opal_620_positive_cells/tumor_area_analyzed_mm2_)) %>% 
   mutate(CD11b_stroma = (stroma_cd11b_opal_620_positive_cells/stroma_area_analyzed_mm2_)) %>% 
   mutate(CD11b_CD15_tumor_mm2 = (tumor_cd11bplus_cd15plus_cells/tumor_area_analyzed_mm2_)) %>% 
-  mutate(CD11b_CD15_stroma_mm2 = stroma_cd11bplus_cd15plus_cells/stroma_area_analyzed_mm2_) %>% 
+  mutate(CD11b_CD15_stroma_mm2 = stroma_cd11bplus_cd15plus_cells/stroma_area_analyzed_mm2_) # %>% 
 
-  mutate(CD3perc_tumor_mm2 = (tumor_percent_cd3_opal_650_positive_cells/tumor_area_analyzed_mm2_)) %>%
-  mutate(CD3perc_stroma_mm2 = (stroma_percent_cd3_opal_650_positive_cells/stroma_area_analyzed_mm2_)) %>%
-  mutate(CD3_CD8perc_tumor_mm2 = (tumor_percent_cd3plus_cd8plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
-  mutate(CD3_CD8perc_stroma_mm2 = (stroma_percent_cd3plus_cd8plus_positive_cells/stroma_area_analyzed_mm2_)) %>%
-  mutate(CD3_FoxP3perc_tumor_mm2 = (tumor_percent_cd3plus_foxp3plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
-  mutate(CD3_FoxP3perc_stroma_mm2 = (stroma_percent_cd3plus_foxp3plus_positive_cells/stroma_area_analyzed_mm2_)) %>%
-  mutate(CD11bperc_tumor = (tumor_percent_cd11b_opal_620_positive_cells/tumor_area_analyzed_mm2_)) %>%
-  mutate(CD11bperc_stroma = (stroma_percent_cd11b_opal_620_positive_cells/stroma_area_analyzed_mm2_)) %>%
-  mutate(CD11b_CD15perc_tumor_mm2 = (tumor_percent_cd11bplus_cd15plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
-  mutate(CD11b_CD15perc_stroma_mm2 = stroma_percent_cd11bplus_cd15plus_positive_cells/stroma_area_analyzed_mm2_)
+  # mutate(CD3perc_tumor_mm2 = (tumor_percent_cd3_opal_650_positive_cells/tumor_area_analyzed_mm2_)) %>%
+  # mutate(CD3perc_stroma_mm2 = (stroma_percent_cd3_opal_650_positive_cells/stroma_area_analyzed_mm2_)) %>%
+  # mutate(CD3_CD8perc_tumor_mm2 = (tumor_percent_cd3plus_cd8plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
+  # mutate(CD3_CD8perc_stroma_mm2 = (stroma_percent_cd3plus_cd8plus_positive_cells/stroma_area_analyzed_mm2_)) %>%
+  # mutate(CD3_FoxP3perc_tumor_mm2 = (tumor_percent_cd3plus_foxp3plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
+  # mutate(CD3_FoxP3perc_stroma_mm2 = (stroma_percent_cd3plus_foxp3plus_positive_cells/stroma_area_analyzed_mm2_)) %>%
+  # mutate(CD11bperc_tumor = (tumor_percent_cd11b_opal_620_positive_cells/tumor_area_analyzed_mm2_)) %>%
+  # mutate(CD11bperc_stroma = (stroma_percent_cd11b_opal_620_positive_cells/stroma_area_analyzed_mm2_)) %>%
+  # mutate(CD11b_CD15perc_tumor_mm2 = (tumor_percent_cd11bplus_cd15plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
+  # mutate(CD11b_CD15perc_stroma_mm2 = stroma_percent_cd11bplus_cd15plus_positive_cells/stroma_area_analyzed_mm2_)
 
 # Look at the variation between each patient and the global mean # Should we mot compare Black and White?
 # Here compare the mean of % cells to global study % cells
@@ -122,6 +122,90 @@ variations_ROI <- group_by(variations_ROIip, suid) %>%
   mutate(ID = seq(1:nrow(.)))
 variations_ROI$tumor_variation <- variations_ROI$mean_tumor - mean(ROI_global$percent_tumor)
 variations_ROI$stroma_variation <- variations_ROI$mean_stroma - mean(ROI_global$percent_stroma)
+
+# recode clinical data
+table(clinical_data$race)
+clinical_data <- clinical_data %>% 
+  mutate_at(("casecon"), ~ case_when(
+   . == 1 ~ "case",
+   . == 2 ~ "control"
+  )) %>% 
+  mutate(vitalstatus = case_when(
+    vitalstatus == 1 ~ "alive",
+    vitalstatus == 2 ~ "deceased",
+    TRUE ~ NA_character_
+  )) %>% 
+  mutate(cancersite = case_when(
+    cancersite == 1 ~ "ovarian",
+    cancersite == 2 ~ "tubal",
+    cancersite == 3 ~ "peritoneal",
+    cancersite == 4 ~ "ovarian or tubal, can't distinguish",
+    cancersite == 5 ~ "ovarian, tubal or peritoneal, can't distinguish",
+    TRUE ~ NA_character_
+  )) %>% 
+  mutate_at(c("timelastfu", "morphology"), 
+            ~ case_when(
+              . %in% c("8888","9998", "9999")             ~ NA_real_,
+              TRUE                                     ~ as.numeric(.)
+            )) %>% 
+  mutate_at(c("height", "wt_recent", "wt_YA", "wtgain", "BMI_recent", "BMI_YA"), 
+            ~ case_when(
+              . %in% c("888","998", "999")             ~ NA_real_,
+              TRUE                                     ~ as.numeric(.)
+            )) %>% 
+  mutate(histology = case_when(
+    histology == 1 ~ "serous",
+    histology == 2 ~ "endometrioid",
+    histology == 3 ~ "clear cell",
+    histology == 4 ~ "mucinous",
+    histology == 5 ~ "carcinosarcoma",
+    histology == 6 ~ "carcinoma, NOS",
+    histology == 7 ~ "other specified epithelial ovarian cancer (e.g. Malignant Brenner, mixed)",
+    histology == 8 ~ "epithelial, NOS",
+    histology == 9 ~ "synchronous",
+    TRUE ~ NA_character_
+  )) %>% 
+  mutate(behavior = case_when(
+    behavior == 1 ~ "borderline",
+    behavior == 2 ~ "invasive",
+    TRUE ~ NA_character_
+  )) %>% 
+  mutate(stage = case_when(
+    stage == 1 ~ "Localized",
+    stage == 2 ~ "Regional",
+    stage == 3 ~ "Distant",
+    TRUE ~ NA_character_
+  )) %>% 
+  mutate(race = case_when(
+    race == 1 ~ "white",
+    race == 2 ~ "black",
+    race == 3 ~ "biracial"
+  )) %>% 
+  mutate(hispanic = case_when(
+    hispanic == 1 ~ "hispanic",
+    hispanic == 2 ~ "non-hispanic",
+    TRUE ~ NA_character_
+  )) %>% 
+  mutate(married = case_when(
+    married == 1 ~ "single/never married",
+    married == 2 ~ "married/living as married"
+  )) %>% 
+  mutate(pregever = case_when(
+    pregever == 1 ~ "yes",
+    pregever == 2 ~ "no",
+    TRUE ~ NA_character_
+  )) 
+  
+
+
+
+
+
+
+
+
+
+
 
 
 # End #
