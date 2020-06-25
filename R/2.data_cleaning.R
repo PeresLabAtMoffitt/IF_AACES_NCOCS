@@ -126,9 +126,9 @@ variations_ROI$stroma_variation <- variations_ROI$mean_stroma - mean(ROI_global$
 ########################################################################################## IV ### recode clinical data
 class(clinical_data$BMI_YA)
 clinical_data <- clinical_data %>% 
-  mutate_at(("casecon"), ~ case_when(
-   . == 1 ~ "case",
-   . == 2 ~ "control"
+  mutate(casecon = case_when(
+    casecon == 1 ~ "case",
+    casecon == 2 ~ "control"
   )) %>% 
   mutate(vitalstatus = case_when(
     vitalstatus == 1 ~ "alive",
@@ -155,13 +155,15 @@ clinical_data <- clinical_data %>%
               "breastfedtimes", "breastfeddur", "menarch_age", "menopause_age", "talcgenfreq", 
               "talcgendur", "talcnongenfreq", "talcnongendur", "talcagegen", "talcagenongen",
               "endomet_age", "fibroids_age", "pid_age", "pcos_age", "ovcyst_age", "anyfhstart",
-              "anyfhstop", "eonlystart", "eonlystop", "epstart", "epstop", 
-              ), 
+              "anyfhstop", "eonlystart", "eonlystop", "epstart", "epstop", "smokstart", "smokstop",
+              "cigday", "smokyrs", "packyrs", "diabage", "hrtdisage", "hbpage", "hcholage", "osteoage",
+              "thyrdage", "prvcanage", "prbreastage", "prcolage", "prcervage", "prlungage", 
+              "prmelage", "prutage"), 
             ~ case_when(
               . %in% c("888","998", "999")             ~ NA_real_,
               TRUE                                     ~ as.numeric(.)
             )) %>% 
-  mutate_at(c("pregnum", "fullpregnum", "numsis", "numbro", "numsibs" ), 
+  mutate_at(c("pregnum", "fullpregnum", "numsis", "numbro", "numsibs", "strenpa"), 
             ~ case_when(
               . %in% c("88","98", "99")             ~ NA_real_,
               TRUE                                     ~ as.numeric(.)
@@ -237,29 +239,19 @@ clinical_data <- clinical_data %>%
     married == 1 ~ "single/never married",
     married == 2 ~ "married/living as married"
   )) %>% 
-  mutate(pregever = case_when(
-    pregever == 1 ~ "yes",
-    pregever == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(nulliparous = case_when(
-    nulliparous == 1 ~ "yes",
-    nulliparous == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(hyster = case_when(
-    hyster == 1 ~ "yes",
-    hyster == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(hyster1yr = case_when(
-    hyster1yr == 1 ~ "yes",
-    hyster1yr == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(hyster2yr = case_when(
-    hyster2yr == 1 ~ "yes",
-    hyster2yr == 2 ~ "no",
+  mutate_at(c("pregever", "nulliparous", "hyster", "hyster1yr", "hyster2yr", "oophor", 
+              "oophor1yr", "tubelig", "tubelig1yr", "ocever", "breastfedever", 
+              "talcever", "talcgen", "talcnongen", "talcpartner", "talc_occ", "brcancer",
+              "brcancermom", "brcancersis", "brcancergrandma", "brcanceraunt", "brcancerdau",
+              "brcancerdad", "brcancerbro", "brcancerson", "brcancerchildren", "ovcancermom",
+              "ovcancersis", "ovcancergrandma", "ovcanceraunt", "ovcancerdaughter", "famhxbr",
+              "famhxov", "endomet", "fibroids", "pid", "pcos", "ovcyst", "anyfhever", "eonlyever",
+              "epever", "eonlyever", "aspirin", "NSAID", "aceta", "diab", "hrtdis", "hbp", 
+              "hchol", "osteo", "prvcan", "prbreast",  "prcol", "prcerv", "prlung", "prmel", 
+              "prut", "infert", "trypreg1yr", "mdvisit", "fertmed", "infertsurgivf"), 
+            ~ case_when(
+    . == 1 ~ "yes",
+    . == 2 ~ "no",
     TRUE ~ NA_character_
   )) %>% 
   mutate(hysterreason = case_when(
@@ -267,39 +259,14 @@ clinical_data <- clinical_data %>%
     hysterreason == 2 ~ "Any reason not due to ovarian/FT/peritoneal cancer diagnosis",
     TRUE ~ NA_character_
   )) %>% 
-  mutate(hystertype = case_when(
-    hystertype == 1 ~ "premenopausal",
-    hystertype == 2 ~ "postmenopausal",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(oophor = case_when(
-    oophor == 1 ~ "yes",
-    oophor == 2 ~ "no",
+  mutate_at(c("hystertype", "menopause"), ~ case_when(
+    . == 1 ~ "premenopausal",
+    . == 2 ~ "postmenopausal",
     TRUE ~ NA_character_
   )) %>% 
   mutate(oophortype = case_when(
     oophortype == 1 ~ "unilateral",
     oophortype == 2 ~ "bilateral",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(oophor1yr = case_when(
-    oophor1yr == 1 ~ "yes",
-    oophor1yr == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(tubelig = case_when(
-    tubelig == 1 ~ "yes",
-    tubelig == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(tubelig1yr = case_when(
-    tubelig1yr == 1 ~ "yes",
-    tubelig1yr == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(ocever = case_when(
-    ocever == 1 ~ "yes",
-    ocever == 2 ~ "no",
     TRUE ~ NA_character_
   )) %>% 
   mutate(ocever = case_when(
@@ -311,11 +278,6 @@ clinical_data <- clinical_data %>%
     ocever == 6 ~ "menopausal symptoms",
     ocever == 7 ~ "vaginal bleeding",
     ocever == 8 ~ "other",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(breastfedever = case_when(
-    breastfedever == 1 ~ "yes",
-    breastfedever == 2 ~ "no",
     TRUE ~ NA_character_
   )) %>% 
   mutate(menarch_agecat = case_when(
@@ -335,11 +297,6 @@ clinical_data <- clinical_data %>%
     regperiod_agecat == 6 ~ "never became regular",
     TRUE ~ NA_character_
   )) %>% 
-  mutate(menopause = case_when(
-    menopause == 1 ~ "premenopausal",
-    menopause == 2 ~ "postmenopausal",
-    TRUE ~ NA_character_
-  )) %>% 
   mutate(periodstopreason = case_when(
     periodstopreason == 1 ~ "stopped naturally",
     periodstopreason == 2 ~ "stopped due to surgery",
@@ -348,202 +305,38 @@ clinical_data <- clinical_data %>%
     periodstopreason == 5 ~ "stopped due to other reason",
     TRUE ~ NA_character_
   )) %>% 
-  mutate(talcever = case_when(
-    talcever == 1 ~ "yes",
-    talcever == 2 ~ "no",
+  mutate_at(c("brcancermom_age", "brcancersis_age", "brcancergrandma_age", 
+              "brcancerdau_age", "ovcancermom_age", "ovcancersis_age", 
+              "ovcancergrandma_age", "ovcancerdaughter_age"), ~ case_when(
+    . == 1 ~ "<50 years",
+    . == 2 ~ "50+ years",
     TRUE ~ NA_character_
   )) %>% 
-  mutate(talcgen = case_when(
-    talcgen == 1 ~ "yes",
-    talcgen == 2 ~ "no",
+  mutate(smokever = case_when(
+    smokever == 1 ~ "ever",
+    smokever == 2 ~ "never",
     TRUE ~ NA_character_
   )) %>% 
-  mutate(talcnongen = case_when(
-    talcnongen == 1 ~ "yes",
-    talcnongen == 2 ~ "no",
+  mutate(smokcurrent = case_when(
+    smokcurrent == 1 ~ "current",
+    smokcurrent == 2 ~ "never",
+    smokcurrent == 3 ~ "former",
     TRUE ~ NA_character_
   )) %>% 
-  mutate(talcpartner = case_when(
-    talcpartner == 1 ~ "yes",
-    talcpartner == 2 ~ "no",
+  mutate(thyrd = case_when(
+    thyrd == 1 ~ "yes, unspecified",
+    thyrd == 2 ~ "no",
+    thyrd == 3 ~ "yes, hyperthyroid/overreactive",
+    thyrd == 4 ~ "yes, hypothyroid/underreactive",
     TRUE ~ NA_character_
   )) %>% 
-  mutate(talc_occ = case_when(
-    talc_occ == 1 ~ "yes",
-    talc_occ == 2 ~ "no",
+  mutate(mdvisitrsn = case_when(
+    mdvisitrsn == 1 ~ "Female problem",
+    mdvisitrsn == 2 ~ "Partner problem",
+    mdvisitrsn == 3 ~ "Both female and partner problem",
+    mdvisitrsn == 4 ~ "No problem was found",
     TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcancer = case_when(
-    brcancer == 1 ~ "yes",
-    brcancer == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcancermom = case_when(
-    brcancermom == 1 ~ "yes",
-    brcancermom == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcancermom_age = case_when(
-    brcancermom_age == 1 ~ "<50 years",
-    brcancermom_age == 2 ~ "50+ years",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcancersis = case_when(
-    brcancersis == 1 ~ "yes",
-    brcancersis == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcancersis_age = case_when(
-    brcancersis_age == 1 ~ "<50 years",
-    brcancersis_age == 2 ~ "50+ years",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcancergrandma = case_when(
-    brcancergrandma == 1 ~ "yes",
-    brcancergrandma == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcancergrandma_age = case_when(
-    brcancergrandma_age == 1 ~ "<50 years",
-    brcancergrandma_age == 2 ~ "50+ years",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcanceraunt = case_when(
-    brcanceraunt == 1 ~ "yes",
-    brcanceraunt == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcancerdau = case_when(
-    brcancerdau == 1 ~ "yes",
-    brcancerdau == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcancerdau_age = case_when(
-    brcancerdau_age == 1 ~ "<50 years",
-    brcancerdau_age == 2 ~ "50+ years",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcancerdad = case_when(
-    brcancerdad == 1 ~ "yes",
-    brcancerdad == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcancerbro = case_when(
-    brcancerbro == 1 ~ "yes",
-    brcancerbro == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcancerson = case_when(
-    brcancerson == 1 ~ "yes",
-    brcancerson == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(brcancerchildren = case_when(
-    brcancerchildren == 1 ~ "yes",
-    brcancerchildren == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(ovcancermom = case_when(
-    ovcancermom == 1 ~ "yes",
-    ovcancermom == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(ovcancermom_age = case_when(
-    ovcancermom_age == 1 ~ "<50 years",
-    ovcancermom_age == 2 ~ "50+ years",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(ovcancersis = case_when(
-    ovcancersis == 1 ~ "yes",
-    ovcancersis == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(ovcancersis_age = case_when(
-    ovcancersis_age == 1 ~ "<50 years",
-    ovcancersis_age == 2 ~ "50+ years",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(ovcancergrandma = case_when(
-    ovcancergrandma == 1 ~ "yes",
-    ovcancergrandma == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(ovcancergrandma_age = case_when(
-    ovcancergrandma_age == 1 ~ "<50 years",
-    ovcancergrandma_age == 2 ~ "50+ years",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(ovcanceraunt = case_when(
-    ovcanceraunt == 1 ~ "yes",
-    ovcanceraunt == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(ovcancerdaughter = case_when(
-    ovcancerdaughter == 1 ~ "yes",
-    ovcancerdaughter == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(ovcancerdaughter_age = case_when(
-    ovcancerdaughter_age == 1 ~ "<50 years",
-    ovcancerdaughter_age == 2 ~ "50+ years",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(famhxbr = case_when(
-    famhxbr == 1 ~ "yes",
-    famhxbr == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(famhxov = case_when(
-    famhxov == 1 ~ "yes",
-    famhxov == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(endomet = case_when(
-    endomet == 1 ~ "yes",
-    endomet == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(fibroids = case_when(
-    fibroids == 1 ~ "yes",
-    fibroids == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(pid = case_when(
-    pid == 1 ~ "yes",
-    pid == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(pcos = case_when(
-    pcos == 1 ~ "yes",
-    pcos == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(ovcyst = case_when(
-    ovcyst == 1 ~ "yes",
-    ovcyst == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(anyfhever = case_when(
-    anyfhever == 1 ~ "yes",
-    anyfhever == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(eonlyever = case_when(
-    eonlyever == 1 ~ "yes",
-    eonlyever == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(epever = case_when(
-    epever == 1 ~ "yes",
-    epever == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-  mutate(eonlyever = case_when(
-    eonlyever == 1 ~ "yes",
-    eonlyever == 2 ~ "no",
-    TRUE ~ NA_character_
-  )) %>% 
-
+  ))
 
 
 
