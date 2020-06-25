@@ -124,8 +124,8 @@ variations_ROI$tumor_variation <- variations_ROI$mean_tumor - mean(ROI_global$pe
 variations_ROI$stroma_variation <- variations_ROI$mean_stroma - mean(ROI_global$percent_stroma)
 
 ########################################################################################## IV ### recode clinical data
-class(clinical_data$BMI_YA)
 clinical_data <- clinical_data %>% 
+  mutate(suid = factor(suid)) %>% 
   mutate(casecon = case_when(
     casecon == 1                                       ~ "case",
     casecon == 2                                       ~ "control"
@@ -345,11 +345,5 @@ clinical_data <- clinical_data %>%
 
 # x <- clinical_data %>% drop_na("menopause_age") %>% 
 #   select("suid", "hyster", "menopause_age", "menopause", "periodstopreason")
-
-
-
-
-
-
 
 # End
