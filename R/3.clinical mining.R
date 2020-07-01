@@ -32,7 +32,7 @@ clinical_data %>%
   theme_minimal()+
   coord_flip()
 
-# clinical_data %>%  # histotype doesn't seem relavant as almost all are invasive
+# clinical_data %>%  # histotype doesn't seem relavant as almost all are high grade serous
 #   group_by(histotype, race) %>% 
 #   summarise(count=n()) %>% 
 #   ggplot(aes(x=histotype, y=count, fill=race))+
