@@ -1,3 +1,4 @@
+# more cleaning ----------------------------------------------------------------------------------------------------------
 
 # III-Remove the TMA IDs from patient excluded from the study
 # Should only be done for TMAs
@@ -11,22 +12,23 @@ TMA_stroma <-
   filter(!is.na(suid))
 
 # Did it for ROIs too in case  #------------------ All good so don't run anymore but still create suid 
-ROI_tumor$suid <- str_match(ROI_tumor$image_tag, "Peres_P1_([:digit:]*)")[,2]
+ROI_tumor$suid <- str_match(ROI_tumor$image_tag, 
+                            "(Peres_P1_AACES.|Peres_P1_AACEES.|Peres_P1_OV|Peres_P1.|)([:digit:]*)")[,3]
 # ROI_tumor <-
 #   ROI_tumor[(!grepl(uid, ROI_tumor$suid)), ]
-ROI_stroma$suid <- str_match(ROI_stroma$image_tag, "Peres_P1_([:digit:]*)")[,2]
+ROI_stroma$suid <- str_match(ROI_stroma$image_tag, 
+                             "(Peres_P1_AACES.|Peres_P1_AACEES.|Peres_P1_OV|Peres_P1.|)([:digit:]*)")[,3]
 # ROI_stroma <-
 #   ROI_stroma[(!grepl(uid, ROI_stroma$suid)), ]
 
 # Cleaning
-rm(uid, fct_name_repair, # roir_import,
+rm(uid, fct_name_repair, var_names, # roir_import,
    data_import, roit_import, rois_import, tmat_import, tmas_import,
    tma2t_import, tma2s_import, common_ROITMA_import, # tmar_import, 
-   TMAcases_remove, case_remove_import)
+   TMAcases_remove, case_remove_import, binding, match_cases_import)
 
 
-#-----------------------------------------------------------------------------------------------------------------
-
+# Merging TMAs and ROIs --------------------------------------------------------------------------------------------------
 # 1.	Calculate the % tumor and % stroma within each ROI/TMA core. 
 # Provide the mean, median, and range of the % tumor and % stroma 
 # for the TMA cores, intratumoral ROIs, and peripheral ROIs. 
@@ -45,7 +47,7 @@ ROI_global <- merge.data.frame(ROI_tumor, ROI_stroma %>% select(-c("intratumoral
     intratumoral_i_vs_peripheral_p_ == "p" ~ "Peripheral",
     intratumoral_i_vs_peripheral_p_ == "i" ~ "Intratumoral")
     ) %>% 
-  mutate(suid = factor(suid)) %>% 
+  mutate(suid = as.character(suid)) %>% 
   select(suid, everything()) %>% 
   mutate(CD3_tumor_mm2 = (tumor_cd3_opal_650_positive_cells/tumor_area_analyzed_mm2_)) %>% # density of marker per mm2
   mutate(CD3_stroma_mm2 = (stroma_cd3_opal_650_positive_cells/stroma_area_analyzed_mm2_)) %>% 
@@ -79,7 +81,7 @@ TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma %>% select(-suid),
          ) %>% 
   mutate(percent_stroma = round((stroma_total_cells / total_cell_number)*100, 2)
          ) %>% 
-  mutate(suid = factor(suid)) %>% 
+  mutate(suid = as.character(suid)) %>% 
   select(suid, everything()) %>% 
   mutate(CD3_tumor_mm2 = (tumor_cd3_opal_650_positive_cells/tumor_area_analyzed_mm2_)) %>% 
   mutate(CD3_stroma_mm2 = (stroma_cd3_opal_650_positive_cells/stroma_area_analyzed_mm2_)) %>% 
@@ -103,27 +105,58 @@ TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma %>% select(-suid),
   # mutate(CD11b_CD15perc_tumor_mm2 = (tumor_percent_cd11bplus_cd15plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
   # mutate(CD11b_CD15perc_stroma_mm2 = stroma_percent_cd11bplus_cd15plus_positive_cells/stroma_area_analyzed_mm2_)
 
+
+# variation data ---------------------------------------------------------------------------------------------------------
 # Look at the variation between each patient and the global mean # Should we mot compare Black and White?
 # Here compare the mean of % cells to global study % cells
 variations_TMA <- group_by(TMA_global, suid) %>% 
-  summarize(mean_tumor = mean(percent_tumor), mean_stroma = mean(percent_stroma)) %>% 
+  summarize(mean_tumor = mean(percent_tumor), mean_stroma = mean(percent_stroma),
+            variance_tumor = var(percent_tumor), variance_stroma = var(percent_stroma)) %>% 
   mutate(ID = seq(1:nrow(.)))
 variations_TMA$tumor_variation <- variations_TMA$mean_tumor - mean(TMA_global$percent_tumor)
 variations_TMA$stroma_variation <- variations_TMA$mean_stroma - mean(TMA_global$percent_stroma)
 
 variations_ROIip <- group_by(ROI_global, suid, intratumoral_i_vs_peripheral_p_) %>% # mean of % cells separated by intra or perip
-  summarize(mean_tumor = mean(percent_tumor), mean_stroma = mean(percent_stroma))
+  summarize(mean_tumor = mean(percent_tumor), mean_stroma = mean(percent_stroma),
+            variance_tumor = var(percent_tumor), variance_stroma = var(percent_stroma))
 setDT(variations_ROIip)[, ID := .GRP, .(suid)]
 variations_ROIip$tumor_variation <- variations_ROIip$mean_tumor - mean(ROI_global$percent_tumor)
 variations_ROIip$stroma_variation <- variations_ROIip$mean_stroma - mean(ROI_global$percent_stroma)
 
-variations_ROI <- group_by(variations_ROIip, suid) %>% 
-  summarize(mean_tumor = mean(mean_tumor), mean_stroma = mean(mean_stroma)) %>% # mean of % cells merging intra or perip
-  mutate(ID = seq(1:nrow(.)))
-variations_ROI$tumor_variation <- variations_ROI$mean_tumor - mean(ROI_global$percent_tumor)
-variations_ROI$stroma_variation <- variations_ROI$mean_stroma - mean(ROI_global$percent_stroma)
+# Commented because, after checking, it is not a good idea to combined all suid (I + P)
+# variations_ROI <- group_by(variations_ROIip, suid) %>% 
+#   summarize(mean_tumor = mean(mean_tumor), mean_stroma = mean(mean_stroma)) %>% # mean of % cells merging intra or perip
+#   mutate(ID = seq(1:nrow(.)))
+# variations_ROI$tumor_variation <- variations_ROI$mean_tumor - mean(ROI_global$percent_tumor)
+# variations_ROI$stroma_variation <- variations_ROI$mean_stroma - mean(ROI_global$percent_stroma)
 
-########################################################################################## IV ### recode clinical data
+# variation for the 28 patients----
+uid <- paste(unique(common_ROITMA_IDs$Subject_IDs), collapse = '|')
+variation_TMA <- variations_TMA[(grepl(uid, variations_TMA$suid)),]
+# variation_ROI <- variations_ROI[(grepl(uid, variations_ROI$suid)),]
+variation_ROIi <- variations_ROIip[(grepl(uid, variations_ROIip$suid)),] %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral")
+variation_ROIp <- variations_ROIip[(grepl(uid, variations_ROIip$suid)),] %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral")
+
+# variation <- merge.data.frame(variations_TMA %>% 
+#                                 select(-ID), 
+#                               variations_ROI %>% 
+#                                 select(-ID),
+#                               by.x = "suid", by.y = "suid",
+#                               all = TRUE, suffixes = c("_tma", "_roi"))
+variation_ROIip <- merge.data.frame(variation_ROIi %>% 
+                                      select(-ID),
+                                    variation_ROIp %>% 
+                                      select(-ID),
+                                    by.x = "suid", by.y = "suid",
+                                    all = TRUE, suffixes = c("_roi_i", "_roi_p"))
+variation <- merge.data.frame(variation_TMA, variation_ROIip,
+                              by.x = "suid", by.y = "suid",
+                              all = TRUE, suffixes = c("_tma", "")) %>% 
+  mutate(ID = seq(1:nrow(.)))
+
+########################################################################################## IV ### recode clinical data----
 clinical_data <- clinical_data %>% 
   mutate(suid = factor(suid)) %>% 
   mutate(casecon = case_when(
@@ -346,4 +379,4 @@ clinical_data <- clinical_data %>%
 # x <- clinical_data %>% drop_na("menopause_age") %>% 
 #   select("suid", "hyster", "menopause_age", "menopause", "periodstopreason")
 
-# End
+# End----
