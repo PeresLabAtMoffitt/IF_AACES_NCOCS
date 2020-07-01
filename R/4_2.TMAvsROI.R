@@ -1,23 +1,26 @@
 
 # Test normality
-qqnorm(variations$mean_tumor_tma)
-qqnorm(variations$mean_tumor_roi_i)
+qqnorm(variation$mean_tumor)
+qqnorm(variation$mean_tumor_roi_i)
 # Correlation
 library(psych)
-pairs.panels(variations)
-pairs.panels(variations[c("mean_tumor_tma", "mean_tumor_roi_i")])
+colnames(variation)
+pairs.panels(variation[c("mean_tumor", "mean_stroma", "tumor_variation", "stroma_variation",
+                          "mean_tumor_roi_i", "mean_stroma_roi_i", "tumor_variation_roi_i", "stroma_variation_roi_i",
+                          "mean_tumor_roi_p", "mean_stroma_roi_p", "tumor_variation_roi_p", "stroma_variation_roi_p")])
+pairs.panels(variation[c("mean_tumor", "mean_tumor_roi_i", "tumor_variation", "tumor_variation_roi_i")])
 
 library(corrplot)
 library(ggcorrplot)
 
-mat <- cor(variations[, c("mean_tumor_tma", "mean_tumor_roi_i", "mean_tumor_roi_p", 
-                          "mean_stroma_tma", "mean_stroma_roi_i", "mean_stroma_roi_p")], 
+mat <- cor(variation[, c("mean_tumor", "mean_tumor_roi_i", "mean_tumor_roi_p", 
+                          "mean_stroma", "mean_stroma_roi_i", "mean_stroma_roi_p")], 
            use = "pairwise.complete.obs")
 corrplot(mat)
 corrplot.mixed(mat)
 
-mat1 <- cor(variations[, c("tumor_variation_tma", "tumor_variation_roi_i", "tumor_variation_roi_p", 
-                           "stroma_variation_tma", "stroma_variation_roi_i", "stroma_variation_roi_p")], 
+mat1 <- cor(variation[, c("tumor_variation", "tumor_variation_roi_i", "tumor_variation_roi_p", 
+                           "stroma_variation", "stroma_variation_roi_i", "stroma_variation_roi_p")], 
             use = "pairwise.complete.obs")
 corrplot(mat1)
 corrplot.mixed(mat1)
