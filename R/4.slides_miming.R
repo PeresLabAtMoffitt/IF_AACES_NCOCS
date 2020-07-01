@@ -21,7 +21,22 @@ ICC_TMA <- TMA_global[, c("suid", "tumor_total_cells")]
 ICC_TMA <- dcast(setDT(ICC_TMA), suid ~ rowid(suid), 
                  value.var = "tumor_total_cells") %>% 
   select(c(2:4))
-
+# Check density
+ICC_d_ROIi <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>%
+  select(c("suid", "CD3_tumor_mm2", "CD3_stroma_mm2"))
+ICC_d_ROIi <- dcast(setDT(ICC_d_ROIi), suid ~ rowid(suid), 
+                  value.var = c("CD3_tumor_mm2", "CD3_stroma_mm2")) %>% 
+  select(c(2:4, 14:16))
+# vs %
+ICC_p_ROIi <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>%
+  select(c("suid", "tumor_percent_cd3_opal_650_positive_cells", 
+           "stroma_percent_cd3_opal_650_positive_cells"))
+ICC_p_ROIi <- dcast(setDT(ICC_d_ROIi), suid ~ rowid(suid), 
+                    value.var = c("tumor_percent_cd3_opal_650_positive_cells", 
+                    "stroma_percent_cd3_opal_650_positive_cells")) %>% 
+  select(c(2:4, 14:16))
 # If test for intra-rater (because for each patient the 3 TMA/ROI was done by the same person)
 # If test for inter-rater (because not the same rater between patients)
 # Two-way mixed effect, fixed raters are defined. Each subject is measured by the k raters.
@@ -29,6 +44,8 @@ library(psych) # Koo and Li (2016)
 ICC(ICC_TMA)  # between 0.75 and 0.90: good
 ICC(ICC_ROIi)
 ICC(ICC_ROIp) #between 0.50 and 0.75: moderate
+ICC(ICC_d_ROIi)
+ICC(ICC_p_ROIi)
 library(irr) # Does not count patient with NA
 icc(
   ICC_TMA, model = "twoway", 
@@ -44,7 +61,7 @@ icc(
 )
 
 # Cleaning
-rm(ICC_TMA, ICC_ROIi, ICC_ROIp)
+rm(ICC_TMA, ICC_ROIi, ICC_ROIp, ICC_d_ROIi, ICC_p_ROIi)
 
 ###################################################################################### II ### Create population table----
 table <- matrix(c("", "Tumor", "Stroma",
@@ -113,7 +130,17 @@ table <- matrix(c("", "Tumor", "Stroma",
 # write.csv(table, 
 #           paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Summary tumor, stroma in TMAs and ROIs.csv"))
 rm(table)
-
+TMA_global %>% select("suid", "percent_tumor", "percent_stroma") %>% 
+  tbl_summary(by= "suid", statistic = list(all_continuous() ~ "{median} ({sd})")) %>% 
+  add_p()
+ROI_global %>% filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
+  select("suid", "percent_tumor", "percent_stroma") %>% 
+  tbl_summary(by= "suid", statistic = list(all_continuous() ~ "{median} ({sd})")) %>% 
+  add_p()
+ROI_global %>% filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
+  select("suid", "percent_tumor", "percent_stroma") %>% 
+  tbl_summary(by= "suid", statistic = list(all_continuous() ~ "{median} ({sd})"))%>% 
+  add_p()
 
 ###################################################################################### III ### Plots data----
 # 1. Investigate number of tumoral and stromal cell in TMAs and ROIs----
