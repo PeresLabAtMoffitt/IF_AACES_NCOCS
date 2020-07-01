@@ -39,7 +39,8 @@ ggcorrplot(mat, hc.order = TRUE, method = "circle",
            digits = 1
 )
 
-
+# Cleaning
+rm(mat, mat1)
 
 # End
 

@@ -1,6 +1,13 @@
-# more cleaning ----------------------------------------------------------------------------------------------------------
+########################################################################################## I ### Cleaning TMAs, ROIs data----
 
-# III-Remove the TMA IDs from patient excluded from the study
+
+# Keep the control slides for comparaison----
+# other_tissue = 1 are controls used for QC purposes
+# They may be benign or cancerous tissue from other anatomical sites - like tonsil or spleen
+# TMA_Tctrl <- TMA_tumor %>% filter(!is.na(other_tissue))
+# TMA_Sctrl <- TMA_stroma %>% filter(!is.na(other_tissue))
+
+# 1-Remove the TMA IDs from patient excluded from the study----
 # Should only be done for TMAs
 # Plus remove TMA with no IDs = controls images
 uid <- paste(unique(TMAcases_remove$Subject_IDs), collapse = "|")
@@ -11,25 +18,16 @@ TMA_stroma <-
   TMA_stroma[(!grepl(uid, TMA_stroma$suid)),] %>% 
   filter(!is.na(suid))
 
-# Did it for ROIs too in case  #------------------ All good so don't run anymore but still create suid 
+# Did it for ROIs too in case but no cases to remove
+# Create suid for ROIs
 ROI_tumor$suid <- str_match(ROI_tumor$image_tag, 
                             "(Peres_P1_AACES.|Peres_P1_AACEES.|Peres_P1_OV|Peres_P1.|)([:digit:]*)")[,3]
-# ROI_tumor <-
-#   ROI_tumor[(!grepl(uid, ROI_tumor$suid)), ]
 ROI_stroma$suid <- str_match(ROI_stroma$image_tag, 
                              "(Peres_P1_AACES.|Peres_P1_AACEES.|Peres_P1_OV|Peres_P1.|)([:digit:]*)")[,3]
-# ROI_stroma <-
-#   ROI_stroma[(!grepl(uid, ROI_stroma$suid)), ]
-
-# Cleaning
-rm(uid, fct_name_repair, var_names, # roir_import,
-   data_import, roit_import, rois_import, tmat_import, tmas_import,
-   tma2t_import, tma2s_import, common_ROITMA_import, # tmar_import, 
-   TMAcases_remove, case_remove_import, binding, match_cases_import)
 
 
-# Merging TMAs and ROIs --------------------------------------------------------------------------------------------------
-# 1.	Calculate the % tumor and % stroma within each ROI/TMA core. 
+# 2.Merging TMAs and ROIs --------------------------------------------------------------------------------------------------
+# 2.1.	Calculate the % tumor and % stroma within each ROI/TMA core----
 # Provide the mean, median, and range of the % tumor and % stroma 
 # for the TMA cores, intratumoral ROIs, and peripheral ROIs. 
 # Also assess the variation by case in terms of the % tumor and % stroma. 
@@ -106,7 +104,7 @@ TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma %>% select(-suid),
   # mutate(CD11b_CD15perc_stroma_mm2 = stroma_percent_cd11bplus_cd15plus_positive_cells/stroma_area_analyzed_mm2_)
 
 
-# variation data ---------------------------------------------------------------------------------------------------------
+# 2.2. Create variation data ---------------------------------------------------------------------------------------------------------
 # Look at the variation between each patient and the global mean # Should we mot compare Black and White?
 # Here compare the mean of % cells to global study % cells
 variations_TMA <- group_by(TMA_global, suid) %>% 
@@ -130,7 +128,7 @@ variations_ROIip$stroma_variation <- variations_ROIip$mean_stroma - mean(ROI_glo
 # variations_ROI$tumor_variation <- variations_ROI$mean_tumor - mean(ROI_global$percent_tumor)
 # variations_ROI$stroma_variation <- variations_ROI$mean_stroma - mean(ROI_global$percent_stroma)
 
-# variation for the 28 patients----
+# 2.4. Create variation for the 28 patients----
 uid <- paste(unique(common_ROITMA_IDs$Subject_IDs), collapse = '|')
 variation_TMA <- variations_TMA[(grepl(uid, variations_TMA$suid)),]
 # variation_ROI <- variations_ROI[(grepl(uid, variations_ROI$suid)),]
@@ -156,7 +154,7 @@ variation <- merge.data.frame(variation_TMA, variation_ROIip,
                               all = TRUE, suffixes = c("_tma", "")) %>% 
   mutate(ID = seq(1:nrow(.)))
 
-########################################################################################## IV ### recode clinical data----
+########################################################################################## II ### recode clinical data----
 clinical_data <- clinical_data %>% 
   mutate(suid = factor(suid)) %>% 
   mutate(casecon = case_when(
@@ -376,7 +374,12 @@ clinical_data <- clinical_data %>%
     TRUE                                                ~ NA_character_
   ))
 
-# x <- clinical_data %>% drop_na("menopause_age") %>% 
+# x <- clinical_data %>% drop_na("menopause_age") %>% # To answer why is there 777 in menopause_age
 #   select("suid", "hyster", "menopause_age", "menopause", "periodstopreason")
+
+
+# Cleaning
+rm(uid, TMAcases_remove)
+
 
 # End----
