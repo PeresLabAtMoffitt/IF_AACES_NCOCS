@@ -379,7 +379,8 @@ clinical_data <- clinical_data %>%
 
 
 # Cleaning
-rm(uid, TMAcases_remove)
+rm(uid, TMAcases_remove, TMA_tumor, TMA_stroma, ROI_tumor, ROI_stroma,
+   common_ROITMA_IDs)
 
 
 # End----
