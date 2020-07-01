@@ -121,12 +121,12 @@ setDT(variations_ROIip)[, ID := .GRP, .(suid)]
 variations_ROIip$tumor_variation <- variations_ROIip$mean_tumor - mean(ROI_global$percent_tumor)
 variations_ROIip$stroma_variation <- variations_ROIip$mean_stroma - mean(ROI_global$percent_stroma)
 
-# Commented because, after checking, it is not a good idea to combined all suid (I + P)
-# variations_ROI <- group_by(variations_ROIip, suid) %>% 
-#   summarize(mean_tumor = mean(mean_tumor), mean_stroma = mean(mean_stroma)) %>% # mean of % cells merging intra or perip
-#   mutate(ID = seq(1:nrow(.)))
-# variations_ROI$tumor_variation <- variations_ROI$mean_tumor - mean(ROI_global$percent_tumor)
-# variations_ROI$stroma_variation <- variations_ROI$mean_stroma - mean(ROI_global$percent_stroma)
+# Will commented because, after checking, it is not a good idea to combined all suid (I + P)
+variations_ROI <- group_by(variations_ROIip, suid) %>%
+  summarize(mean_tumor = mean(mean_tumor), mean_stroma = mean(mean_stroma)) %>% # mean of % cells merging intra or perip
+  mutate(ID = seq(1:nrow(.)))
+variations_ROI$tumor_variation <- variations_ROI$mean_tumor - mean(ROI_global$percent_tumor)
+variations_ROI$stroma_variation <- variations_ROI$mean_stroma - mean(ROI_global$percent_stroma)
 
 # 2.4. Create variation for the 28 patients----
 uid <- paste(unique(common_ROITMA_IDs$Subject_IDs), collapse = '|')
@@ -143,35 +143,37 @@ variation_ROIp <- variations_ROIip[(grepl(uid, variations_ROIip$suid)),] %>%
 #                                 select(-ID),
 #                               by.x = "suid", by.y = "suid",
 #                               all = TRUE, suffixes = c("_tma", "_roi"))
-variation_ROIip <- merge.data.frame(variation_ROIi %>% 
-                                      select(-ID),
-                                    variation_ROIp %>% 
-                                      select(-ID),
+variation_ROIip <- merge.data.frame(variation_ROIi # %>% 
+                                      # select(-ID)
+                                      ,
+                                    variation_ROIp # %>% 
+                                      # select(-ID)
+                                      ,
                                     by.x = "suid", by.y = "suid",
                                     all = TRUE, suffixes = c("_roi_i", "_roi_p"))
 variation <- merge.data.frame(variation_TMA, variation_ROIip,
                               by.x = "suid", by.y = "suid",
-                              all = TRUE, suffixes = c("_tma", "")) %>% 
-  mutate(ID = seq(1:nrow(.)))
+                              all = TRUE, suffixes = c("_tma", "")) # %>% 
+  # mutate(ID = seq(1:nrow(.)))
 
 ########################################################################################## II ### recode clinical data----
 clinical_data <- clinical_data %>% 
   mutate(suid = factor(suid)) %>% 
   mutate(casecon = case_when(
-    casecon == 1                                       ~ "case",
-    casecon == 2                                       ~ "control"
+    casecon == 1                                       ~ "Case",
+    casecon == 2                                       ~ "Control"
   )) %>% 
   mutate(vitalstatus = case_when(
-    vitalstatus == 1                                   ~ "alive",
-    vitalstatus == 2                                   ~ "deceased",
+    vitalstatus == 1                                   ~ "Alive",
+    vitalstatus == 2                                   ~ "Deceased",
     TRUE                                               ~ NA_character_
   )) %>% 
   mutate(cancersite = case_when(
-    cancersite == 1                                    ~ "ovarian",
-    cancersite == 2                                    ~ "tubal",
-    cancersite == 3                                    ~ "peritoneal",
-    cancersite == 4                                    ~ "ovarian or tubal, can't distinguish",
-    cancersite == 5                                    ~ "ovarian, tubal or peritoneal, can't distinguish",
+    cancersite == 1                                    ~ "Ovarian",
+    cancersite == 2                                    ~ "Tubal",
+    cancersite == 3                                    ~ "Peritoneal",
+    cancersite == 4                                    ~ "Ovarian or tubal, can't distinguish",
+    cancersite == 5                                    ~ "Ovarian, tubal or peritoneal, can't distinguish",
     TRUE                                               ~ NA_character_
   )) %>% 
   mutate_at(c("timelastfu", "morphology", "hysteryear", "oophoryear", "tubeligyear",
@@ -205,20 +207,20 @@ clinical_data <- clinical_data %>%
               TRUE                                     ~ as.numeric(.)
             )) %>% 
   mutate(histology = case_when(
-    histology == 1                                     ~ "serous",
-    histology == 2                                     ~ "endometrioid",
-    histology == 3                                     ~ "clear cell",
-    histology == 4                                     ~ "mucinous",
-    histology == 5                                     ~ "carcinosarcoma",
-    histology == 6                                     ~ "carcinoma, NOS",
-    histology == 7                                     ~ "other specified epithelial ovarian cancer (e.g. Malignant Brenner, mixed)",
-    histology == 8                                     ~ "epithelial, NOS",
-    histology == 9                                     ~ "synchronous",
+    histology == 1                                     ~ "Serous",
+    histology == 2                                     ~ "Endometrioid",
+    histology == 3                                     ~ "Clear cell",
+    histology == 4                                     ~ "Mucinous",
+    histology == 5                                     ~ "Carcinosarcoma",
+    histology == 6                                     ~ "Carcinoma, NOS",
+    histology == 7                                     ~ "Other specified epithelial ovarian cancer (e.g. Malignant Brenner, mixed)",
+    histology == 8                                     ~ "Epithelial, NOS",
+    histology == 9                                     ~ "Synchronous",
     TRUE                                                ~ NA_character_
   )) %>% 
   mutate(behavior = case_when(
-    behavior == 1                                      ~ "borderline",
-    behavior == 2                                      ~ "invasive",
+    behavior == 1                                      ~ "Borderline",
+    behavior == 2                                      ~ "Invasive",
     TRUE                                                ~ NA_character_
   )) %>% 
   mutate(stage = case_when(
@@ -249,14 +251,14 @@ clinical_data <- clinical_data %>%
     TRUE                                                ~ NA_character_
   )) %>%
   mutate(race = case_when(
-    race == 1                                          ~ "white",
-    race == 2                                          ~ "black",
-    race == 3                                          ~ "biracial",
+    race == 1                                          ~ "White",
+    race == 2                                          ~ "Black",
+    race == 3                                          ~ "Biracial",
     TRUE                                                ~ NA_character_
   )) %>% 
   mutate(hispanic = case_when(
-    hispanic == 1                                      ~ "hispanic",
-    hispanic == 2                                      ~ "non-hispanic",
+    hispanic == 1                                      ~ "Hispanic",
+    hispanic == 2                                      ~ "Non-hispanic",
     TRUE                                                ~ NA_character_
   )) %>% 
   mutate(birthplace = case_when(
@@ -296,13 +298,13 @@ clinical_data <- clinical_data %>%
     TRUE                                                ~ NA_character_
   )) %>% 
   mutate_at(c("hystertype", "menopause"), ~ case_when(
-    . == 1                                              ~ "premenopausal",
-    . == 2                                              ~ "postmenopausal",
+    . == 1                                              ~ "Premenopausal",
+    . == 2                                              ~ "Postmenopausal",
     TRUE                                                ~ NA_character_
   )) %>% 
   mutate(oophortype = case_when(
-    oophortype == 1                                     ~ "unilateral",
-    oophortype == 2                                     ~ "bilateral",
+    oophortype == 1                                     ~ "Unilateral",
+    oophortype == 2                                     ~ "Bilateral",
     TRUE                                                ~ NA_character_
   )) %>% 
   mutate(ocever = case_when(

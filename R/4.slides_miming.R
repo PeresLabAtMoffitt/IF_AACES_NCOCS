@@ -33,7 +33,7 @@ ICC_p_ROIi <- ROI_global %>%
   filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>%
   select(c("suid", "tumor_percent_cd3_opal_650_positive_cells", 
            "stroma_percent_cd3_opal_650_positive_cells"))
-ICC_p_ROIi <- dcast(setDT(ICC_d_ROIi), suid ~ rowid(suid), 
+ICC_p_ROIi <- dcast(setDT(ICC_p_ROIi), suid ~ rowid(suid), 
                     value.var = c("tumor_percent_cd3_opal_650_positive_cells", 
                     "stroma_percent_cd3_opal_650_positive_cells")) %>% 
   select(c(2:4, 14:16))
@@ -130,6 +130,7 @@ table <- matrix(c("", "Tumor", "Stroma",
 # write.csv(table, 
 #           paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Summary tumor, stroma in TMAs and ROIs.csv"))
 rm(table)
+
 TMA_global %>% select("suid", "percent_tumor", "percent_stroma") %>% 
   tbl_summary(by= "suid", statistic = list(all_continuous() ~ "{median} ({sd})")) %>% 
   add_p()

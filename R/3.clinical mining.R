@@ -81,10 +81,6 @@ clinical_data %>%
   geom_freqpoly()+
   theme_minimal()
 
-# Age at diag between black and white
-ggplot(clinical_data, aes(x=race, y=refage, color=race))+
-  geom_violin(scale = "count") # choose count to refect areas are scaled proportionally to the number of observations.
-
 clinical_data$range_BMI <- as.factor(findInterval(clinical_data$BMI_recent,c(0,25,30,35,40,45,50,55,60,65,70,75,80)))
 levels(clinical_data$range_BMI) <-  
   c("<26","26-30","31-35","36-40","41-45","46-50","51-55","56-60","61-65","65-70", "70-75", 
@@ -97,6 +93,13 @@ clinical_data %>%
   geom_bar(stat = "identity", position=position_dodge2(preserve = "single"))+
   theme_minimal()+
   coord_flip()
+
+
+# Age at diag between black and white
+ggplot(clinical_data, aes(x=race, y=refage, color=race))+
+  geom_violin(scale = "count") # choose count to refect areas are scaled proportionally to the number of observations.
+
+
 
 
 

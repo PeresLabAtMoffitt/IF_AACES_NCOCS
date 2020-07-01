@@ -177,7 +177,8 @@ markers_ROIp <- ROI_global %>%
 markers_ROI <- full_join(markers_ROIi, markers_ROIp,
                          by = "suid", suffixe = c("i", "p"))
 
-markers_ROI <-
+markers_ROI <- markers_ROI %>% 
+  mutate(ratio_CD3 = percent_CD3_tumor/percent_tumor)
 
 
 
