@@ -168,6 +168,11 @@ clinical_data <- clinical_data %>%
     vitalstatus == 2                                   ~ "Deceased",
     TRUE                                               ~ NA_character_
   )) %>% 
+  mutate(surv_vital = case_when(
+    vitalstatus == "Alive"                             ~ 0,
+    vitalstatus == "Deceased"                          ~ 1,
+    TRUE                                               ~ NA_real_
+  )) %>% 
   mutate(cancersite = case_when(
     cancersite == 1                                    ~ "Ovarian",
     cancersite == 2                                    ~ "Tubal",
