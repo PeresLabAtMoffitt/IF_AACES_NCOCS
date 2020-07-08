@@ -812,7 +812,6 @@ variation %>% select("suid", "mean_tumor", "mean_tumor_roi_i", "mean_tumor_roi_p
 # Test normality
 qqnorm(variation$mean_tumor)
 qqnorm(variation$mean_tumor_roi_i)
-
 pairs.panels(variation[c("mean_tumor", "mean_stroma", # "tumor_variation", "stroma_variation",
                          "mean_tumor_roi_i", "mean_stroma_roi_i", # "tumor_variation_roi_i", "stroma_variation_roi_i",
                          "mean_tumor_roi_p", "mean_stroma_roi_p"# , "tumor_variation_roi_p", "stroma_variation_roi_p"
