@@ -463,6 +463,7 @@ markers_ROIi <- ROI_global %>%
             percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
             percent_CD11b_CD15_tumor = mean(tumor_percent_cd11bplus_cd15plus_positive_cells), 
             percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells))
+
 # setDT(markers_ROIip)[, ID := .GRP, .(suid)]
 markers_ROIp <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
@@ -483,7 +484,6 @@ markers_ROIp <- ROI_global %>%
             percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
             percent_CD11b_CD15_tumor = mean(tumor_percent_cd11bplus_cd15plus_positive_cells), 
             percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells))
-
 
 
 # Cleaning

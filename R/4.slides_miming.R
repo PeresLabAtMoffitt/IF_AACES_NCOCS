@@ -848,6 +848,6 @@ ggcorrplot(mat, hc.order = TRUE, method = "circle",
            digits = 2
 )
 # Cleaning
-rm(p1, p2, p3, mat, mat1, variations_TMA, variations_ROI, variations_ROIip)
+rm(p1, p2, p3, mat, mat1, variations_TMA, variations_ROI, variations_ROIip, var_cor)
 # End ----
 

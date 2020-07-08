@@ -1,52 +1,5 @@
-# # 2.	For each case, calculate the average cell density (number of cells positive #--------------- Do % first
-# # for each marker per mm2 of tumor/stroma) of the markers below across the TMA cores, 
-# # intratumoral ROIs, and peripheral ROIs (separately – overall, tumor, and stroma). 
-# # Potentially create some sort of variable denoting an immune hot or immune cold tumor – 
-# # or something along those lines?
-# 
-# # % Cell
-# colnames(TMA_global)
-# markers_TMA <- group_by(TMA_global, suid) %>% 
-#   summarize(percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells), 
-#             percent_CD3_stroma = mean(stroma_percent_cd3_opal_650_positive_cells),
-#             percent_CD8_tumor = mean(tumor_percent_cd8_opal_570_positive_cells), 
-#             percent_CD8_stroma = mean(stroma_percent_cd8_opal_570_positive_cells),
-#             percent_CD3_CD8_tumor = mean(tumor_percent_cd3plus_cd8plus_positive_cells),
-#             percent_CD3_CD8_stroma = mean(stroma_percent_cd3plus_cd8plus_positive_cells),
-#             percent_FoxP3_tumor = mean(tumor_percent_foxp3_opal_540_positive_cells), 
-#             percent_FoxP3_stroma = mean(stroma_percent_foxp3_opal_540_positive_cells),
-#             percent_CD3_FoxP3_tumor = mean(tumor_percent_cd3plus_foxp3plus_positive_cells),
-#             percent_CD3_FoxP3_stroma = mean(stroma_percent_cd3plus_foxp3plus_positive_cells),
-#             percent_CD11b_tumor = mean(tumor_percent_cd11b_opal_620_positive_cells), 
-#             percent_CD11b_stroma = mean(stroma_percent_cd11b_opal_620_positive_cells),
-#             percent_CD15_tumor = mean(tumor_percent_cd15_opal_520_positive_cells), 
-#             percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
-#             percent_CD11b_CD15_tumor = mean(tumor_percent_cd11bplus_cd15plus_positive_cells), 
-#             percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells))# %>%
-#   # mutate(ID = seq(1:nrow(.)))
-# 
-# markers_ROIi <- ROI_global %>% 
-#   filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
-#   group_by(suid) %>% 
-#   summarize(percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells), 
-#             percent_CD3_stroma = mean(stroma_percent_cd3_opal_650_positive_cells),
-#             percent_CD8_tumor = mean(tumor_percent_cd8_opal_570_positive_cells), 
-#             percent_CD8_stroma = mean(stroma_percent_cd8_opal_570_positive_cells),
-#             percent_CD3_CD8_tumor = mean(tumor_percent_cd3plus_cd8plus_positive_cells),
-#             percent_CD3_CD8_stroma = mean(stroma_percent_cd3plus_cd8plus_positive_cells),
-#             percent_FoxP3_tumor = mean(tumor_percent_foxp3_opal_540_positive_cells), 
-#             percent_FoxP3_stroma = mean(stroma_percent_foxp3_opal_540_positive_cells),
-#             percent_CD3_FoxP3_tumor = mean(tumor_percent_cd3plus_foxp3plus_positive_cells),
-#             percent_CD3_FoxP3_stroma = mean(stroma_percent_cd3plus_foxp3plus_positive_cells),
-#             percent_CD11b_tumor = mean(tumor_percent_cd11b_opal_620_positive_cells), 
-#             percent_CD11b_stroma = mean(stroma_percent_cd11b_opal_620_positive_cells),
-#             percent_CD15_tumor = mean(tumor_percent_cd15_opal_520_positive_cells), 
-#             percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
-#             percent_CD11b_CD15_tumor = mean(tumor_percent_cd11bplus_cd15plus_positive_cells), 
-#             percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells))
-# # setDT(markers_ROIip)[, ID := .GRP, .(suid)]
+# Plots Immune markers
 
-# Plots CD3 and CD11b in TMAs and ROIs
 cols <- 
   c("CD3 tumor" = "#99CCFF", "CD8 tumor" = "#33CCFF", "FoxP3 tumor" = "#33FFFF", "CD11b tumor" = "#99FFFF", "CD15 tumor" = "#CCFFFF",
     "CD3 stroma" = "#660000", "CD8 stroma" = "#990000", "FoxP3 stroma" = "#CC0000", "CD11b stroma" = "#FF0000", "CD15 stroma" = "#FF66CC")
@@ -109,8 +62,8 @@ ggplot(markers_ROIi, aes(x=suid, y=percent_CD3_tumor)) +
   labs(y="% cells", title="Immune Markers Repartition in ROIs", fill='Immune \nMarkers')
 
 markers_TMA %>% 
-  summarise(count = n()) %>% 
-  mutate(percent=(count/sum(count)*100)) %>% 
+  # summarise(count = n()) %>% 
+  # mutate(percent=(count/sum(count)*100)) %>% 
   ggplot(aes(x=suid, y=percent_CD3_tumor)) +
   geom_bar(aes(fill="CD3 tumor"), stat="identity") +
   geom_bar(aes(y=percent_CD8_tumor, fill="CD8 tumor"), stat="identity") +
@@ -122,10 +75,11 @@ markers_TMA %>%
   coord_flip()+
   labs(y="% cells", title="Immune Markers Repartition in TMAs", fill='Immune \nMarkers')
 
+
+# heatmap----
 library(gplots)
 library(heatmap.plus)
 library(RColorBrewer)
-
 
 df1 <- as.data.frame(markers_ROIi) %>% 
   `row.names<-`(markers_ROIi$suid) %>% 
@@ -150,36 +104,16 @@ heatmap.2(df2, main = "Immune Marker Presentation",
           ColSideColors = ,
           scale = "row")
 
-
+rm(df1, df2, cols)
 ########################################################################################## II ### Immune hot vs cold----
 # 2.1.Look difference between peripheral and intra.----
 
-# markers_ROIp <- ROI_global %>% 
-#   filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
-#   group_by(suid) %>% 
-#   summarize(percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells), 
-#             percent_CD3_stroma = mean(stroma_percent_cd3_opal_650_positive_cells),
-#             percent_CD8_tumor = mean(tumor_percent_cd8_opal_570_positive_cells), 
-#             percent_CD8_stroma = mean(stroma_percent_cd8_opal_570_positive_cells),
-#             percent_CD3_CD8_tumor = mean(tumor_percent_cd3plus_cd8plus_positive_cells),
-#             percent_CD3_CD8_stroma = mean(stroma_percent_cd3plus_cd8plus_positive_cells),
-#             percent_FoxP3_tumor = mean(tumor_percent_foxp3_opal_540_positive_cells), 
-#             percent_FoxP3_stroma = mean(stroma_percent_foxp3_opal_540_positive_cells),
-#             percent_CD3_FoxP3_tumor = mean(tumor_percent_cd3plus_foxp3plus_positive_cells),
-#             percent_CD3_FoxP3_stroma = mean(stroma_percent_cd3plus_foxp3plus_positive_cells),
-#             percent_CD11b_tumor = mean(tumor_percent_cd11b_opal_620_positive_cells), 
-#             percent_CD11b_stroma = mean(stroma_percent_cd11b_opal_620_positive_cells),
-#             percent_CD15_tumor = mean(tumor_percent_cd15_opal_520_positive_cells), 
-#             percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
-#             percent_CD11b_CD15_tumor = mean(tumor_percent_cd11bplus_cd15plus_positive_cells), 
-#             percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells))
 
 markers_ROI <- full_join(markers_ROIi, markers_ROIp,
                          by = "suid", suffixe = c("i", "p"))
 
 markers_ROI <- markers_ROI %>% 
   mutate(ratio_CD3 = percent_CD3_tumor/percent_tumor)
-
 
 
 
