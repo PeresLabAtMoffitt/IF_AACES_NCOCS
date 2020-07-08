@@ -131,17 +131,6 @@ table <- matrix(c("", "Tumor", "Stroma",
 #           paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Summary tumor, stroma in TMAs and ROIs.csv"))
 rm(table)
 
-TMA_global %>% select("suid", "percent_tumor", "percent_stroma") %>% 
-  tbl_summary(by= "suid", statistic = list(all_continuous() ~ "{median} ({sd})")) %>% 
-  add_p()
-ROI_global %>% filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
-  select("suid", "percent_tumor", "percent_stroma") %>% 
-  tbl_summary(by= "suid", statistic = list(all_continuous() ~ "{median} ({sd})")) %>% 
-  add_p()
-ROI_global %>% filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
-  select("suid", "percent_tumor", "percent_stroma") %>% 
-  tbl_summary(by= "suid", statistic = list(all_continuous() ~ "{median} ({sd})"))%>% 
-  add_p()
 
 ###################################################################################### III ### Plots data----
 # 1. Investigate number of tumoral and stromal cell in TMAs and ROIs----
@@ -296,6 +285,19 @@ p3 <- ROI_global %>%
 gridExtra::grid.arrange(p1, p2, p3, ncol = 3,
                         top = "% of Cell Present in", left = "% Cell (mean)")
 
+# Variation----
+# Between patient
+TMA_global %>% select("suid", "percent_tumor", "percent_stroma") %>% 
+  tbl_summary(by= "suid") %>% 
+  add_p()
+ROI_global %>% filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
+  select("suid", "percent_tumor", "percent_stroma") %>% 
+  tbl_summary(by= "suid") %>% 
+  add_p()
+ROI_global %>% filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
+  select("suid", "percent_tumor", "percent_stroma") %>% 
+  tbl_summary(by= "suid", statistic = list(all_continuous() ~ "{median} ({sd})"))%>% 
+  add_p()
 
 # jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/tumor cell presence per case in TMAs.jpg"))
 ggplot(variations_TMA, aes(x=suid, y=mean_tumor)) +
@@ -309,7 +311,7 @@ ggplot(variations_TMA, aes(x=suid, y=mean_tumor)) +
     axis.ticks.y = element_blank(),
     axis.text.y = element_blank()
   ) +
-  labs(x=paste(length(variations_TMA$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% of Tumor Cell Present in TMAs per Patient",
+  labs(x=paste(length(variations_TMA$suid), "Patients IDs"), y="% Tumor Cell (mean)", title="% of Tumor Cell Present in TMAs per Patient",
        subtitle = "Each point represent the mean of up to 3 values")
 # dev.off()
 
@@ -325,7 +327,7 @@ ggplot(variations_ROI, aes(x=suid, y=mean_tumor)) +
     axis.ticks.y = element_blank(),
     axis.text.y = element_blank()
   ) +
-  labs(x=paste(length(variations_ROI$ID), "Patients IDs"), y="% Tumor Cell (mean)", title="% of Tumor Cell Present in ROIs per Patient",
+  labs(x=paste(length(variations_ROI$suid), "Patients IDs"), y="% Tumor Cell (mean)", title="% of Tumor Cell Present in ROIs per Patient",
        subtitle = "Each point represent the mean of up to 3 values")
 # dev.off()
 
@@ -806,10 +808,47 @@ variation %>% select("suid", "mean_tumor", "mean_tumor_roi_i", "mean_tumor_roi_p
   tbl_summary(by = suid, statistic = list(all_continuous() ~ "{median} ({sd})")) %>% 
   add_p()
 
-# TMAs silmilar to intratumoral ROIs
-# Need corr!!!
+# TMAs silmilar to intratumoral ROIs?----
+# Test normality
+qqnorm(variation$mean_tumor)
+qqnorm(variation$mean_tumor_roi_i)
 
+pairs.panels(variation[c("mean_tumor", "mean_stroma", # "tumor_variation", "stroma_variation",
+                         "mean_tumor_roi_i", "mean_stroma_roi_i", # "tumor_variation_roi_i", "stroma_variation_roi_i",
+                         "mean_tumor_roi_p", "mean_stroma_roi_p"# , "tumor_variation_roi_p", "stroma_variation_roi_p"
+)])
+pairs.panels(variation[c("mean_tumor", "mean_tumor_roi_i", "tumor_variation", "tumor_variation_roi_i")])
+
+# Correlation
+var_cor <- variation[, c("mean_tumor", "mean_tumor_roi_i", "mean_tumor_roi_p")]
+
+mat <- cor(variation[, c("mean_tumor", "mean_tumor_roi_i", "mean_tumor_roi_p", 
+                         "mean_stroma", "mean_stroma_roi_i", "mean_stroma_roi_p"
+)], 
+use = "pairwise.complete.obs")
+corrplot(mat)
+corrplot.mixed(mat)
+
+mat1 <- cor(variation[, c("tumor_variation", "tumor_variation_roi_i", "tumor_variation_roi_p", 
+                          "stroma_variation", "stroma_variation_roi_i", "stroma_variation_roi_p")], 
+            use = "pairwise.complete.obs")
+corrplot(mat1)
+corrplot.mixed(mat1)
+ggcorrplot(mat, hc.order = TRUE, method = "circle", 
+           # outline.col = "darkblue", # the outline of the circle or sqare
+           # hc.method = "complete",
+           type = "lower", # show the top half panel
+           lab = TRUE, # add correlation nbr
+           title = "Correlation between collection type",
+           show.legend = TRUE, legend.title = "Correlation", show.diag = TRUE,
+           # colors = viridis::inferno(n=3),
+           lab_col = "darkblue", lab_size = 3, # col and size of the correlation nbr
+           # p.mat = pmat, # Add correlation significance
+           sig.level = 0.05, insig = c("pch", "blank"), pch = 4, pch.col = "black", pch.cex = 10, 
+           tl.cex = 10, tl.col = "red", tl.srt = 40,
+           digits = 2
+)
 # Cleaning
-rm(p1, p2, p3)
+rm(p1, p2, p3, mat, mat1, variations_TMA, variations_ROI, variations_ROIip)
 # End ----
 
