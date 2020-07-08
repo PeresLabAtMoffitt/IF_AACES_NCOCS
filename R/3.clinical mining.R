@@ -206,4 +206,4 @@ ggsurvplot(myplot, data = clin_surv1,
            conf.int = TRUE
 )
 
-
+rm(clin_surv1, clin_surv, myplot, mysurv)
