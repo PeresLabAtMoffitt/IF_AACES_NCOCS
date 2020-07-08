@@ -1,23 +1,23 @@
-########################################################################################## I ### Create ROI Match Cases----
-
-cases_match <- cases_match %>% mutate(suid = as.character(suid))
-cases_match <- left_join(cases_match, 
-                          clinical_data %>% select("suid", "race"),
-                          by= "suid")
-  
-
-cases_match1 <- dcast(setDT(cases_match), pair_id ~ rowid(pair_id),
-                      value.var = c("suid", "race")) %>%
-  drop_na("race_1", "race_2") # We all have the matching
-
-
-cases_match <-  left_join(cases_match, # innerjoin for only patient who has a match and ROIs give no white for comparison
-                     markers_ROIi,
-                     by= "suid")
-
-# Cleanup both paired ID when one had a missing data----
-cases_match$suid[is.na(cases_match$percent_CD3_tumor)]
-cases_match2 <-  cases_match %>% drop_na(.) %>% group_by(pair_id) %>% filter( n() > 1 )
+# ########################################################################################## I ### Create ROI Match Cases----
+# 
+# cases_match <- cases_match %>% mutate(suid = as.character(suid))
+# cases_match <- left_join(cases_match, 
+#                           clinical_data %>% select("suid", "race"),
+#                           by= "suid")
+#   
+# 
+# cases_match1 <- dcast(setDT(cases_match), pair_id ~ rowid(pair_id),
+#                       value.var = c("suid", "race")) %>%
+#   drop_na("race_1", "race_2") # We all have the matching
+# 
+# 
+# cases_match <-  left_join(cases_match, # innerjoin for only patient who has a match and ROIs give no white for comparison
+#                      markers_ROIi,
+#                      by= "suid")
+# 
+# # Cleanup both paired ID when one had a missing data----
+# cases_match$suid[is.na(cases_match$percent_CD3_tumor)]
+# cases_match2 <-  cases_match %>% drop_na(.) %>% group_by(pair_id) %>% filter( n() > 1 )
 
 
 ########################################################################################## II ### Plot Matched Cases----
