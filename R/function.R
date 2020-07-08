@@ -53,12 +53,12 @@ tma2s_import <- function(path){
 #-----------------------------------------------------------------------------------------------------------------
 case_remove_import <- function(path){
   read_csv(paste0(path,
-                "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Subject_IDs to remove from TMA.csv"))
+                "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/data/Subject_IDs to remove from TMA.csv"))
 }
 #-----------------------------------------------------------------------------------------------------------------
 common_ROITMA_import <- function(path){
   read_csv(paste0(path,
-                  "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Subject_IDs common TMA ROI.csv"))
+                  "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/data/Subject_IDs common TMA ROI.csv"))
 }
 #-----------------------------------------------------------------------------------------------------------------
 match_cases_import <- function(path){

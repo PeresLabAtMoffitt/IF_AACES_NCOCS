@@ -16,7 +16,8 @@ cases_match <-  left_join(cases_match, # innerjoin for only patient who has a ma
                      by= "suid")
 
 # Cleanup both paired ID when one had a missing data----
-cases_match <-  cases_match %>% drop_na(.) %>% group_by(pair_id) %>% filter( n() > 1 )
+cases_match$suid[is.na(cases_match$percent_CD3_tumor)]
+cases_match2 <-  cases_match %>% drop_na(.) %>% group_by(pair_id) %>% filter( n() > 1 )
 
 
 ########################################################################################## II ### Plot Matched Cases----
