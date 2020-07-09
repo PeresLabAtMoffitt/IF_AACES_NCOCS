@@ -23,5 +23,6 @@ loadd(clinical_data, ROI_tumor ,ROI_stroma ,TMA_tumor ,TMA_stroma,
 rm(fct_name_repair, var_names, # roir_import,
    data_import, roit_import, rois_import, tmat_import, tmas_import,
    tma2t_import, tma2s_import, common_ROITMA_import, # tmar_import, 
-   case_remove_import, binding, match_cases_import)
+   case_remove_import, binding, match_cases_import,
+   plan, config)
 
