@@ -216,11 +216,7 @@ ggplot(markers_ROI, aes(x=mean_tumor.i, y=percent_CD11b_CD15_tumor.i))+
   annotation_logticks(sides="l")
 
 
-
-
-
 markers_ROI <- markers_ROI %>% 
-  mutate(ratio_CD3 = percent_CD3_tumor.i/mean_tumor.i) %>% 
   mutate(ratio_CD8 = percent_CD8_tumor.i/mean_tumor.i) %>% 
   mutate(ratio_FoxP3 = percent_FoxP3_tumor.i/mean_tumor.i) %>% 
   mutate(ratio_CD11b = percent_CD11b_tumor.i/mean_tumor.i) %>% 
@@ -229,14 +225,31 @@ markers_ROI <- markers_ROI %>%
   mutate(ratio_CD3_FoxP3 = percent_CD3_FoxP3_tumor.i/mean_tumor.i) %>% 
   mutate(ratio_CD11b_CD15 = percent_CD11b_CD15_tumor.i/mean_tumor.i)
 
-ggplot(markers_ROI)+
-  geom_bar(aes(x=mean_tumor.i, y=ratio_CD3),stat = "summary_bin", fill="white", color="#8707A6FF")+
-  geom_bar(aes(x=mean_tumor.i, y=ratio_CD8),stat = "summary_bin", fill="pink", alpha=.3, color="pink", position = position_nudge(1))+
-  geom_bar(aes(x=mean_tumor.i, y=ratio_FoxP3),stat = "summary_bin", fill="orange", alpha=.3, color="orange", position = position_nudge(2))+
-  geom_bar(aes(x=mean_tumor.i, y=ratio_CD11b),stat = "summary_bin", fill="#00204DFF", alpha=.3, color="#00204DFF", position = position_nudge(3))+
-  geom_bar(aes(x=mean_tumor.i, y=ratio_CD15),stat = "summary_bin", fill="red", alpha=.3, color="red", position = position_nudge(4))+
+markers_ROI %>% 
+  gather("ratio_type", "ratio", 36:43) %>% 
+  select("suid", "ratio_type", "ratio") %>%
+  ggplot(aes(x=suid, y=ratio, fill=ratio_type)) +
+  geom_bar(stat="identity", position = position_dodge())+
+  coord_flip()+
+  labs(y="Ratio", title="", fill='Ratio \nType')
+markers_ROI %>% 
+  gather("ratio_type", "ratio", 36:43) %>% 
+  ggplot(aes(x=mean_tumor.i, y=ratio, color=ratio_type, fill=ratio_type)) +
+  geom_bar(stat="identity")+
+  labs(y="Ratio", title="", fill='Ratio \nType')
 
-
+markers_ROI %>% 
+  ggplot(aes(x=percent_CD3_CD8_tumor.i, y=percent_CD3_FoxP3_tumor.i, color=percent_CD11b_CD15_tumor.i))+
+  geom_point(aes(size=percent_CD3_FoxP3_tumor.i), size=3)+
+  scale_color_gradient2(midpoint = .8, low = "#CCFFFF", mid = "#990000",
+                        high = "#000000", space = "Lab" )+
+  # scale_color_gradientn(colours = rainbow(5))+
+  theme_minimal()+
+  #geom_point(aes(x=percent_CD3_CD8_tumor.i, y=percent_CD3_FoxP3_tumor.i, ))+ 
+  scale_y_continuous(trans = "log10")+
+  scale_x_continuous(trans = "log10")+
+  annotation_logticks(sides="lb")
+colour=percent_CD3_FoxP3_tumor.i<1
 
 #####
 
