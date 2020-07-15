@@ -201,6 +201,8 @@ heatmap.2(df2, main = "Immune Marker Presentation",
           scale = "row")
 
 rm(df1, df2, cols)
+
+
 ########################################################################################## II ### Immune hot vs cold----
 # 2.1.Exclusion: Immune markers difference between periph and intra.----
 markers_ROI <- full_join(markers_ROIi, markers_ROIp,
@@ -211,28 +213,49 @@ p1 <- ggplot(markers_ROI, aes(x=percent_CD3_tumor.p, y=percent_CD3_tumor.i))+
   stat_cor(label.y = 15)+
   stat_cor(label.y = 17, 
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
-  stat_regline_equation()
+  stat_regline_equation(label.y.npc = 1)
 p2 <- ggplot(markers_ROI, aes(x=percent_CD8_tumor.p, y=percent_CD8_tumor.i))+
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE)
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 12.5, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  stat_regline_equation(label.y.npc = 1)
 p3 <- ggplot(markers_ROI, aes(x=percent_FoxP3_tumor.p, y=percent_FoxP3_tumor.i))+
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE)
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 3.5, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  stat_regline_equation(label.y.npc = 1)
 p4 <- ggplot(markers_ROI, aes(x=percent_CD11b_tumor.p, y=percent_CD11b_tumor.i))+
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE)
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 5, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  stat_regline_equation(label.y.npc = 1)
 p5 <- ggplot(markers_ROI, aes(x=percent_CD15_tumor.p, y=percent_CD15_tumor.i))+
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE)
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 4, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  stat_regline_equation(label.y.npc = 1)
 p6 <- ggplot(markers_ROI, aes(x=percent_CD3_CD8_tumor.p, y=percent_CD3_CD8_tumor.i))+
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE)
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 11, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  stat_regline_equation(label.y.npc = 1)
 p7 <- ggplot(markers_ROI, aes(x=percent_CD3_FoxP3_tumor.p, y=percent_CD3_FoxP3_tumor.i))+
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE)
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 3, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  stat_regline_equation(label.y.npc = 1)
 p8 <- ggplot(markers_ROI, aes(x=percent_CD11b_CD15_tumor.p, y=percent_CD11b_CD15_tumor.i))+
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE)
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 1.5, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  stat_regline_equation(label.y.npc = 1)
 gridExtra::grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, ncol = 5)
 
 
@@ -446,12 +469,6 @@ gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 
 
-
-
-
-
-
-
 markers_ROIi <- markers_ROIi %>% 
   mutate(special_cluster = case_when(
     clusters_CD38 == 1 ~ 1, # lox CD8 aka cold
@@ -462,7 +479,7 @@ markers_ROIi <- markers_ROIi %>%
 
 # Survival by cluster
 clin_surv1 <- left_join(clin_surv, markers_ROIi[, c("suid", "clusters1", "clusters2", "special_cluster")], by="suid")
-# 1
+# cluster 1
 mysurv <- Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)
 myplot <- survfit(mysurv~clin_surv1$clusters1)
 myplot
@@ -478,7 +495,7 @@ ggsurvplot(myplot, data = clin_surv1,
            conf.int = TRUE
 )
 survdiff(mysurv~clin_surv1$race+clin_surv1$clusters1)
-# 2
+# cluster 2
 myplot <- survfit(mysurv~clin_surv1$clusters2)
 myplot
 ggsurvplot(myplot, data = clin_surv1,
@@ -494,7 +511,7 @@ ggsurvplot(myplot, data = clin_surv1,
            risk.table.title = "Risk table"
 )
 survdiff(mysurv~clin_surv1$race+clin_surv1$clusters2)
-# 3
+# special_cluster
 myplot <- survfit(mysurv~clin_surv1$special_cluster)
 myplot
 ggsurvplot(myplot, data = clin_surv1,
