@@ -370,7 +370,6 @@ p3 <- markers_ROIi %>% filter(!is.na(race)) %>%
   stat_compare_means(label = "p.format")  
 gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
-
 # 2.3.3.clusters 1_CD3-CD8 then FoxP3
 clust <- Mclust(markers_ROIi[21], G = 2)
 summary(clust)
@@ -416,6 +415,29 @@ markers_ROIi %>%
   ggplot(aes(x=suid, y=value, group=clusters_FoxP3, color=clusters_FoxP3))+
   geom_boxplot()+
   facet_grid(.~ markers_cat)
+
+p1 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor, color=clusters_FoxP3))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_FoxP3)+
+  stat_compare_means(label = "p.format")
+p2 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor, color=clusters_FoxP3))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_FoxP3)+
+  stat_compare_means(label = "p.format")
+p3 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor, color=clusters_FoxP3))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_FoxP3)+
+  stat_compare_means(label = "p.format")  
+gridExtra::grid.arrange(p1, p2, p3, ncol=3)
+
+colnames(markers_ROIi)
+table(markers_ROIi$clusters_CD38.y)
 
 p1 <- markers_ROIi %>% filter(!is.na(race)) %>% 
   ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor, color=clusters_FoxP3))+
