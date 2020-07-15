@@ -450,6 +450,7 @@ colnames(sqrt.markers) <- c("sqrt_CD3_tumor", "sqrt_CD8_tumor", "sqrt_CD3_CD8_tu
                                "sqrt_CD3_CD8_stroma", "sqrt_FoxP3_stroma", "sqrt_CD3_FoxP3_stroma",
                                "sqrt_CD11b_stroma", "sqrt_CD15_stroma", "sqrt_CD11b_CD15_stroma")
 markers_TMA <- cbind(markers_TMA, sqrt.markers)
+markers_TMA <- left_join(markers_TMA, clinical_data, by="suid")
 
 markers_ROIi <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
@@ -478,6 +479,7 @@ colnames(sqrt.markers) <- c("sqrt_CD3_tumor", "sqrt_CD8_tumor", "sqrt_CD3_CD8_tu
                             "sqrt_CD3_CD8_stroma", "sqrt_FoxP3_stroma", "sqrt_CD3_FoxP3_stroma",
                             "sqrt_CD11b_stroma", "sqrt_CD15_stroma", "sqrt_CD11b_CD15_stroma")
 markers_ROIi <- cbind(markers_ROIi, sqrt.markers)
+markers_ROIi <- left_join(markers_ROIi, clinical_data, by="suid")
 
 markers_ROIp <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
@@ -506,7 +508,7 @@ colnames(sqrt.markers) <- c("sqrt_CD3_tumor", "sqrt_CD8_tumor", "sqrt_CD3_CD8_tu
                             "sqrt_CD3_CD8_stroma", "sqrt_FoxP3_stroma", "sqrt_CD3_FoxP3_stroma",
                             "sqrt_CD11b_stroma", "sqrt_CD15_stroma", "sqrt_CD11b_CD15_stroma")
 markers_ROIp <- cbind(markers_ROIp, sqrt.markers)
-
+markers_ROIp <- left_join(markers_ROIp, clinical_data, by="suid")
 
 # Cleaning
 rm(uid, TMAcases_remove, TMA_tumor, TMA_stroma, ROI_tumor, ROI_stroma,

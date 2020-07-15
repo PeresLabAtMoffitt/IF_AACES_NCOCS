@@ -300,26 +300,152 @@ colour=percent_CD3_FoxP3_tumor.i<1
 
 #####
 
-# Clustering----
+# 2.3.Clustering----
+# Do not take CD3 alone for clustering beacuse contain effector, regulator, helper, gamma delta
+# Do not take FoxP3 alone because tumor cells can express FoxP3
+# Do not take CD11b alone because CD3CD11b can be NK cells
+# CD11bCD15 are myeloid cells prevent other immune cells to traffic into the tumor
+
+# 2.3.1.clusters 1_by_CD3-CD8
+clust <- Mclust(markers_ROIi[21], G = 5)
+summary(clust)
+markers_ROIi$clusters1 <- clust$classification
+
+markers_ROIi %>% 
+  gather(key = "markers_cat", value = "value", c(21, 23:26)) %>% 
+  select(suid, clusters1, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters1, color=clusters1))+
+  geom_boxplot()+
+  facet_grid(.~ markers_cat)
+
+p1 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor, color=clusters1))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters1)+
+  stat_compare_means(label = "p.format")
+p2 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor, color=clusters1))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters1)+
+  stat_compare_means(label = "p.format")
+p3 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor, color=clusters1))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters1)+
+  stat_compare_means(label = "p.format")  
+gridExtra::grid.arrange(p1, p2, p3, ncol=3)
+  
+# 2.3.2.clusters 2_by_all double positive
 clust <- Mclust(markers_ROIi[,c(21, 23:26)], G = 5)
 summary(clust)
-markers_ROIi$clusters <- clust$classification
+markers_ROIi$clusters2 <- clust$classification
+
+markers_ROIi %>% 
+  gather(key = "markers_cat", value = "value", c(21, 23:26)) %>% 
+  select(suid, clusters2, markers_cat, value) %>% 
+  ggplot(aes(x=suid, group=clusters2, color=clusters2))+
+  geom_boxplot(aes(y=value))+
+  facet_grid(.~ markers_cat)
+
+p1 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor, color=clusters2))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters2)+
+  stat_compare_means(label = "p.format")
+p2 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor, color=clusters2))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters2)+
+  stat_compare_means(label = "p.format")
+p3 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor, color=clusters2))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters2)+
+  stat_compare_means(label = "p.format")  
+gridExtra::grid.arrange(p1, p2, p3, ncol=3)
+
+
+# 2.3.3.clusters 1_CD3-CD8 then FoxP3
+clust <- Mclust(markers_ROIi[21], G = 2)
+summary(clust)
+markers_ROIi$clusters_CD38 <- clust$classification
+
+markers_ROIi %>% 
+  gather(key = "markers_cat", value = "value", c(21, 23:26)) %>% 
+  select(suid, clusters_CD38, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_CD38, color=clusters_CD38))+
+  geom_boxplot()+
+  facet_grid(.~ markers_cat)
+
+p1 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor, color=clusters_CD38))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_CD38)+
+  stat_compare_means(label = "p.format")
+p2 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor, color=clusters_CD38))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_CD38)+
+  stat_compare_means(label = "p.format")
+p3 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor, color=clusters_CD38))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_CD38)+
+  stat_compare_means(label = "p.format")  
+gridExtra::grid.arrange(p1, p2, p3, ncol=3)
+
+#
+a <- markers_ROIi %>% filter(clusters_CD38 == 2)
+clust <- Mclust(a[23], G = 2)
+summary(clust)
+a$clusters_FoxP3 <- clust$classification
+markers_ROIi <- left_join(markers_ROIi, a[, c("suid", "clusters_FoxP3")], by= "suid")
+
+markers_ROIi %>% 
+  gather(key = "markers_cat", value = "value", c(21, 23:26)) %>% 
+  select(suid, clusters_FoxP3, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_FoxP3, color=clusters_FoxP3))+
+  geom_boxplot()+
+  facet_grid(.~ markers_cat)
+
+p1 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor, color=clusters_FoxP3))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_FoxP3)+
+  stat_compare_means(label = "p.format")
+p2 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor, color=clusters_FoxP3))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_FoxP3)+
+  stat_compare_means(label = "p.format")
+p3 <- markers_ROIi %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor, color=clusters_FoxP3))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_FoxP3)+
+  stat_compare_means(label = "p.format")  
+gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 colnames(markers_ROIi)
-markers_ROIi %>% 
-  ggplot(aes(x=suid, y=sqrt_CD3_CD8_tumor, group=clusters))+
-  geom_boxplot()+
-  facet_grid(.~ clusters)
+table(markers_ROIi$clusters_CD38.y)
 
-
-
-
-
-
-
-
-
-
+markers_ROIi <- markers_ROIi %>% 
+  mutate(special_cluster = case_when(
+    clusters_CD38 == 1 ~ 1, # lox CD8 aka cold
+    clusters_FoxP3 == 1 ~ 2, # low Fox aka hot
+    clusters_FoxP3 == 2 ~ 3, # high Fox aka immunosupp
+  ))
 
 
 
