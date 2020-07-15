@@ -129,8 +129,55 @@ markers_TMA %>%
 library(gplots)
 library(heatmap.plus)
 library(RColorBrewer)
+# Plot SQRT
+df1 <- as.data.frame(markers_ROIi[19:34]) %>% 
+  `row.names<-`(markers_ROIi$suid) %>% 
+  drop_na(.)
+df1$suid <- NULL
+df1 <- as.matrix(df1)
+heatmap.2(df1, main = "Immune Marker Presentation",
+          
+          trace = "none", density="none", col=bluered(20), cexRow=1, cexCol = 1, 
+          margins = c(10,5), # bottom, right
+          ColSideColors = ,
+          scale = "row")
+df2 <- t(scale(t(df1)))
+df2 <- df2[complete.cases(df2 * 0), , drop=FALSE]
 
-df1 <- as.data.frame(markers_ROIi) %>% 
+heatmap.2(df2, main = "Immune Marker Presentation",
+          
+          trace = "none", density="none", col=bluered(20), cexRow=1, cexCol = 1, 
+          margins = c(10,5), # bottom, right
+          ColSideColors = ,
+          scale = "row")
+
+# Plot values
+df1 <- as.data.frame(markers_ROIi[1:17]) %>% 
+  `row.names<-`(markers_ROIi$suid) %>% 
+  drop_na(.)
+df1$suid <- NULL
+
+df1 <- as.matrix(df1)
+heatmap.2(df1, main = "Immune Marker Presentation",
+          
+          trace = "none", density="none", col=bluered(20), cexRow=1, cexCol = 1, 
+          margins = c(10,5), # bottom, right
+          ColSideColors = ,
+          scale = "row")
+
+df2 <- t(scale(t(df1)))
+df2 <- df2[complete.cases(df2 * 0), , drop=FALSE]
+
+heatmap.2(df2, main = "Immune Marker Presentation",
+          
+          trace = "none", density="none", col=bluered(20), cexRow=1, cexCol = 1, 
+          margins = c(10,5), # bottom, right
+          ColSideColors = ,
+          scale = "row")
+
+# SQRT only tumor
+colnames(markers_ROIi)
+df1 <- as.data.frame(markers_ROIi[,c(21, 23:26)]) %>% 
   `row.names<-`(markers_ROIi$suid) %>% 
   drop_na(.)
 df1$suid <- NULL
@@ -253,9 +300,29 @@ colour=percent_CD3_FoxP3_tumor.i<1
 
 #####
 
+# Clustering----
+clust <- Mclust(markers_ROIi[,c(21, 23:26)], G = 5)
+summary(clust)
+markers_ROIi$clusters <- clust$classification
+
+colnames(markers_ROIi)
+markers_ROIi %>% 
+  ggplot(aes(x=suid, y=sqrt_CD3_CD8_tumor, group=clusters))+
+  geom_boxplot()+
+  facet_grid(.~ clusters)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 # Cleaning
 rm(markers_ROIi, markers_ROIp)
-geom_bar(aes(x=mean_tumor.i, y=ratio_CD8),stat = "summary_bin", color="#00204DFF", position = position_nudge(1))+
