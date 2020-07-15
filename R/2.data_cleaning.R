@@ -336,11 +336,11 @@ TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma %>% select(-suid),
 ######################################################################################## III ### Merge Matched Cases----
 # 3.1.Create ROI Match Cases----
 cases_match <- cases_match %>% mutate(suid = as.character(suid))
-# 3.2.Add case_match to clinical_data
+# 3.2.Add case_match to clinical_data----
 clinical_data <- full_join(cases_match, 
                            clinical_data,
                            by= "suid")
-# 3.3.Add case_match and race to ROI data
+# 3.3.Add case_match and race to ROI data----
 cases_match <- left_join(cases_match, 
                          clinical_data %>% select("suid", "race"),
                          by= "suid")
@@ -363,7 +363,7 @@ cases_match$suid[is.na(cases_match$percent_CD3_tumor)]
 cases_match2 <-  cases_match %>% drop_na(.) %>% group_by(pair_id) %>% filter( n() > 1 )
 
 ######################################################################################### IV ### Create df to plot
-# 4.1. Create variation data ---------------------------------------------------------------------------------------------------------
+# 4.1. Create variation data ----
 # Look at the variation between each patient and the global mean # Should we mot compare Black and White?
 # Here compare the mean of % cells to global study % cells
 variations_TMA <- group_by(TMA_global, suid) %>% 
@@ -417,14 +417,14 @@ variation <- merge.data.frame(variation_TMA, variation_ROIip,
 
 
 # 4.3.Create marker data----
-# For each case, calculate the average cell density (number of cells positive #--------------- Do % first
+# For each case, calculate the average cell density (number of cells positive 
 # for each marker per mm2 of tumor/stroma) of the markers below across the TMA cores, 
 # intratumoral ROIs, and peripheral ROIs (separately – overall, tumor, and stroma). 
 # Potentially create some sort of variable denoting an immune hot or immune cold tumor – 
 # or something along those lines?
 
-# % Cell
-colnames(TMA_global)
+# Using % Cell
+## Add sqrt transformation if better with 0
 markers_TMA <- group_by(TMA_global, suid) %>% 
   summarize(percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells), 
             percent_CD8_tumor = mean(tumor_percent_cd8_opal_570_positive_cells), 
@@ -443,6 +443,13 @@ markers_TMA <- group_by(TMA_global, suid) %>%
             percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
             percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells),
             mean_tumor = mean(percent_tumor))
+sqrt.markers <- sqrt(markers_TMA[,c(2:17)])
+colnames(sqrt.markers) <- c("sqrt_CD3_tumor", "sqrt_CD8_tumor", "sqrt_CD3_CD8_tumor", "sqrt_FoxP3_tumor",
+                               "sqrt_CD3_FoxP3_tumor", "sqrt_CD11b_tumor", "sqrt_CD15_tumor", 
+                               "sqrt_CD11b_CD15_tumor", "sqrt_CD3_stroma", "sqrt_CD8_stroma",
+                               "sqrt_CD3_CD8_stroma", "sqrt_FoxP3_stroma", "sqrt_CD3_FoxP3_stroma",
+                               "sqrt_CD11b_stroma", "sqrt_CD15_stroma", "sqrt_CD11b_CD15_stroma")
+markers_TMA <- cbind(markers_TMA, sqrt.markers)
 
 markers_ROIi <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
@@ -464,6 +471,13 @@ markers_ROIi <- ROI_global %>%
             percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
             percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells),
             mean_tumor = mean(percent_tumor))
+sqrt.markers <- sqrt(markers_ROIi[,c(2:17)])
+colnames(sqrt.markers) <- c("sqrt_CD3_tumor", "sqrt_CD8_tumor", "sqrt_CD3_CD8_tumor", "sqrt_FoxP3_tumor",
+                            "sqrt_CD3_FoxP3_tumor", "sqrt_CD11b_tumor", "sqrt_CD15_tumor", 
+                            "sqrt_CD11b_CD15_tumor", "sqrt_CD3_stroma", "sqrt_CD8_stroma",
+                            "sqrt_CD3_CD8_stroma", "sqrt_FoxP3_stroma", "sqrt_CD3_FoxP3_stroma",
+                            "sqrt_CD11b_stroma", "sqrt_CD15_stroma", "sqrt_CD11b_CD15_stroma")
+markers_ROIi <- cbind(markers_ROIi, sqrt.markers)
 
 markers_ROIp <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
@@ -485,11 +499,18 @@ markers_ROIp <- ROI_global %>%
             percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
             percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells),
             mean_tumor = mean(percent_tumor))
+sqrt.markers <- sqrt(markers_ROIp[,c(2:17)])
+colnames(sqrt.markers) <- c("sqrt_CD3_tumor", "sqrt_CD8_tumor", "sqrt_CD3_CD8_tumor", "sqrt_FoxP3_tumor",
+                            "sqrt_CD3_FoxP3_tumor", "sqrt_CD11b_tumor", "sqrt_CD15_tumor", 
+                            "sqrt_CD11b_CD15_tumor", "sqrt_CD3_stroma", "sqrt_CD8_stroma",
+                            "sqrt_CD3_CD8_stroma", "sqrt_FoxP3_stroma", "sqrt_CD3_FoxP3_stroma",
+                            "sqrt_CD11b_stroma", "sqrt_CD15_stroma", "sqrt_CD11b_CD15_stroma")
+markers_ROIp <- cbind(markers_ROIp, sqrt.markers)
 
 
 # Cleaning
 rm(uid, TMAcases_remove, TMA_tumor, TMA_stroma, ROI_tumor, ROI_stroma,
-   common_ROITMA_IDs, cases_match1)
+   common_ROITMA_IDs, cases_match1, sqrt.markers)
 
 
 # End----
