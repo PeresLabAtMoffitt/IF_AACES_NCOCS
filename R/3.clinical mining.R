@@ -128,9 +128,7 @@ print(myplot,print.mean=TRUE)
 # For black and white
 myplot <- survfit(mysurv~clin_surv$race)
 myplot
-plot(myplot)
 table(clin_surv$race)
-
 plot(myplot, col= c("red", "blue"))
 surv_pvalue(myplot)
 

@@ -350,6 +350,12 @@ markers_ROIi %>%
   geom_boxplot(aes(y=value))+
   facet_grid(.~ markers_cat)
 
+markers_ROIi %>% 
+  gather(key = "markers_cat", value = "value", c(21, 23:26)) %>% 
+  select(suid, clusters2, markers_cat, value) %>% 
+  ggplot(aes(x=suid, group=clusters2, color=clusters2))+
+  geom_boxplot(aes(y=value))
+
 p1 <- markers_ROIi %>% filter(!is.na(race)) %>% 
   ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor, color=clusters2))+
   geom_boxplot()+
@@ -369,6 +375,7 @@ p3 <- markers_ROIi %>% filter(!is.na(race)) %>%
   facet_grid(.~ clusters2)+
   stat_compare_means(label = "p.format")  
 gridExtra::grid.arrange(p1, p2, p3, ncol=3)
+
 
 # 2.3.3.clusters 1_CD3-CD8 then FoxP3
 clust <- Mclust(markers_ROIi[21], G = 2)
@@ -436,31 +443,14 @@ p3 <- markers_ROIi %>% filter(!is.na(race)) %>%
   stat_compare_means(label = "p.format")  
 gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
-colnames(markers_ROIi)
-table(markers_ROIi$clusters_CD38.y)
 
-p1 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor, color=clusters_FoxP3))+
-  geom_boxplot()+
-  geom_jitter(shape=16, position=position_jitter(0.2))+
-  facet_grid(.~ clusters_FoxP3)+
-  stat_compare_means(label = "p.format")
-p2 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor, color=clusters_FoxP3))+
-  geom_boxplot()+
-  geom_jitter(shape=16, position=position_jitter(0.2))+
-  facet_grid(.~ clusters_FoxP3)+
-  stat_compare_means(label = "p.format")
-p3 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor, color=clusters_FoxP3))+
-  geom_boxplot()+
-  geom_jitter(shape=16, position=position_jitter(0.2))+
-  facet_grid(.~ clusters_FoxP3)+
-  stat_compare_means(label = "p.format")  
-gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
-colnames(markers_ROIi)
-table(markers_ROIi$clusters_CD38.y)
+
+
+
+
+
+
 
 markers_ROIi <- markers_ROIi %>% 
   mutate(special_cluster = case_when(
@@ -470,7 +460,56 @@ markers_ROIi <- markers_ROIi %>%
   ))
 
 
-
+# Survival by cluster
+clin_surv1 <- left_join(clin_surv, markers_ROIi[, c("suid", "clusters1", "clusters2", "special_cluster")], by="suid")
+# 1
+mysurv <- Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)
+myplot <- survfit(mysurv~clin_surv1$clusters1)
+myplot
+ggsurvplot(myplot, data = clin_surv1,
+           title = "Survival analysis on matched patient",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by CD3+/CD8+", legend.labs = c("mid-high", "mid-low", "high", "low"), # 4253
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = TRUE
+)
+survdiff(mysurv~clin_surv1$race+clin_surv1$clusters1)
+# 2
+myplot <- survfit(mysurv~clin_surv1$clusters2)
+myplot
+ggsurvplot(myplot, data = clin_surv1,
+           title = "Survival analysis on matched patient",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by all double positive", 
+           legend.labs = c("mid", "mid-high", "low", "mid-low", "high"), # 52143 
+           conf.int = FALSE,
+           pval = TRUE, # pval.coord = c(2100,.53), 
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table"
+)
+survdiff(mysurv~clin_surv1$race+clin_surv1$clusters2)
+# 3
+myplot <- survfit(mysurv~clin_surv1$special_cluster)
+myplot
+ggsurvplot(myplot, data = clin_surv1,
+           title = "Survival analysis on matched patient",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by CD8 then FoxP3", 
+           legend.labs = c("cold", "hot", "immunosuppressed"), 
+           conf.int = FALSE,
+           pval = TRUE, # pval.coord = c(2100,.53), 
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table"
+)
+survdiff(mysurv~clin_surv1$race+clin_surv1$special_cluster)
 
 # Cleaning
 rm(markers_ROIi, markers_ROIp)
