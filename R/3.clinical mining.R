@@ -102,10 +102,9 @@ ggplot(clinical_data, aes(x=race, y=refage, color=race))+
 
 
 
-# Survival plot----##############################################################################################################
-# Limiting to only the case_match ids
-clin_surv <- clinical_data %>% 
-  filter(!is.na(pair_id))
+######################################################################################## Survival plot----
+# Limiting to only the case_match ids----
+clin_surv <- markers_match
 # no event should be 0, when event happened should be 1
 # so will use the var surv_vital that I created alive=0, death=1
 mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
@@ -125,13 +124,13 @@ abline(v=1576) # Here put the median value in the my surv
 # can get a restricted mean 
 print(myplot,print.mean=TRUE)
 
-# For black and white
+# For black and white----
 myplot <- survfit(mysurv~clin_surv$race)
 myplot
 table(clin_surv$race)
 plot(myplot, col= c("red", "blue"))
-surv_pvalue(myplot)
 
+jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Survival paired ID.jpg"))
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on matched patient",
            font.main = c(16, "bold", "black"),
@@ -147,25 +146,51 @@ ggsurvplot(myplot, data = clin_surv,
            # palette = c("#E7B800", "#2E9FDF"),
            conf.int = TRUE
            )
+dev.off()
+survdiff(mysurv~clin_surv$race)
 
-survdiff(mysurv~clin_surv$race) # Would be 0.02 if take all data
+# With all patients----
+clin_surv <- markers
+mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
+myplot <- survfit(mysurv~clin_surv$race)
+jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Survival all patients.jpg"))
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis all patient",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "Race", legend.labs = c("Black", "White"),
+           pval = TRUE, pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           # Add risk table
+           risk.table = TRUE,
+           tables.height = 0.2,
+           # tables.theme = theme_cleantable(),
+           risk.table.title = "Risk table",
+           # Color
+           # palette = c("#E7B800", "#2E9FDF"),
+           conf.int = TRUE
+)
+dev.off()
+survdiff(mysurv~clin_surv$race)
 
 
 # Plot cumhaz for cumulative hazard or event
 plot(myplot, fun="cumhaz")
 plot(myplot, fun="event")
 
-# What if we look at only Black and comparing lower vs higher BMI
-median(clin_surv1$BMI_fold_increase, na.rm = TRUE)
+# What if we look at only Black and comparing lower vs higher BMI----all black patients
+clin_surv <- markers %>% 
+  mutate(BMI_fold_increase = BMI_recent/BMI_YA)
+
 clin_surv1 <- clin_surv %>% 
   filter(race == "Black") %>% 
   mutate(BMI_fold_increase = BMI_recent/BMI_YA) %>% 
-  mutate(BMI_grp = ifelse(BMI_fold_increase >=1.454545, "higher", "lower")) %>%  # 1.454545 is the median
+  mutate(BMI_grp = ifelse(BMI_fold_increase >=1.444444, "higher", "lower")) %>%  # 1.444444 is the median
   mutate(BMI_grp = factor(BMI_grp, levels = c("lower", "higher")))
+median(clin_surv1$BMI_fold_increase, na.rm = TRUE)
 
 myplot <- survfit(Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)~clin_surv1$BMI_grp) 
 ggsurvplot(myplot, data = clin_surv1,
-           title = "Survival analysis on matched patient",
+           title = "Survival analysis on matched patient comparing BMI fold increase",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "Race", legend.labs = c("higher", "lower"),
            pval = TRUE, pval.coord = c(2100,.53),
@@ -184,12 +209,12 @@ ggsurvplot(myplot, data = clin_surv1,
 median(clin_surv1$BMI_recent, na.rm = TRUE)
 clin_surv1 <- clin_surv %>% 
   filter(race == "Black") %>% 
-  mutate(BMI_grp = ifelse(BMI_recent >=30.66646, "higher", "lower")) %>%  # 30.66646 is the median
+  mutate(BMI_grp = ifelse(BMI_recent >=30.08423, "higher", "lower")) %>%  # 30.08423 is the median
   mutate(BMI_grp = factor(BMI_grp, levels = c("lower", "higher")))
 
 myplot <- survfit(Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)~clin_surv1$BMI_grp) 
 ggsurvplot(myplot, data = clin_surv1,
-           title = "Survival analysis on matched patient",
+           title = "Survival analysis on matched patient comparing recent BMI",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "Race", # legend.labs = c("higher", "lower"),
            pval = TRUE, pval.coord = c(2100,.53),
@@ -203,5 +228,46 @@ ggsurvplot(myplot, data = clin_surv1,
            # palette = c("#E7B800", "#2E9FDF"),
            conf.int = TRUE
 )
+
+# BMI_YA
+median(clin_surv1$BMI_YA, na.rm = TRUE)
+clin_surv1 <- clin_surv %>% 
+  filter(race == "Black") %>% 
+  mutate(BMI_grp = ifelse(BMI_YA >=21.03354, "higher", "lower")) %>%  # 21.03354 is the median
+  mutate(BMI_grp = factor(BMI_grp, levels = c("lower", "higher")))
+
+myplot <- survfit(Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)~clin_surv1$BMI_grp) 
+ggsurvplot(myplot, data = clin_surv1,
+           title = "Survival analysis on matched patient comparing recent BMI young",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "Race", # legend.labs = c("higher", "lower"),
+           pval = TRUE, pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           # Add risk table
+           risk.table = TRUE,
+           tables.height = 0.2,
+           # tables.theme = theme_cleantable(),
+           risk.table.title = "Risk table",
+           # Color
+           # palette = c("#E7B800", "#2E9FDF"),
+           conf.int = TRUE
+)
+
+
+
+
+# Add per BMI obese etc gpe_ do with white too
+# per stage...etc
+
+
+
+
+
+
+
+
+
+
+
 
 rm(clin_surv1, clin_surv, myplot, mysurv)
