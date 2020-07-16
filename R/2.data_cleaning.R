@@ -338,15 +338,6 @@ TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma %>% select(-suid),
   # mutate(CD11b_CD15perc_stroma_mm2 = stroma_percent_cd11bplus_cd15plus_positive_cells/stroma_area_analyzed_mm2_)
 
 
-<<<<<<< HEAD
-=======
-
-
-######################################################################################### IV ### Summarize df for plotting
-
-
->>>>>>> bc13e0af681d27eaf88eaa5fe22013517b62cb07
-
 ######################################################################################### III ### Summarize new var----
 # 3.1.Summarize immune markers----
 # For each case, calculate the average cell density (number of cells positive 
@@ -389,10 +380,7 @@ colnames(sqrt.markers) <- c("sqrt_CD3_tumor", "sqrt_CD8_tumor", "sqrt_CD3_CD8_tu
                             "sqrt_CD3_CD8_stroma", "sqrt_FoxP3_stroma", "sqrt_CD3_FoxP3_stroma",
                             "sqrt_CD11b_stroma", "sqrt_CD15_stroma", "sqrt_CD11b_CD15_stroma")
 markers_TMA <- cbind(markers_TMA, sqrt.markers)
-<<<<<<< HEAD
-=======
-#markers_TMA <- left_join(markers_TMA, clinical_data, by="suid")
->>>>>>> bc13e0af681d27eaf88eaa5fe22013517b62cb07
+
 #
 markers_ROIi <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
@@ -453,11 +441,6 @@ markers_ROIp$stroma_variation <- markers_ROIp$mean_stroma - mean(ROI_global$perc
 markers_ROI <- full_join(markers_ROIi, markers_ROIp,
                          by= "suid", suffix= c(".i", ".p"))
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> bc13e0af681d27eaf88eaa5fe22013517b62cb07
 sqrt.markers <- sqrt(markers_ROI[,c(6:21, 28:43)])
 colnames(sqrt.markers) <- c("sqrt_CD3_tumor.i", "sqrt_CD8_tumor.i", "sqrt_CD3_CD8_tumor.i", "sqrt_FoxP3_tumor.i",
                             "sqrt_CD3_FoxP3_tumor.i", "sqrt_CD11b_tumor.i", "sqrt_CD15_tumor.i", 
@@ -470,30 +453,16 @@ colnames(sqrt.markers) <- c("sqrt_CD3_tumor.i", "sqrt_CD8_tumor.i", "sqrt_CD3_CD
                             "sqrt_CD3_CD8_stroma.p", "sqrt_FoxP3_stroma.p", "sqrt_CD3_FoxP3_stroma.p",
                             "sqrt_CD11b_stroma.p", "sqrt_CD15_stroma.p", "sqrt_CD11b_CD15_stroma.p")
 markers_ROI <- cbind(markers_ROI, sqrt.markers)
-<<<<<<< HEAD
-=======
 
 
-
->>>>>>> bc13e0af681d27eaf88eaa5fe22013517b62cb07
-
-colnames(markers_TMA)[2:39] <- paste(colnames(markers_TMA)[2:39], "tma", sep = "_")
-markers <- full_join(markers_TMA, markers_ROI,
-                     by= "suid")
-markers <- left_join(markers, clinical_data, by="suid")
-
-
-<<<<<<< HEAD
 ######################################################################################## IV ### Merging all df----
 colnames(markers_TMA)[2:39] <- paste(colnames(markers_TMA)[2:39], "tma", sep = "_")
 markers <- full_join(markers_TMA, markers_ROI,
                      by= "suid")
 markers <- left_join(markers, clinical_data, by="suid")
-# # 4.1. Create variation data 
-=======
+
 
 # # 4.1. Create variation data ----
->>>>>>> bc13e0af681d27eaf88eaa5fe22013517b62cb07
 # # Look at the variation between each patient and the global mean # Should we mot compare Black and White?
 # # Here compare the mean of % cells to global study % cells
 # variations_TMA <- group_by(TMA_global, suid) %>% 
@@ -517,44 +486,23 @@ markers <- left_join(markers, clinical_data, by="suid")
 # # variations_ROI$stroma_variation <- variations_ROI$mean_stroma - mean(ROI_global$percent_stroma)
 
 
-<<<<<<< HEAD
-######################################################################################## V ### Create df 28 patients----
-=======
-
-
-
-
-
 ######################################################################################## III ### Create df 28 patients----
->>>>>>> bc13e0af681d27eaf88eaa5fe22013517b62cb07
 uid <- paste(unique(common_ROITMA_IDs$Subject_IDs), collapse = '|')
 markers_28 <- markers[(grepl(uid, markers$suid)),]
 
 
-<<<<<<< HEAD
 ######################################################################################## VI ### Create df for pair_id----
 markers_match <-  markers %>% drop_na(pair_id) %>% 
   group_by(pair_id) %>% filter( n() > 1 )
 
 
 ######################################################################################## VII ### to look----
-=======
-
-
-######################################################################################## III ### Add paired_id to dataframes----
-# Cleanup both paired ID when one had a missing data----
-# 3.2.Add case_match to clinical_data----
-markers_match <-  markers %>% drop_na(pair_id) %>% 
-  group_by(pair_id) %>% filter( n() > 1 )
-
-######################################################################################## III ### ----
->>>>>>> bc13e0af681d27eaf88eaa5fe22013517b62cb07
 # cases_match <- cases_match %>% mutate(suid = as.character(suid))
-# # 3.2.Add case_match to clinical_data----
+# # 3.2.Add case_match to clinical_data
 # clinical_data <- full_join(cases_match, 
 #                            clinical_data,
 #                            by= "suid")
-# # 3.3.Add case_match and race to ROI data----
+# # 3.3.Add case_match and race to ROI data
 cases_match <- left_join(cases_match,
                          clinical_data %>% select("suid", "race"),
                          by= "suid")
