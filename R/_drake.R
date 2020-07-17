@@ -1,7 +1,7 @@
 # For help with drake
-# https://ropenscilabs.github.io/drake-manual/projects.html#safer-interactivity
+# https://ropenscilabs.github.io/drake-manual/projects.html#safer-interactivity or https://docs.ropensci.org/drake
 # and
-# https://ropensci.github.io/drake/reference/r_make.html
+# https://ropensci.github.io/drake/reference/r_make.html or https://docs.ropensci.org/drake
 
 # Load your packages from packages.R
 source("R/packages.R")

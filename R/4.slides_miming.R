@@ -22,12 +22,12 @@ ICC_TMA <- dcast(setDT(ICC_TMA), suid ~ rowid(suid),
                  value.var = "tumor_total_cells") %>% 
   select(c(2:4))
 # Check density
-ICC_d_ROIi <- ROI_global %>% 
-  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>%
-  select(c("suid", "CD3_tumor_mm2", "CD3_stroma_mm2"))
-ICC_d_ROIi <- dcast(setDT(ICC_d_ROIi), suid ~ rowid(suid), 
-                  value.var = c("CD3_tumor_mm2", "CD3_stroma_mm2")) %>% 
-  select(c(2:4, 14:16))
+# ICC_d_ROIi <- ROI_global %>% 
+#   filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>%
+#   select(c("suid", "CD3_tumor_mm2", "CD3_stroma_mm2"))
+# ICC_d_ROIi <- dcast(setDT(ICC_d_ROIi), suid ~ rowid(suid), 
+#                   value.var = c("CD3_tumor_mm2", "CD3_stroma_mm2")) %>% 
+#   select(c(2:4, 14:16))
 # vs %
 ICC_p_ROIi <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>%
@@ -44,8 +44,8 @@ library(psych) # Koo and Li (2016)
 ICC(ICC_TMA)  # between 0.75 and 0.90: good
 ICC(ICC_ROIi)
 ICC(ICC_ROIp) #between 0.50 and 0.75: moderate
-ICC(ICC_d_ROIi)
-ICC(ICC_p_ROIi)
+# ICC(ICC_d_ROIi)
+# ICC(ICC_p_ROIi)
 library(irr) # Does not count patient with NA
 icc(
   ICC_TMA, model = "twoway", 
@@ -138,56 +138,50 @@ rm(table)
 # TMA
 # jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/hist TMA tumor vs stroma-yaxis.jpg"),
 #      width = 350, height = 350)
-p1 <- ggplot(TMA_global) +
-  geom_histogram(aes(tumor_total_cells), color = "darkgrey", fill="#8707A6FF") +
+p1 <- ggplot(markers_TMA) +
+  geom_histogram(aes(mean_tumor_tma), color = "darkgrey", fill="darkred") +
   theme_minimal() +
-  ylim(0,100) +
-  labs(x="Tumor", y="count", title="Cell Type Repartition in TMAs")
-p2 <- ggplot(TMA_global) +
-  geom_histogram(aes(stroma_total_cells), color = "darkgrey", fill="#00204DFF") +
+  ylim(0,25) +
+  labs(x="% Tumor", y="count")
+p2 <- ggplot(markers_TMA) +
+  geom_histogram(aes(mean_stroma_tma), color = "darkgrey", fill="orange") +
   theme_minimal() +
-  labs(x="Stroma", y="count")
-gridExtra::grid.arrange(p1, p2, ncol = 2)
-# dev.off()
-
-# ROI
-# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/hist ROI tumor vs stroma.jpg")
-#      , width = 350, height = 350)
-# p1 <- ggplot(ROI_global) +
-#   geom_histogram(aes(tumor_total_cells), color = "darkgrey", fill="#8707A6FF") +
-#   theme_minimal() +
-#   scale_y_continuous(limits=c(0,175)) +
-#   labs(x="Tumor", y="count")
-# p2 <- ggplot(ROI_global) +
-#   geom_histogram(aes(stroma_total_cells), color = "darkgrey", fill="#00204DFF") +
-#   theme_minimal() +
-#   scale_y_continuous(limits=c(0,175)) +
-#   labs(x="Stroma", y="count")
-# gridExtra::grid.arrange(p1, p2, ncol = 2,
-#                         top = "Cell Type Repartition in ROIs")
-# dev.off()
-
-# 
-# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/hist ROI tumor vs stroma facet location.jpg")
-#      , width = 350, height = 350)
-p1 <- ggplot(ROI_global) +
-  geom_histogram(aes(tumor_total_cells), color = "darkgrey", fill="#8707A6FF") +
-  theme_minimal() +
-  scale_y_continuous(limits=c(0,175)) +
-  labs(x="Tumor", y="count") +
-  facet_grid(.~intratumoral_i_vs_peripheral_p_)
-p2 <- ggplot(ROI_global) +
-  geom_histogram(aes(stroma_total_cells), color = "darkgrey", fill="#00204DFF") +
-  theme_minimal() +
-  scale_y_continuous(limits=c(0,175)) +
-  labs(x="Stroma", y="count") +
-  facet_grid(.~intratumoral_i_vs_peripheral_p_)
-gridExtra::grid.arrange(p1, p2, nrow = 2,
-                        top = "Cell Type Repartition in ROIs")
+  ylim(0,25) +
+  labs(x="% Stroma", y="")
+gridExtra::grid.arrange(p1, p2, ncol = 2, top="Cell Type Repartition in patient's TMAs")
 # dev.off()
 
 
-# Density plot----
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/hist ROI tumor vs stroma facet location.jpg"))
+p1 <- ggplot(markers_ROI) +
+  geom_histogram(aes(mean_tumor.i), color = "darkgrey", fill="darkred") +
+  theme_minimal() +
+  scale_y_continuous(limits=c(0,50)) +
+  labs(x="% Tumor", y="count", title = "Intratumoral")
+p2 <- ggplot(markers_ROI) +
+  geom_histogram(aes(mean_tumor.p), color = "darkgrey", fill="darkred") +
+  theme_minimal() +
+  scale_y_continuous(limits=c(0,50)) +
+  coord_cartesian(xlim = c(0,100))+
+  labs(x="% Tumor", y="", title = "Peripheral")
+p3 <- ggplot(markers_ROI) +
+  geom_histogram(aes(mean_stroma.i), color = "darkgrey", fill="orange") +
+  theme_minimal() +
+  scale_y_continuous(limits=c(0,50)) +
+  coord_cartesian(xlim = c(0,100))+
+  labs(x="Stroma", y="count", title = "Intratumoral")
+p4 <- ggplot(markers_ROI) +
+  geom_histogram(aes(mean_stroma.p), color = "darkgrey", fill="orange") +
+  theme_minimal() +
+  scale_y_continuous(limits=c(0,50)) +
+  coord_cartesian(xlim = c(0,100))+
+  labs(x="Stroma", y="", title = "Peripheral")
+gridExtra::grid.arrange(p1, p2, p3, p4, nrow = 2,
+                        top = "Cell Type Repartition in patient's ROIs")
+# dev.off()
+
+
+# Density plot----------------------------------------------------------------------------------------------------------------------------
 # jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/density ROI tumor.jpg"))
 ggplot(ROI_global, aes(tumor_total_cells, linetype = intratumoral_i_vs_peripheral_p_)) +
   geom_density(alpha=.3, color = "#8707A6FF") +
@@ -808,27 +802,27 @@ variation %>% select("suid", "mean_tumor", "mean_tumor_roi_i", "mean_tumor_roi_p
   tbl_summary(by = suid, statistic = list(all_continuous() ~ "{median} ({sd})")) %>% 
   add_p()
 
+
 # TMAs silmilar to intratumoral ROIs?----
 # Test normality
-qqnorm(variation$mean_tumor)
-qqnorm(variation$mean_tumor_roi_i)
-pairs.panels(variation[c("mean_tumor", "mean_stroma", # "tumor_variation", "stroma_variation",
-                         "mean_tumor_roi_i", "mean_stroma_roi_i", # "tumor_variation_roi_i", "stroma_variation_roi_i",
-                         "mean_tumor_roi_p", "mean_stroma_roi_p"# , "tumor_variation_roi_p", "stroma_variation_roi_p"
+qqnorm(markers$mean_tumor_tma)
+qqnorm(markers$mean_tumor.i)
+pairs.panels(markers[c("mean_tumor_tma", "mean_stroma_tma", # "tumor_variation_tma", "stroma_variation_tma",
+                         "mean_tumor.i", "mean_stroma.i", # "tumor_variation_roi_i", "stroma_variation_roi_i",
+                         "mean_tumor.p", "mean_stroma.p"# , "tumor_variation_roi_p", "stroma_variation_roi_p"
 )])
-pairs.panels(variation[c("mean_tumor", "mean_tumor_roi_i", "tumor_variation", "tumor_variation_roi_i")])
+pairs.panels(markers[c("mean_tumor_tma", "mean_tumor.i", "tumor_variation_tma", "variance_tumor.i")])
 
-# Correlation
-var_cor <- variation[, c("mean_tumor", "mean_tumor_roi_i", "mean_tumor_roi_p")]
+# Correlation----
+var_cor <- markers[, c("mean_tumor", "mean_tumor_roi_i", "mean_tumor_roi_p")]
 
-mat <- cor(variation[, c("mean_tumor", "mean_tumor_roi_i", "mean_tumor_roi_p", 
-                         "mean_stroma", "mean_stroma_roi_i", "mean_stroma_roi_p"
-)], 
-use = "pairwise.complete.obs")
+mat <- cor(markers[, c("mean_tumor_tma", "mean_tumor.i", "mean_tumor.p", 
+                         "mean_stroma_tma", "mean_stroma.i", "mean_stroma.p")], 
+           use = "pairwise.complete.obs")
 corrplot(mat)
 corrplot.mixed(mat)
 
-mat1 <- cor(variation[, c("tumor_variation", "tumor_variation_roi_i", "tumor_variation_roi_p", 
+mat1 <- cor(markers[, c("tumor_variation", "tumor_variation_roi_i", "tumor_variation_roi_p", 
                           "stroma_variation", "stroma_variation_roi_i", "stroma_variation_roi_p")], 
             use = "pairwise.complete.obs")
 corrplot(mat1)
@@ -847,6 +841,191 @@ ggcorrplot(mat, hc.order = TRUE, method = "circle",
            tl.cex = 10, tl.col = "red", tl.srt = 40,
            digits = 2
 )
+
+mat <- cor(markers[, c("percent_CD3_tumor_tma", "percent_CD3_tumor.i", "percent_CD8_tumor_tma", "percent_CD8_tumor.i",
+                       "percent_CD3_CD8_tumor_tma", "percent_CD3_CD8_tumor.i", "percent_FoxP3_tumor_tma", "percent_FoxP3_tumor.i",
+                       "percent_CD3_FoxP3_tumor_tma", "percent_CD3_FoxP3_tumor.i", "percent_CD11b_tumor_tma", "percent_CD11b_tumor.i",
+                       "percent_CD15_tumor_tma", "percent_CD15_tumor.i", "percent_CD11b_CD15_tumor_tma", "percent_CD11b_CD15_tumor.i",
+                       "percent_CD3_stroma_tma", "percent_CD3_stroma.i", "percent_CD8_stroma_tma", "percent_CD8_stroma.i",
+                       "percent_CD3_CD8_stroma_tma", "percent_CD3_CD8_stroma.i", "percent_FoxP3_stroma_tma", "percent_FoxP3_stroma.i",
+                       "percent_CD3_FoxP3_stroma_tma", "percent_CD3_FoxP3_stroma.i", "percent_CD11b_stroma_tma", "percent_CD11b_stroma.i", 
+                       "percent_CD15_stroma_tma", "percent_CD15_stroma.i", "percent_CD11b_CD15_stroma_tma", "percent_CD11b_CD15_stroma.i")],
+           use = "pairwise.complete.obs")
+corrplot(mat)
+corrplot.mixed(mat)
+ggcorrplot(mat, hc.order = FALSE, method = "circle", 
+           # outline.col = "darkblue", # the outline of the circle or sqare
+           # hc.method = "complete",
+           type = "upper", # show the top half panel
+           lab = TRUE, lab_col = "darkblue", lab_size = 3, # add correlation nbr, col and size of the correlation nbr
+           title = "Immune markers correlation in TMA vs intratumoral ROI",
+           show.legend = TRUE, legend.title = "Correlation", show.diag = FALSE,
+           # colors = viridis::inferno(n=3),
+           # p.mat = pmat, # Add correlation significance
+           sig.level = 0.05, insig = c("pch", "blank"), pch = 4, pch.col = "black", pch.cex = 10, 
+           tl.cex = 10, tl.col = "red", tl.srt = 40,
+           digits = 2
+)
+
+# For the 28 patients----
+mat <- cor(markers_28[, c("percent_CD3_tumor_tma", "percent_CD3_tumor.i", "percent_CD8_tumor_tma", "percent_CD8_tumor.i",
+                       "percent_CD3_CD8_tumor_tma", "percent_CD3_CD8_tumor.i", "percent_FoxP3_tumor_tma", "percent_FoxP3_tumor.i",
+                       "percent_CD3_FoxP3_tumor_tma", "percent_CD3_FoxP3_tumor.i", "percent_CD11b_tumor_tma", "percent_CD11b_tumor.i",
+                       "percent_CD15_tumor_tma", "percent_CD15_tumor.i", "percent_CD11b_CD15_tumor_tma", "percent_CD11b_CD15_tumor.i",
+                       "percent_CD3_stroma_tma", "percent_CD3_stroma.i", "percent_CD8_stroma_tma", "percent_CD8_stroma.i",
+                       "percent_CD3_CD8_stroma_tma", "percent_CD3_CD8_stroma.i", "percent_FoxP3_stroma_tma", "percent_FoxP3_stroma.i",
+                       "percent_CD3_FoxP3_stroma_tma", "percent_CD3_FoxP3_stroma.i", "percent_CD11b_stroma_tma", "percent_CD11b_stroma.i", 
+                       "percent_CD15_stroma_tma", "percent_CD15_stroma.i", "percent_CD11b_CD15_stroma_tma", "percent_CD11b_CD15_stroma.i")],
+           use = "pairwise.complete.obs")
+corrplot(mat)
+corrplot.mixed(mat)
+
+jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation Immune markers for 28 patients.jpg"),
+     width = 1300, height = 800, quality = 100)
+ggcorrplot(mat, hc.order = FALSE, method = "square", 
+           # outline.col = "darkblue", # the outline of the circle or sqare
+           # hc.method = "complete",
+           type = "upper", # show the top half panel
+           lab = TRUE, lab_col = "darkblue", lab_size = 2.5, # add correlation nbr, col and size of the correlation nbr
+           title = "Immune markers correlation in TMA vs Intratumoral ROI",
+           show.legend = TRUE, legend.title = "Correlation", show.diag = TRUE,
+           # colors = viridis::inferno(n=3),
+           # p.mat = pmat, # Add correlation significance
+           sig.level = 0.05, insig = c("pch", "blank"), pch = 4, pch.col = "black", pch.cex = 10, 
+           tl.cex = 10, tl.col = "red", tl.srt = 40,
+           digits = 2
+)
+dev.off()
+
+mat <- cor(markers_28[, c("percent_CD3_tumor_tma", "percent_CD3_tumor.i", "percent_CD8_tumor_tma", "percent_CD8_tumor.i",
+                          "percent_CD3_CD8_tumor_tma", "percent_CD3_CD8_tumor.i", "percent_FoxP3_tumor_tma", "percent_FoxP3_tumor.i",
+                          "percent_CD3_FoxP3_tumor_tma", "percent_CD3_FoxP3_tumor.i",
+                          "percent_CD3_stroma_tma", "percent_CD3_stroma.i", "percent_CD8_stroma_tma", "percent_CD8_stroma.i",
+                          "percent_CD3_CD8_stroma_tma", "percent_CD3_CD8_stroma.i", "percent_FoxP3_stroma_tma", "percent_FoxP3_stroma.i",
+                          "percent_CD3_FoxP3_stroma_tma", "percent_CD3_FoxP3_stroma.i")],
+           use = "pairwise.complete.obs")
+mat1 <- cor(markers_28[, c("percent_CD11b_tumor_tma", "percent_CD11b_tumor.i",
+                          "percent_CD15_tumor_tma", "percent_CD15_tumor.i", "percent_CD11b_CD15_tumor_tma", "percent_CD11b_CD15_tumor.i",
+                          "percent_CD11b_stroma_tma", "percent_CD11b_stroma.i", 
+                          "percent_CD15_stroma_tma", "percent_CD15_stroma.i", "percent_CD11b_CD15_stroma_tma", "percent_CD11b_CD15_stroma.i")],
+           use = "pairwise.complete.obs")
+
+jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation Immune markers for 28 patients separated.jpg"),
+     width = 1300, height = 800, quality = 100)
+p1 <- ggcorrplot(mat, hc.order = FALSE, method = "square", 
+                 # outline.col = "darkblue", # the outline of the circle or sqare
+                 # hc.method = "complete",
+                 type = "upper", # show the top half panel
+                 lab = TRUE, lab_col = "darkblue", lab_size = 2.5, # add correlation nbr, col and size of the correlation nbr
+                 title = "CD3/CD8/FoxP3: TMA vs Intratumoral ROI",
+                 show.legend = TRUE, legend.title = "Correlation", show.diag = TRUE,
+                 # colors = viridis::inferno(n=3),
+                 # p.mat = pmat, # Add correlation significance
+                 sig.level = 0.05, insig = c("pch", "blank"), pch = 4, pch.col = "black", pch.cex = 10, 
+                 tl.cex = 10, tl.col = "red", tl.srt = 40,
+                 digits = 2
+)
+p2 <- ggcorrplot(mat1, hc.order = FALSE, method = "square", 
+                 # outline.col = "darkblue", # the outline of the circle or sqare
+                 # hc.method = "complete",
+                 type = "upper", # show the top half panel
+                 lab = TRUE, lab_col = "darkblue", lab_size = 2.5, # add correlation nbr, col and size of the correlation nbr
+                 title = "CD11b/CD15: TMA vs Intratumoral ROI",
+                 show.legend = TRUE, legend.title = "Correlation", show.diag = TRUE,
+                 # colors = viridis::inferno(n=3),
+                 # p.mat = pmat, # Add correlation significance
+                 sig.level = 0.05, insig = c("pch", "blank"), pch = 4, pch.col = "black", pch.cex = 10, 
+                 tl.cex = 10, tl.col = "red", tl.srt = 40,
+                 digits = 2
+)
+gridExtra::grid.arrange(p1, p2, ncol = 2, top="Immune markers correlation in TMA vs Intratumoral ROI")
+dev.off()
+
+mat <- cor(markers_28[, c("percent_CD11b_tumor_tma", "percent_CD11b_tumor.i",
+                           "percent_CD15_tumor_tma", "percent_CD15_tumor.i", "percent_CD11b_CD15_tumor_tma", "percent_CD11b_CD15_tumor.i",
+                           "percent_CD11b_stroma_tma", "percent_CD11b_stroma.i", 
+                           "percent_CD15_stroma_tma", "percent_CD15_stroma.i", "percent_CD11b_CD15_stroma_tma", "percent_CD11b_CD15_stroma.i")],
+            use = "pairwise.complete.obs")
+mat1 <- cor(markers_28[, c("percent_CD11b_tumor_tma", "percent_CD11b_tumor.p",
+                           "percent_CD15_tumor_tma", "percent_CD15_tumor.p", "percent_CD11b_CD15_tumor_tma", "percent_CD11b_CD15_tumor.p",
+                           "percent_CD11b_stroma_tma", "percent_CD11b_stroma.p", 
+                           "percent_CD15_stroma_tma", "percent_CD15_stroma.p", "percent_CD11b_CD15_stroma_tma", "percent_CD11b_CD15_stroma.p")],
+            use = "pairwise.complete.obs")
+
+jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation CD11bCD15 for 28 patients intra or periph vs TMA.jpg"),
+     width = 1300, height = 800, quality = 100)
+p1 <- ggcorrplot(mat, hc.order = FALSE, method = "square", 
+                 # outline.col = "darkblue", # the outline of the circle or sqare
+                 # hc.method = "complete",
+                 type = "upper", # show the top half panel
+                 lab = TRUE, lab_col = "darkblue", lab_size = 3, # add correlation nbr, col and size of the correlation nbr
+                 title = "CD11b/CD15: TMA vs Intratumoral ROI",
+                 show.legend = TRUE, legend.title = "Correlation", show.diag = TRUE,
+                 # colors = viridis::inferno(n=3),
+                 # p.mat = pmat, # Add correlation significance
+                 sig.level = 0.05, insig = c("pch", "blank"), pch = 4, pch.col = "black", pch.cex = 10, 
+                 tl.cex = 10, tl.col = "red", tl.srt = 40,
+                 digits = 2
+)
+p2 <- ggcorrplot(mat1, hc.order = FALSE, method = "square", 
+                 # outline.col = "darkblue", # the outline of the circle or sqare
+                 # hc.method = "complete",
+                 type = "upper", # show the top half panel
+                 lab = TRUE, lab_col = "darkblue", lab_size = 3, # add correlation nbr, col and size of the correlation nbr
+                 title = "CD11b/CD15: TMA vs Peripheral ROI",
+                 show.legend = TRUE, legend.title = "Correlation", show.diag = TRUE,
+                 # colors = viridis::inferno(n=3),
+                 # p.mat = pmat, # Add correlation significance
+                 sig.level = 0.05, insig = c("pch", "blank"), pch = 4, pch.col = "black", pch.cex = 10, 
+                 tl.cex = 10, tl.col = "red", tl.srt = 40,
+                 digits = 2
+)
+gridExtra::grid.arrange(p1, p2, ncol = 2, top="Immune markers correlation in TMA vs Intratumoral or Peripheral ROI")
+dev.off()
+
+# Pairwise
+jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Pairwise tumor stromal cells for 28 patients.jpg"),
+     width = 1300, height = 800, quality = 100)
+pairs.panels(markers_28[c("mean_tumor_tma", "mean_stroma_tma",
+                       "mean_tumor.i", "mean_stroma.i",
+                       "mean_tumor.p", "mean_stroma.p"
+)])
+dev.off()
+
+jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Pairwise Immune markers CD3CD8FoxP3 for 28 patients.jpg"),
+     width = 1300, height = 800, quality = 100)
+pairs.panels(markers_28[c("percent_CD3_tumor_tma", "percent_CD3_tumor.i", "percent_CD8_tumor_tma", "percent_CD8_tumor.i",
+                       "percent_CD3_CD8_tumor_tma", "percent_CD3_CD8_tumor.i", "percent_FoxP3_tumor_tma", "percent_FoxP3_tumor.i",
+                       "percent_CD3_FoxP3_tumor_tma", "percent_CD3_FoxP3_tumor.i",
+                       "percent_CD3_stroma_tma", "percent_CD3_stroma.i", "percent_CD8_stroma_tma", "percent_CD8_stroma.i",
+                       "percent_CD3_CD8_stroma_tma", "percent_CD3_CD8_stroma.i", "percent_FoxP3_stroma_tma", "percent_FoxP3_stroma.i",
+                       "percent_CD3_FoxP3_stroma_tma", "percent_CD3_FoxP3_stroma.i"
+)])
+dev.off()
+jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Pairwise Immune markers CD11bCD15 for 28 patients.jpg"),
+     width = 1300, height = 800, quality = 100)
+pairs.panels(markers_28[c("percent_CD11b_tumor_tma", "percent_CD11b_tumor.i",
+                             "percent_CD15_tumor_tma", "percent_CD15_tumor.i", "percent_CD11b_CD15_tumor_tma", "percent_CD11b_CD15_tumor.i",
+                             "percent_CD11b_stroma_tma", "percent_CD11b_stroma.i", 
+                             "percent_CD15_stroma_tma", "percent_CD15_stroma.i", "percent_CD11b_CD15_stroma_tma", "percent_CD11b_CD15_stroma.i"
+)])
+dev.off()
+
+# Why is there a difference?
+table <- as.data.table(markers_28[c("percent_CD3_tumor_tma", "percent_CD3_tumor.i", "percent_CD8_tumor_tma", "percent_CD8_tumor.i",
+          "percent_CD3_CD8_tumor_tma", "percent_CD3_CD8_tumor.i", "percent_FoxP3_tumor_tma", "percent_FoxP3_tumor.i",
+          "percent_CD3_FoxP3_tumor_tma", "percent_CD3_FoxP3_tumor.i",
+          "percent_CD3_stroma_tma", "percent_CD3_stroma.i", "percent_CD8_stroma_tma", "percent_CD8_stroma.i",
+          "percent_CD3_CD8_stroma_tma", "percent_CD3_CD8_stroma.i", "percent_FoxP3_stroma_tma", "percent_FoxP3_stroma.i",
+          "percent_CD3_FoxP3_stroma_tma", "percent_CD3_FoxP3_stroma.i", 
+          "percent_CD11b_tumor_tma", "percent_CD11b_tumor.i",
+          "percent_CD15_tumor_tma", "percent_CD15_tumor.i", "percent_CD11b_CD15_tumor_tma", "percent_CD11b_CD15_tumor.i",
+          "percent_CD11b_stroma_tma", "percent_CD11b_stroma.i", 
+          "percent_CD15_stroma_tma", "percent_CD15_stroma.i", "percent_CD11b_CD15_stroma_tma", "percent_CD11b_CD15_stroma.i"
+)])
+table
+
+
 # Cleaning
 rm(p1, p2, p3, mat, mat1, variations_TMA, variations_ROI, variations_ROIip, var_cor)
 # End ----
