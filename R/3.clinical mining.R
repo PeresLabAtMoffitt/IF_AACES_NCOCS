@@ -130,7 +130,7 @@ myplot
 table(clin_surv$race)
 plot(myplot, col= c("red", "blue"))
 
-jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Survival paired ID.jpg"))
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Survival paired ID.jpg"))
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on matched patient",
            font.main = c(16, "bold", "black"),
@@ -146,14 +146,14 @@ ggsurvplot(myplot, data = clin_surv,
            # palette = c("#E7B800", "#2E9FDF"),
            conf.int = TRUE
            )
-dev.off()
+# dev.off()
 survdiff(mysurv~clin_surv$race)
 
 # With all patients----
 clin_surv <- markers
 mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
 myplot <- survfit(mysurv~clin_surv$race)
-jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Survival all patients.jpg"))
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Survival all patients.jpg"))
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis all patient",
            font.main = c(16, "bold", "black"),
@@ -169,7 +169,7 @@ ggsurvplot(myplot, data = clin_surv,
            # palette = c("#E7B800", "#2E9FDF"),
            conf.int = TRUE
 )
-dev.off()
+# dev.off()
 survdiff(mysurv~clin_surv$race)
 
 
@@ -192,7 +192,7 @@ myplot <- survfit(Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vit
 ggsurvplot(myplot, data = clin_surv1,
            title = "Survival analysis on matched patient comparing BMI fold increase",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "Race", legend.labs = c("higher", "lower"),
+           xlab = "Time (days)", legend.title = "grouped by BMI (median)", legend.labs = c("higher", "lower"),
            pval = TRUE, pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
            # Add risk table
@@ -256,8 +256,215 @@ ggsurvplot(myplot, data = clin_surv1,
 
 
 
-# Add per BMI obese etc gpe_ do with white too
-# per stage...etc
+# per BMI----
+# Black
+clin_surv1 <- clin_surv %>% 
+  filter(race == "Black") %>% 
+  mutate(BMI_classification = case_when(
+    BMI_recent < 18.5	~ "underweight",
+    BMI_recent >=18.5 & BMI_recent <25 ~ "normal",
+    BMI_recent >=25.0 & BMI_recent <30 ~ "overweight",
+    BMI_recent >=30.0 & BMI_recent <35 ~ "obesity I",
+    BMI_recent >=35.0 & BMI_recent <40 ~ "obesity II",
+    BMI_recent >= 40.0 ~ "obesity III"
+  ))
+myplot <- survfit(Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)~clin_surv1$BMI_classification) 
+ggsurvplot(myplot, data = clin_surv1,
+           title = "Survival analysis on Black population comparing recent BMI",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "BMI classification", # legend.labs = c("higher", "lower"),
+           pval = TRUE, pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           # Add risk table
+           risk.table = TRUE,
+           tables.height = 0.2,
+           # tables.theme = theme_cleantable(),
+           risk.table.title = "Risk table",
+           # Color
+           # palette = c("#E7B800", "#2E9FDF"),
+           conf.int = FALSE
+)
+
+# BMI	Classification[16]
+# < 18.5	underweight
+# 18.5–24.9	normal weight
+# 25.0–29.9	overweight
+# 30.0–34.9	class I obesity
+# 35.0–39.9	class II obesity
+# ≥ 40.0	  class III obesity  
+
+# Black vs White
+clin_surv <- markers_match
+clin_surv1 <- clin_surv %>% 
+  mutate(BMI_classification = case_when(
+    BMI_recent < 18.5	~ "underweight",
+    BMI_recent >=18.5 & BMI_recent <25 ~ "normal",
+    BMI_recent >=25.0 & BMI_recent <30 ~ "overweight",
+    BMI_recent >=30.0 & BMI_recent <35 ~ "obesity I",
+    BMI_recent >=35.0 & BMI_recent <40 ~ "obesity II",
+    BMI_recent >= 40.0 ~ "obesity III"
+  ))
+myplot <- survfit(Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)~clin_surv1$BMI_classification+clin_surv1$race) 
+ggsurv <- ggsurvplot(myplot, data = clin_surv1,
+           title = "Survival analysis on Black population comparing recent BMI",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "BMI classification",# legend.labs = c("higher", "lower"),
+           pval = TRUE, pval.coord = c(2100, .53),
+           surv.median.line = c("hv"),
+           # Add risk table
+           risk.table = TRUE, tables.height = 0.2, # tables.theme = theme_cleantable(),
+           risk.table.title = "Risk table",
+           # Color
+           # palette = c("#E7B800", "#2E9FDF"),
+           conf.int = FALSE
+)
+# Faceting survival curves
+curv_facet <- ggsurv$plot + facet_grid( ~ race)
+curv_facet
+
+clin_surv1 <- clin_surv %>% 
+  mutate(BMI_classification = case_when(
+    BMI_recent < 18.5	~ "underweight",
+    BMI_recent >=18.5 & BMI_recent <25 ~ "normal",
+    BMI_recent >=25.0 & BMI_recent <30 ~ "overweight",
+    BMI_recent >=30.0 & BMI_recent <35 ~ "obesity I",
+    BMI_recent >=35.0 & BMI_recent <40 ~ "obesity II",
+    BMI_recent >= 40.0 ~ "obesity III"
+  ))
+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~BMI_classification + race, data = clin_surv1) 
+ggsurvplot(myplot, data = clin_surv1,
+                     title = "Survival analysis on Black vs White population comparing recent BMI",
+                     font.main = c(16, "bold", "black"),
+                     xlab = "Time (days)",
+                     legend.title = "BMI classification",
+                     # legend.labs = c("normal", "obesity I", "obesity II", "obesity III", "overweight", "underweight"),
+                     # panel.labs = list(BMI_classification = c("underweight", "normal", "overweight", "obesity I", "obesity II", "obesity III")),
+                     pval = TRUE, pval.coord = c(2100, .53),
+                     surv.median.line = c("hv"),
+                     # Add risk table
+                     risk.table = TRUE, tables.height = 0.2, # tables.theme = theme_cleantable(),
+                     risk.table.title = "Risk table",
+                     # Color
+                     # palette = "jco",
+                     color = "BMI_classification",
+                     conf.int = FALSE
+) %>% 
+  .$plot +theme_bw() + 
+  theme (legend.position = "right")+
+  facet_grid(race ~ .)
+
+
+
+# per stage----
+clin_surv <- markers_match
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~stage + race, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on Black vs White population comparing recent BMI",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "Stage",
+           pval = TRUE, pval.coord = c(2100, .53),
+           surv.median.line = c("hv"),
+           # Color
+           # palette = "jco",
+           color = "stage",
+           conf.int = FALSE
+) %>% 
+  .$plot +theme_bw() + 
+  theme (legend.position = "right")+
+  facet_grid(race ~ .)
+
+# Per histology
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~histology + race, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on Black vs White population comparing recent BMI",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "Histology",
+           pval = TRUE, pval.coord = c(2100, .53),
+           surv.median.line = c("hv"),
+           # Color
+           # palette = "jco",
+           color = "histology",
+           conf.int = FALSE
+) %>% 
+  .$plot +theme_bw() + 
+  theme (legend.position = "right")+
+  facet_grid(race ~ .)
+
+# Per behavior
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~behavior + race, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on Black vs White population comparing recent BMI",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "Behavior",
+           pval = TRUE, pval.coord = c(2100, .53),
+           surv.median.line = c("hv"),
+           # Color
+           # palette = "jco",
+           color = "behavior",
+           conf.int = FALSE
+) %>% 
+  .$plot +theme_bw() + 
+  theme (legend.position = "right")+
+  facet_grid(race ~ .)
+
+# Per grade
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~grade + race, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on Black vs White population comparing recent BMI",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "Grade",
+           pval = TRUE, pval.coord = c(2100, .53),
+           surv.median.line = c("hv"),
+           # Color
+           # palette = "jco",
+           color = "grade",
+           conf.int = FALSE
+) %>% 
+  .$plot +theme_bw() + 
+  theme (legend.position = "right")+
+  facet_grid(race ~ .)
+
+# Per histotype
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~histotype + race, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on Black vs White population comparing recent BMI",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "Histotype",
+           pval = TRUE, pval.coord = c(2100, .53),
+           surv.median.line = c("hv"),
+           # Color
+           # palette = "jco",
+           color = "histotype",
+           conf.int = FALSE
+) %>% 
+  .$plot +theme_bw() + 
+  theme (legend.position = "right")+
+  facet_grid(race ~ .)
+
+# Per education
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~education + race, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on Black vs White population comparing recent BMI",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "Education",
+           pval = TRUE, pval.coord = c(2100, .53),
+           surv.median.line = c("hv"),
+           # Color
+           # palette = "jco",
+           color = "education",
+           conf.int = FALSE
+) %>% 
+  .$plot +theme_bw() + 
+  theme (legend.position = "right")+
+  facet_grid(race ~ .)
 
 
 
@@ -270,4 +477,8 @@ ggsurvplot(myplot, data = clin_surv1,
 
 
 
+
+
+
+# Cleaning
 rm(clin_surv1, clin_surv, myplot, mysurv)
