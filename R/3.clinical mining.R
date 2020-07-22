@@ -361,118 +361,610 @@ ggsurvplot(myplot, data = clin_surv1,
 clin_surv <- markers_match
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~stage + race, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on Black vs White population comparing recent BMI",
+           title = "Survival analysis on Black vs White population comparing tumor Stage",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
-           legend.title = "Stage",
+           legend.title = "Race",
            pval = TRUE, pval.coord = c(2100, .53),
            surv.median.line = c("hv"),
            # Color
            # palette = "jco",
-           color = "stage",
+           color = "race",
            conf.int = FALSE
 ) %>% 
   .$plot +theme_bw() + 
   theme (legend.position = "right")+
-  facet_grid(race ~ .)
+  facet_grid(. ~ stage)
 
 # Per histology
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~histology + race, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on Black vs White population comparing recent BMI",
+           title = "Survival analysis on Black vs White population comparing tumor Histology",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
-           legend.title = "Histology",
+           legend.title = "Race",
            pval = TRUE, pval.coord = c(2100, .53),
            surv.median.line = c("hv"),
            # Color
            # palette = "jco",
-           color = "histology",
+           color = "race",
            conf.int = FALSE
 ) %>% 
   .$plot +theme_bw() + 
   theme (legend.position = "right")+
-  facet_grid(race ~ .)
+  facet_grid(. ~ histology)
 
 # Per behavior
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~behavior + race, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on Black vs White population comparing recent BMI",
+           title = "Survival analysis on Black vs White population comparing tumor Behavior",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
-           legend.title = "Behavior",
+           legend.title = "Race",
            pval = TRUE, pval.coord = c(2100, .53),
            surv.median.line = c("hv"),
            # Color
            # palette = "jco",
-           color = "behavior",
+           color = "race",
            conf.int = FALSE
 ) %>% 
   .$plot +theme_bw() + 
   theme (legend.position = "right")+
-  facet_grid(race ~ .)
+  facet_grid(. ~ behavior)
 
 # Per grade
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~grade + race, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on Black vs White population comparing recent BMI",
+           title = "Survival analysis on Black vs White population comparing tumor Grade",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
-           legend.title = "Grade",
+           legend.title = "Race",
            pval = TRUE, pval.coord = c(2100, .53),
            surv.median.line = c("hv"),
            # Color
            # palette = "jco",
-           color = "grade",
+           color = "race",
            conf.int = FALSE
 ) %>% 
   .$plot +theme_bw() + 
   theme (legend.position = "right")+
-  facet_grid(race ~ .)
+  facet_grid(. ~ grade)
 
 # Per histotype
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~histotype + race, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on Black vs White population comparing recent BMI",
+           title = "Survival analysis on Black vs White population comparing Histotype",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
-           legend.title = "Histotype",
+           legend.title = "Race",
            pval = TRUE, pval.coord = c(2100, .53),
            surv.median.line = c("hv"),
            # Color
            # palette = "jco",
-           color = "histotype",
+           color = "race",
            conf.int = FALSE
 ) %>% 
   .$plot +theme_bw() + 
   theme (legend.position = "right")+
-  facet_grid(race ~ .)
+  facet_grid(. ~ histotype)
 
-# Per education
+# Per birthplace----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~birthplace + race, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on Black vs White population comparing Country of birth",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "Race",
+           pval = TRUE, pval.coord = c(2100, .53),
+           surv.median.line = c("hv"),
+           # Color
+           # palette = "jco",
+           color = "race",
+           conf.int = FALSE
+) %>% 
+  .$plot +theme_bw() + 
+  theme (legend.position = "right")+
+  facet_grid(. ~ birthplace)
+
+# Per education----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~education + race, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on Black vs White population comparing recent BMI",
+           title = "Survival analysis on Black vs White population comparing Education",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
-           legend.title = "Education",
+           legend.title = "Race",
            pval = TRUE, pval.coord = c(2100, .53),
            surv.median.line = c("hv"),
            # Color
            # palette = "jco",
-           color = "education",
+           color = "race",
            conf.int = FALSE
 ) %>% 
   .$plot +theme_bw() + 
   theme (legend.position = "right")+
-  facet_grid(race ~ .)
+  facet_grid(. ~ education)
+
+# Per married----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~married + race, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on Black vs White population comparing Marrital status",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "Race",
+           pval = TRUE, pval.coord = c(2100, .53),
+           surv.median.line = c("hv"),
+           # Color
+           # palette = "jco",
+           color = "race",
+           conf.int = FALSE
+) %>% 
+  .$plot +theme_bw() + 
+  theme (legend.position = "right")+
+  facet_grid(. ~ married)
+
+# Per pregever----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~pregever + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pregever",
+                 title = "Survival analysis on Black vs White population comparing Pregnacy status",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "pregever")
+
+# Per agefbirth----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~agefbirth + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "agefbirth",
+                 title = "Survival analysis on Black vs White population comparing Age at first birth",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "agefbirth")
+
+clinical_data$range_BMI <- as.factor(findInterval(clinical_data$BMI_recent,c(0,25,30,35,40,45,50,55,60,65,70,75,80)))
+levels(clinical_data$range_BMI) <-  
+  c("<26","26-30","31-35","36-40","41-45","46-50","51-55","56-60","61-65","65-70", "70-75", 
+    "75-80", ">80")
+
+clin_surv$range_agefbirth <- as.factor(findInterval(clin_surv$agefbirth,c(14,20,25,30,35,40)))
+levels(clin_surv$range_agefbirth) <- c("<20","20-24","25-29","30-34","35-39")
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~range_agefbirth + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "range_agefbirth",
+                 title = "Survival analysis on Black vs White population comparing Age at first birth",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "range_agefbirth")
+clin_surv[, c("agefbirth", "range_agefbirth")]
 
 
+# Per hyster----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~hyster +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hyster",
+                 title = "Survival analysis on Black vs White population comparing Hysterectomy status",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "hyster")
 
+# Per oophor----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~oophor +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "oophor",
+                 title = "Survival analysis on Black vs White population comparing Oophorectomy status",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "oophor")
 
+# Per tubelig----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~tubelig +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "tubelig",
+                 title = "Survival analysis on Black vs White population comparing Tubal ligation status",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "tubelig")
 
+# Per ocever----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~ocever +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ocever",
+                 title = "Survival analysis on Black vs White population comparing Ever use oral contraceptives",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "ocever")
 
+# Per breastfedever----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~breastfedever +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "breastfedever",
+                 title = "Survival analysis on Black vs White population comparing Ever breastfed",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "breastfedever")
 
+# Per menarch_agecat----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~menarch_agecat +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "menarch_agecat",
+                 title = "Survival analysis on Black vs White population comparing Age at menarche",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "menarch_agecat")
 
+# Per menopause----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~menopause +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "menopause",
+                 title = "Survival analysis on Black vs White population comparing Menopausal status",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "menopause")
+
+# Per talcever----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~talcever +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "talcever",
+                 title = "Survival analysis on Black vs White population comparing Ever regular use of body powder (at least 1 time per month for 6 months)",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "talcever")
+
+# Per brcancer----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~brcancer +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "brcancer",
+                 title = "Survival analysis on Black vs White population comparing Ever diagnosed with breast cancer",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "brcancer")
+
+# Per brcancermom----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~brcancermom +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "brcancermom",
+                 title = "Survival analysis on Black vs White population comparing Biological mother had breast cancer",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "brcancermom")
+
+# Per famhxbr----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~famhxbr +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "famhxbr",
+                 title = "Survival analysis on Black vs White population comparing Family history of breast cancer in any first-degree relative",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "brcancermom")
+
+# Per ovcancermom----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~ovcancermom +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancermom",
+                 title = "Survival analysis on Black vs White population comparing Biological mother had ovarian cancer",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "ovcancermom")
+
+# Per ovcancersis----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~ovcancersis +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancersis",
+                 title = "Survival analysis on Black vs White population comparing Any biological sister diagnosed with ovarian cancer",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "ovcancersis")
+
+# Per famhxov----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~famhxov +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "famhxov",
+                 title = "Survival analysis on Black vs White population comparing Family history of ovarian cancer in any first-degree relative",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "ovcancersis")
+
+# Per ovcancerdaughter----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~ovcancerdaughter +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancerdaughter",
+                 title = "Survival analysis on Black vs White population comparing ovcancerdaughter",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "ovcancerdaughter")
+
+# Per endomet----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~endomet +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "endomet",
+                 title = "Survival analysis on Black vs White population comparing diagnosed with endometriosis",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "endomet")
+
+# Per fibroids----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~fibroids +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "fibroids",
+                 title = "Survival analysis on Black vs White population comparing diagnosed with uterine fibroids",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "fibroids")
+
+# Per pid----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~pid +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pid",
+                 title = "Survival analysis on Black vs White population comparing diagnosed with pelvic inflammatory disease",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "pid")
+
+# Per pcos----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~pcos +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pcos",
+                 title = "Survival analysis on Black vs White population comparing diagnosed with polycystic ovarian syndrome",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "pcos")
+
+# Per ovcyst----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~ovcyst +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcyst",
+                 title = "Survival analysis on Black vs White population comparing diagnosed with an ovarian cyst",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "ovcyst")
+
+# Per anyfhever----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~anyfhever +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "anyfhever",
+                 title = "Survival analysis on Black vs White population comparing use any female hormones (pill patch or injection only)",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "anyfhever")
+
+# Per eonlyever----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~eonlyever +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "eonlyever",
+                 title = "Survival analysis on Black vs White population comparing use estrogen only (pills, patches, or injections)",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "eonlyever")
+
+# Per epever----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~epever +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "epever",
+                 title = "Survival analysis on Black vs White population comparing use estrogen + progestin (pills, patches, or injections)",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "epever")
+
+# Per smokever----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~smokever +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "smokever",
+                 title = "Survival analysis on Black vs White population comparing smoker status",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "smokever")
+
+# Per diab----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~diab +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "diab",
+                 title = "Survival analysis on Black vs White population comparing diabetes diagnosis",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "diab")
+
+# Per hrtdis----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~hrtdis +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hrtdis",
+                 title = "Survival analysis on Black vs White population comparing heart disease diagnosis",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"),
+                 # Color
+                 # palette = "jco",
+                 palette = "hrtdis")
+
+# Per hbp----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~hbp +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hbp",
+                 title = "Survival analysis on Black vs White population comparing high blood pressure diagnosis ",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv")
+                 # Color
+                 # palette = "jco")
+)
+
+# Per hchol----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~hchol +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hchol",
+                 title = "Survival analysis on Black vs White population comparing high cholesterol diagnosis",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv")
+                 # Color
+                 # palette = "jco")
+)
+
+# Per osteo----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~osteo +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "osteo",
+                 title = "Survival analysis on Black vs White population comparing osteoporosis diagnosis",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv")
+                 # Color
+                 # palette = "jco")
+)
+
+# Per thyrd----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~thyrd +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "thyrd",
+                 title = "Survival analysis on Black vs White population comparing thyroid condition",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv")
+                 # Color
+                 # palette = "jco")
+)
+
+# Per infert----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~infert +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "infert",
+                 title = "Survival analysis on Black vs White population comparing infertility for 1+ year",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv")
+                 # Color
+                 # palette = "jco")
+)
+
+# Per cancersite----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~cancersite +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "cancersite",
+                 title = "Survival analysis on Black vs White population comparing cancer site",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv")
+                 # Color
+                 # palette = "jco")
+)
+
+# Per aspirin----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~aspirin +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "aspirin",
+                 title = "Survival analysis on Black vs White population comparing aspirin",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv")
+                 # Color
+                 # palette = "jco")
+)
+
+# Per NSAID----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~NSAID +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "NSAID",
+                 title = "Survival analysis on Black vs White population comparing NSAID",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv")
+                 # Color
+                 # palette = "jco")
+)
+
+# Per aceta----
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~aceta +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "aceta",
+                 title = "Survival analysis on Black vs White population comparing aceta",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv")
+                 # Color
+                 # palette = "jco")
+)
 
 
 
