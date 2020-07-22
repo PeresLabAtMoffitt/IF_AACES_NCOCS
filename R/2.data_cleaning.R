@@ -60,7 +60,7 @@ clinical_data <- clinical_data %>%
     histology == 4                                     ~ "Mucinous",
     histology == 5                                     ~ "Carcinosarcoma",
     histology == 6                                     ~ "Carcinoma, NOS",
-    histology == 7                                     ~ "Other specified epithelial ovarian cancer (e.g. Malignant Brenner, mixed)",
+    histology == 7                                     ~ "Other specified epithelial ovarian cancer /n(e.g. Malignant Brenner, mixed)",
     histology == 8                                     ~ "Epithelial, NOS",
     histology == 9                                     ~ "Synchronous",
     TRUE                                                ~ NA_character_
@@ -90,7 +90,7 @@ clinical_data <- clinical_data %>%
     histotype == 4                                     ~ "clear cell",
     histotype == 5                                     ~ "mucinous",
     histotype == 6                                     ~ "carcinosarcoma",
-    histotype == 7                                     ~ "other epithelial ovarian cancer (e.g. Malignant Brenner, mixed, carcinoma, NOS)",
+    histotype == 7                                     ~ "other epithelial ovarian cancer /n(e.g. Malignant Brenner, mixed, carcinoma, NOS)",
     histotype == 9                                     ~ "serous borderline",
     histotype == 10                                    ~ "mucinous borderline",
     histotype == 11                                    ~ "other epithelial borderline",

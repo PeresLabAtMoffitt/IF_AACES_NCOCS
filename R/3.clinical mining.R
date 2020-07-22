@@ -966,7 +966,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "aceta",
                  # palette = "jco")
 )
 
-
+# Lymphocytes----
 
 
 
