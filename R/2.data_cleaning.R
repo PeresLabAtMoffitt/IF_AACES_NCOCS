@@ -43,6 +43,14 @@ clinical_data <- clinical_data %>%
               . %in% c("888","998", "999")             ~ NA_real_,
               TRUE                                     ~ as.numeric(.)
             )) %>% 
+  mutate(BMI_classification = case_when(
+    BMI_recent < 18.5	~ "underweight",
+    BMI_recent >=18.5 & BMI_recent <25 ~ "normal",
+    BMI_recent >=25.0 & BMI_recent <30 ~ "overweight",
+    BMI_recent >=30.0 & BMI_recent <35 ~ "obesity I",
+    BMI_recent >=35.0 & BMI_recent <40 ~ "obesity II",
+    BMI_recent >= 40.0 ~ "obesity III"
+  )) %>% 
   mutate_at(c("menopause_age"), 
             ~ case_when(
               . %in% c("777")                          ~ NA_real_,
@@ -60,7 +68,7 @@ clinical_data <- clinical_data %>%
     histology == 4                                     ~ "Mucinous",
     histology == 5                                     ~ "Carcinosarcoma",
     histology == 6                                     ~ "Carcinoma, NOS",
-    histology == 7                                     ~ "Other specified epithelial ovarian cancer /n(e.g. Malignant Brenner, mixed)",
+    histology == 7                                     ~ "Other specified epithelial ovarian cancer \n(e.g. Malignant Brenner, mixed)",
     histology == 8                                     ~ "Epithelial, NOS",
     histology == 9                                     ~ "Synchronous",
     TRUE                                                ~ NA_character_
@@ -90,7 +98,7 @@ clinical_data <- clinical_data %>%
     histotype == 4                                     ~ "clear cell",
     histotype == 5                                     ~ "mucinous",
     histotype == 6                                     ~ "carcinosarcoma",
-    histotype == 7                                     ~ "other epithelial ovarian cancer /n(e.g. Malignant Brenner, mixed, carcinoma, NOS)",
+    histotype == 7                                     ~ "other epithelial ovarian cancer \n(e.g. Malignant Brenner, mixed, carcinoma, NOS)",
     histotype == 9                                     ~ "serous borderline",
     histotype == 10                                    ~ "mucinous borderline",
     histotype == 11                                    ~ "other epithelial borderline",

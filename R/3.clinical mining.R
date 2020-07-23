@@ -1,4 +1,4 @@
-# Start with clinical mining
+################################################################################################################# I ### Basic plots----
 
 
 # Proportion cancer characteristic between Black and White
@@ -43,7 +43,7 @@ clinical_data %>%
 clinical_data %>% 
   group_by(education, race) %>% 
   summarise(count=n()) %>% 
-  mutate(percent=(count/sum(count)*100)) %>% 
+  mutate(percent=(count/NROW(!is.na(clinical_data$education))*100)) %>% 
   ggplot(aes(x=education, y=percent, fill=race))+
   geom_bar(stat = "identity", position=position_dodge2(preserve = "single"))+
   theme_minimal()+
@@ -52,7 +52,7 @@ clinical_data %>%
 clinical_data %>% 
   group_by(married, race) %>% 
   summarise(count=n()) %>% 
-  mutate(percent=(count/sum(count)*100)) %>% 
+  mutate(percent=(count/NROW(!is.na(clinical_data$married))*100)) %>% 
   ggplot(aes(x=married, y=percent, fill=race))+
   geom_bar(stat = "identity", position=position_dodge2(preserve = "single"))+
   theme_minimal()+
@@ -61,7 +61,7 @@ clinical_data %>%
 clinical_data %>% 
   group_by(pregever, race) %>% 
   summarise(count=n()) %>% 
-  mutate(percent=(count/sum(count)*100)) %>% 
+  mutate(percent=(count/NROW(!is.na(clinical_data$pregever))*100)) %>% 
   ggplot(aes(x=pregever, y=percent, fill=race))+
   geom_bar(stat = "identity", position=position_dodge2(preserve = "single"))+
   theme_minimal()+
@@ -89,7 +89,7 @@ levels(clinical_data$range_BMI) <-
 clinical_data %>% 
   group_by(range_BMI, race) %>% 
   summarise(count=n()) %>% 
-  mutate(percent=(count/sum(count)*100)) %>% 
+  mutate(percent=(count/NROW(!is.na(clinical_data$range_BMI))*100)) %>% 
   ggplot(aes(x=range_BMI, y=percent, fill=race))+
   geom_bar(stat = "identity", position=position_dodge2(preserve = "single"))+
   theme_minimal()+
@@ -98,18 +98,20 @@ clinical_data %>%
 
 # Age at diag between black and white----
 ggplot(clinical_data, aes(x=race, y=refage, color=race))+
-  geom_violin(scale = "count") # choose count to refect areas are scaled proportionally to the number of observations.
+  geom_violin(scale = "count") 
+# choose count to refect areas are scaled proportionally to the number of observations.
 
 
 
-######################################################################################## Survival plot----
+################################################################################################################# II ### Survival plot----
 # Limiting to only the case_match ids----
 clin_surv <- markers_match
 # no event should be 0, when event happened should be 1
 # so will use the var surv_vital that I created alive=0, death=1
 mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
 mysurv
-median(clin_surv$timelastfu)# do not use this value as the median survival is tbe time at the survivalship aka function = .5
+median(clin_surv$timelastfu)
+# do not use this value as the median survival is tbe time at the survivalship aka function = .5
 
 # Plot
 # survfit(mysurv~1, type= "kaplan-meier", conf.type = "log-log") # if log
@@ -260,14 +262,14 @@ ggsurvplot(myplot, data = clin_surv1,
 # Black
 clin_surv1 <- clin_surv %>% 
   filter(race == "Black") %>% 
-  mutate(BMI_classification = case_when(
-    BMI_recent < 18.5	~ "underweight",
-    BMI_recent >=18.5 & BMI_recent <25 ~ "normal",
-    BMI_recent >=25.0 & BMI_recent <30 ~ "overweight",
-    BMI_recent >=30.0 & BMI_recent <35 ~ "obesity I",
-    BMI_recent >=35.0 & BMI_recent <40 ~ "obesity II",
-    BMI_recent >= 40.0 ~ "obesity III"
-  ))
+  # mutate(BMI_classification = case_when(
+  #   BMI_recent < 18.5	~ "underweight",
+  #   BMI_recent >=18.5 & BMI_recent <25 ~ "normal",
+  #   BMI_recent >=25.0 & BMI_recent <30 ~ "overweight",
+  #   BMI_recent >=30.0 & BMI_recent <35 ~ "obesity I",
+  #   BMI_recent >=35.0 & BMI_recent <40 ~ "obesity II",
+  #   BMI_recent >= 40.0 ~ "obesity III"
+  # ))
 myplot <- survfit(Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)~clin_surv1$BMI_classification) 
 ggsurvplot(myplot, data = clin_surv1,
            title = "Survival analysis on Black population comparing recent BMI",
@@ -296,14 +298,14 @@ ggsurvplot(myplot, data = clin_surv1,
 # Black vs White
 clin_surv <- markers_match
 clin_surv1 <- clin_surv %>% 
-  mutate(BMI_classification = case_when(
-    BMI_recent < 18.5	~ "underweight",
-    BMI_recent >=18.5 & BMI_recent <25 ~ "normal",
-    BMI_recent >=25.0 & BMI_recent <30 ~ "overweight",
-    BMI_recent >=30.0 & BMI_recent <35 ~ "obesity I",
-    BMI_recent >=35.0 & BMI_recent <40 ~ "obesity II",
-    BMI_recent >= 40.0 ~ "obesity III"
-  ))
+  # mutate(BMI_classification = case_when(
+  #   BMI_recent < 18.5	~ "underweight",
+  #   BMI_recent >=18.5 & BMI_recent <25 ~ "normal",
+  #   BMI_recent >=25.0 & BMI_recent <30 ~ "overweight",
+  #   BMI_recent >=30.0 & BMI_recent <35 ~ "obesity I",
+  #   BMI_recent >=35.0 & BMI_recent <40 ~ "obesity II",
+  #   BMI_recent >= 40.0 ~ "obesity III"
+  # ))
 myplot <- survfit(Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)~clin_surv1$BMI_classification+clin_surv1$race) 
 ggsurv <- ggsurvplot(myplot, data = clin_surv1,
            title = "Survival analysis on Black population comparing recent BMI",
