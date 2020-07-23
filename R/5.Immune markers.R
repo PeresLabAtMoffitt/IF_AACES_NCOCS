@@ -51,19 +51,20 @@ markers_TMA %>% gather("cell_type", "percent", 2:17) %>%
 #                                               "CD11b tumor", "CD15 tumor","CD3 stroma", 
 #                                               "CD8 stroma", "FoxP3 stroma", "CD11b stroma", "CD15 stroma")) +  coord_flip()+
 #   labs(y="% cells", title="Immune Markers Repartition in ROIs", fill='Immune \nMarkers')
-markers_ROIi %>% gather("cell_type", "percent", 2:17) %>% 
+colnames(markers_ROI)
+markers_ROI %>% gather("cell_type", "percent", 6:21) %>% 
   ggplot(aes(x=suid, y=percent, fill=cell_type)) +
   geom_bar(stat="identity")+
   coord_flip()+
-  scale_fill_manual(breaks = c("percent_CD3_tumor", "percent_CD8_tumor", "percent_FoxP3_tumor", "percent_CD11b_tumor",
-                               "percent_CD15_tumor", "percent_CD3_stroma", "percent_CD8_stroma", "percent_FoxP3_stroma",
-                               "percent_CD11b_stroma", "percent_CD15_stroma"),
+  scale_fill_manual(breaks = c("percent_CD3_tumor.i", "percent_CD8_tumor.i", "percent_FoxP3_tumor.i", "percent_CD11b_tumor.i",
+                               "percent_CD15_tumor.i", "percent_CD3_stroma.i", "percent_CD8_stroma.i", "percent_FoxP3_stroma.i",
+                               "percent_CD11b_stroma.i", "percent_CD15_stroma.i"),
                     labels = c("CD3 tumor", "CD8 tumor", "FoxP3 tumor","CD11b tumor",
                                "CD15 tumor",
                                "CD3 stroma", "CD8 stroma", "FoxP3 stroma", "CD11b stroma", 
                                "CD15 stroma"),
                     values = viridis::cividis(n=16))+
-  labs(y="% cells", title="Immune Markers Repartition in TMAs", fill='Immune \nMarkers')
+  labs(y="% cells", title="Immune Markers Repartition in intratumoral ROIs", fill='Immune \nMarkers')
 
 cols <- 
   c("CD3 tumor" = "#99CCFF", "CD8 tumor" = "#33CCFF", "FoxP3 tumor" = "#33FFFF", "CD11b tumor" = "#99FFFF", 
@@ -92,33 +93,27 @@ markers_TMA %>% gather("cell_type", "percent", 2:17) %>%
                     values = viridis::cividis(n=16))+
   labs(y="% cells", title="Immune Markers Repartition in TMAs", fill='Immune \nMarkers')
 
-markers_ROIi %>% gather("cell_type", "percent", 2:17) %>% 
+markers_ROI %>% gather("cell_type", "percent", 6:21) %>% 
   ggplot(aes(x=suid, y=percent, fill=cell_type)) +
   geom_bar(stat="identity")+
   coord_flip()+
-  scale_fill_manual(breaks = c("percent_CD3_tumor", "percent_CD8_tumor", "percent_FoxP3_tumor", "percent_CD11b_tumor",
-                               "percent_CD15_tumor"),
+  scale_fill_manual(breaks = c("percent_CD3_tumor.i", "percent_CD8_tumor.i", "percent_FoxP3_tumor.i", "percent_CD11b_tumor.i",
+                               "percent_CD15_tumor.i"),
                     labels = c("CD3 tumor", "CD8 tumor", "FoxP3 tumor","CD11b tumor",
                                "CD15 tumor"),
                     values = viridis::cividis(n=16))+
   labs(y="% cells", title="Immune Markers Repartition in TMAs", fill='Immune \nMarkers')
 
-
-
-
-
-
-
-
+colnames(markers_TMA)
 markers_TMA %>% 
   # summarise(count = n()) %>% 
   # mutate(percent=(count/sum(count)*100)) %>% 
-  ggplot(aes(x=suid, y=percent_CD3_tumor)) +
+  ggplot(aes(x=suid, y=percent_CD3_tumor_tma)) +
   geom_bar(aes(fill="CD3 tumor"), stat="identity") +
-  geom_bar(aes(y=percent_CD8_tumor, fill="CD8 tumor"), stat="identity") +
-  geom_bar(aes(y=percent_FoxP3_tumor, fill="FoxP3 tumor"), stat="identity") +
-  geom_bar(aes(y=percent_CD11b_tumor, fill="CD11b tumor"), stat="identity") +
-  geom_bar(aes(y=percent_CD15_tumor, fill="CD15 tumor"), stat="identity") +
+  geom_bar(aes(y=percent_CD8_tumor_tma, fill="CD8 tumor"), stat="identity") +
+  geom_bar(aes(y=percent_FoxP3_tumor_tma, fill="FoxP3 tumor"), stat="identity") +
+  geom_bar(aes(y=percent_CD11b_tumor_tma, fill="CD11b tumor"), stat="identity") +
+  geom_bar(aes(y=percent_CD15_tumor_tma, fill="CD15 tumor"), stat="identity") +
   scale_fill_manual(values = cols, breaks = c("CD3 tumor", "CD8 tumor", "FoxP3 tumor",
                                               "CD11b tumor", "CD15 tumor")) +
   coord_flip()+
@@ -205,8 +200,6 @@ rm(df1, df2, cols)
 
 ########################################################################################## II ### Immune hot vs cold----
 # 2.1.Exclusion: Immune markers difference between periph and intra.----
-markers_ROI <- full_join(markers_ROIi, markers_ROIp,
-                         by = "suid", suffix = c(".i", ".p"))
 p1 <- ggplot(markers_ROI, aes(x=percent_CD3_tumor.p, y=percent_CD3_tumor.i))+
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
@@ -295,15 +288,16 @@ markers_ROI <- markers_ROI %>%
   mutate(ratio_CD3_FoxP3 = percent_CD3_FoxP3_tumor.i/mean_tumor.i) %>% 
   mutate(ratio_CD11b_CD15 = percent_CD11b_CD15_tumor.i/mean_tumor.i)
 
+colnames(markers_ROI)
 markers_ROI %>% 
-  gather("ratio_type", "ratio", 36:43) %>% 
+  gather("ratio_type", "ratio", ratio_CD8:ratio_CD11b_CD15) %>% 
   select("suid", "ratio_type", "ratio") %>%
   ggplot(aes(x=suid, y=ratio, fill=ratio_type)) +
   geom_bar(stat="identity", position = position_dodge())+
   coord_flip()+
   labs(y="Ratio", title="", fill='Ratio \nType')
 markers_ROI %>% 
-  gather("ratio_type", "ratio", 36:43) %>% 
+  gather("ratio_type", "ratio", "ratio_CD8":"ratio_CD11b_CD15") %>% 
   ggplot(aes(x=mean_tumor.i, y=ratio, color=ratio_type, fill=ratio_type)) +
   geom_bar(stat="identity")+
   labs(y="Ratio", title="", fill='Ratio \nType')
@@ -328,6 +322,22 @@ colour=percent_CD3_FoxP3_tumor.i<1
 # Do not take FoxP3 alone because tumor cells can express FoxP3
 # Do not take CD11b alone because CD3CD11b can be NK cells
 # CD11bCD15 are myeloid cells prevent other immune cells to traffic into the tumor
+
+# 2.3.0.clusters 1_by_Brooke # She only took intratumoral but all markers simple and doubled staining
+tmp<-Mclust(sqrt.percentages.intra, G = 5)
+summary(tmp)
+groupings<-tmp$classification
+summ.clin.intra<-cbind(summ.clin.intra, groupings)
+
+
+
+colnames(markers_ROI)
+
+
+
+
+
+
 
 # 2.3.1.clusters 1_by_CD3-CD8
 clust <- Mclust(markers_ROIi[21], G = 5)

@@ -162,7 +162,7 @@ clinical_data <- clinical_data %>%
     oophortype == 2                                     ~ "Bilateral",
     TRUE                                                ~ NA_character_
   )) %>% 
-  mutate(ocever = case_when(
+  mutate(ocindication = case_when(
     ocever == 1                                         ~ "birth control",
     ocever == 2                                         ~ "regulate menstrual periods",
     ocever == 3                                         ~ "acne or skin problems",
@@ -217,10 +217,10 @@ clinical_data <- clinical_data %>%
     TRUE                                                ~ NA_character_
   )) %>% 
   mutate(thyrd = case_when(
-    thyrd == 1                                          ~ "yes, unspecified",
+    thyrd == 1                                          ~ "yes unspecified",
     thyrd == 2                                          ~ "no",
-    thyrd == 3                                          ~ "yes, hyperthyroid/overreactive",
-    thyrd == 4                                          ~ "yes, hypothyroid/underreactive",
+    thyrd == 3                                          ~ "yes hyperthyroid/overreactive",
+    thyrd == 4                                          ~ "yes hypothyroid/underreactive",
     TRUE                                                ~ NA_character_
   )) %>% 
   mutate(mdvisitrsn = case_when(
