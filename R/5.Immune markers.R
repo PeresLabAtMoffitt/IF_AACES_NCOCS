@@ -318,124 +318,142 @@ colour=percent_CD3_FoxP3_tumor.i<1
 #####
 
 # 2.3.Clustering----
+# Need to remove NAs
+markers <- markers[!is.na(markers$sqrt_CD3_tumor.i),]
 # Do not take CD3 alone for clustering beacuse contain effector, regulator, helper, gamma delta
 # Do not take FoxP3 alone because tumor cells can express FoxP3
 # Do not take CD11b alone because CD3CD11b can be NK cells
 # CD11bCD15 are myeloid cells prevent other immune cells to traffic into the tumor
 
 # 2.3.0.clusters 1_by_Brooke # She only took intratumoral but all markers simple and doubled staining
-tmp<-Mclust(sqrt.percentages.intra, G = 5)
-summary(tmp)
-groupings<-tmp$classification
-summ.clin.intra<-cbind(summ.clin.intra, groupings)
-
-
-
-colnames(markers_ROI)
-
-
-
-
-
-
-
-# 2.3.1.clusters 1_by_CD3-CD8
-clust <- Mclust(markers_ROIi[21], G = 5)
+clust <- Mclust(markers[,c(85:99)], G = 5)
 summary(clust)
-markers_ROIi$clusters1 <- clust$classification
+markers$clusters_Brooke <- clust$classification
 
-markers_ROIi %>% 
-  gather(key = "markers_cat", value = "value", c(21, 23:26)) %>% 
-  select(suid, clusters1, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=clusters1, color=clusters1))+
+markers %>% 
+  gather(key = "markers_cat", value = "value", c(86, 88:91)) %>% 
+  select(suid, clusters_Brooke, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_Brooke, color=clusters_Brooke))+
   geom_boxplot()+
   facet_grid(.~ markers_cat)
 
-p1 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor, color=clusters1))+
+p1 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor.i, color=clusters_Brooke))+
   geom_boxplot()+
   geom_jitter(shape=16, position=position_jitter(0.2))+
-  facet_grid(.~ clusters1)+
+  facet_grid(.~ clusters_Brooke)+
   stat_compare_means(label = "p.format")
-p2 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor, color=clusters1))+
+p2 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor.i, color=clusters_Brooke))+
   geom_boxplot()+
   geom_jitter(shape=16, position=position_jitter(0.2))+
-  facet_grid(.~ clusters1)+
+  facet_grid(.~ clusters_Brooke)+
   stat_compare_means(label = "p.format")
-p3 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor, color=clusters1))+
+p3 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor.i, color=clusters_Brooke))+
   geom_boxplot()+
   geom_jitter(shape=16, position=position_jitter(0.2))+
-  facet_grid(.~ clusters1)+
+  facet_grid(.~ clusters_Brooke)+
+  stat_compare_means(label = "p.format")  
+gridExtra::grid.arrange(p1, p2, p3, ncol=3)
+
+# 2.3.1.clusters 1_by_CD3-CD8
+clust <- Mclust(markers[86], G = 5)
+summary(clust)
+markers$clusters_CD3CD8 <- clust$classification
+
+markers %>% 
+  gather(key = "markers_cat", value = "value", c(86, 88:91)) %>% 
+  select(suid, clusters_CD3CD8, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_CD3CD8, color=clusters_CD3CD8))+
+  geom_boxplot()+
+  facet_grid(.~ markers_cat)
+
+p1 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor.i, color=clusters_CD3CD8))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_CD3CD8)+
+  stat_compare_means(label = "p.format")
+p2 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor.i, color=clusters_CD3CD8))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_CD3CD8)+
+  stat_compare_means(label = "p.format")
+p3 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor.i, color=clusters_CD3CD8))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_CD3CD8)+
   stat_compare_means(label = "p.format")  
 gridExtra::grid.arrange(p1, p2, p3, ncol=3)
   
 # 2.3.2.clusters 2_by_all double positive
-clust <- Mclust(markers_ROIi[,c(21, 23:26)], G = 5)
+clust <- Mclust(markers[,c(86, 88, 91)], G = 5)
 summary(clust)
-markers_ROIi$clusters2 <- clust$classification
+markers$dbl_pos <- clust$classification
 
-markers_ROIi %>% 
-  gather(key = "markers_cat", value = "value", c(21, 23:26)) %>% 
-  select(suid, clusters2, markers_cat, value) %>% 
-  ggplot(aes(x=suid, group=clusters2, color=clusters2))+
+markers %>% 
+  gather(key = "markers_cat", value = "value", c(86, 88:91)) %>% 
+  select(suid, dbl_pos, markers_cat, value) %>% 
+  ggplot(aes(x=suid, group=dbl_pos, color=dbl_pos))+
   geom_boxplot(aes(y=value))+
   facet_grid(.~ markers_cat)
 
-markers_ROIi %>% 
-  gather(key = "markers_cat", value = "value", c(21, 23:26)) %>% 
-  select(suid, clusters2, markers_cat, value) %>% 
-  ggplot(aes(x=suid, group=clusters2, color=clusters2))+
+markers %>% 
+  gather(key = "markers_cat", value = "value", c(86, 88:91)) %>% 
+  select(suid, dbl_pos, markers_cat, value) %>% 
+  ggplot(aes(x=suid, group=dbl_pos, color=dbl_pos))+
   geom_boxplot(aes(y=value))
 
-p1 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor, color=clusters2))+
+p1 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor.i, color=dbl_pos))+
   geom_boxplot()+
   geom_jitter(shape=16, position=position_jitter(0.2))+
-  facet_grid(.~ clusters2)+
+  facet_grid(.~ dbl_pos)+
   stat_compare_means(label = "p.format")
-p2 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor, color=clusters2))+
+p2 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor.i, color=dbl_pos))+
   geom_boxplot()+
   geom_jitter(shape=16, position=position_jitter(0.2))+
-  facet_grid(.~ clusters2)+
+  facet_grid(.~ dbl_pos)+
   stat_compare_means(label = "p.format")
-p3 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor, color=clusters2))+
+p3 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor.i, color=dbl_pos))+
   geom_boxplot()+
   geom_jitter(shape=16, position=position_jitter(0.2))+
-  facet_grid(.~ clusters2)+
+  facet_grid(.~ dbl_pos)+
   stat_compare_means(label = "p.format")  
 gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 
 # 2.3.3.clusters 1_CD3-CD8 then FoxP3
-clust <- Mclust(markers_ROIi[21], G = 2)
+clust <- Mclust(markers[86], G = 2)
 summary(clust)
-markers_ROIi$clusters_CD38 <- clust$classification
+markers$clusters_CD38 <- clust$classification
 
-markers_ROIi %>% 
-  gather(key = "markers_cat", value = "value", c(21, 23:26)) %>% 
+markers %>% 
+  gather(key = "markers_cat", value = "value", c(86, 88:91)) %>% 
   select(suid, clusters_CD38, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_CD38, color=clusters_CD38))+
   geom_boxplot()+
   facet_grid(.~ markers_cat)
 
-p1 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor, color=clusters_CD38))+
+p1 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor.i, color=clusters_CD38))+
   geom_boxplot()+
   geom_jitter(shape=16, position=position_jitter(0.2))+
   facet_grid(.~ clusters_CD38)+
   stat_compare_means(label = "p.format")
-p2 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor, color=clusters_CD38))+
+p2 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor.i, color=clusters_CD38))+
   geom_boxplot()+
   geom_jitter(shape=16, position=position_jitter(0.2))+
   facet_grid(.~ clusters_CD38)+
   stat_compare_means(label = "p.format")
-p3 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor, color=clusters_CD38))+
+p3 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor.i, color=clusters_CD38))+
   geom_boxplot()+
   geom_jitter(shape=16, position=position_jitter(0.2))+
   facet_grid(.~ clusters_CD38)+
@@ -443,33 +461,33 @@ p3 <- markers_ROIi %>% filter(!is.na(race)) %>%
 gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 #
-a <- markers_ROIi %>% filter(clusters_CD38 == 2)
-clust <- Mclust(a[23], G = 2)
+a <- markers %>% filter(clusters_CD38 == 2) # 2 is high in CD38
+clust <- Mclust(a[88], G = 2)
 summary(clust)
 a$clusters_FoxP3 <- clust$classification
-markers_ROIi <- left_join(markers_ROIi, a[, c("suid", "clusters_FoxP3")], by= "suid")
+markers <- left_join(markers, a[, c("suid", "clusters_FoxP3")], by= "suid")
 
-markers_ROIi %>% 
-  gather(key = "markers_cat", value = "value", c(21, 23:26)) %>% 
+markers %>% 
+  gather(key = "markers_cat", value = "value", c(86, 88:91)) %>% 
   select(suid, clusters_FoxP3, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_FoxP3, color=clusters_FoxP3))+
   geom_boxplot()+
   facet_grid(.~ markers_cat)
 
-p1 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor, color=clusters_FoxP3))+
+p1 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor.i, color=clusters_FoxP3))+
   geom_boxplot()+
   geom_jitter(shape=16, position=position_jitter(0.2))+
   facet_grid(.~ clusters_FoxP3)+
   stat_compare_means(label = "p.format")
-p2 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor, color=clusters_FoxP3))+
+p2 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor.i, color=clusters_FoxP3))+
   geom_boxplot()+
   geom_jitter(shape=16, position=position_jitter(0.2))+
   facet_grid(.~ clusters_FoxP3)+
   stat_compare_means(label = "p.format")
-p3 <- markers_ROIi %>% filter(!is.na(race)) %>% 
-  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor, color=clusters_FoxP3))+
+p3 <- markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor.i, color=clusters_FoxP3))+
   geom_boxplot()+
   geom_jitter(shape=16, position=position_jitter(0.2))+
   facet_grid(.~ clusters_FoxP3)+
@@ -478,8 +496,8 @@ gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 
 
-
-markers_ROIi <- markers_ROIi %>% 
+# Combine cluster CD38 and cluster FoxP3
+markers <- markers %>% 
   mutate(special_cluster = case_when(
     clusters_CD38 == 1 ~ 1, # lox CD8 aka cold
     clusters_FoxP3 == 1 ~ 2, # low Fox aka hot
@@ -488,12 +506,31 @@ markers_ROIi <- markers_ROIi %>%
 
 
 # Survival by cluster
-clin_surv1 <- left_join(clin_surv, markers_ROIi[, c("suid", "clusters1", "clusters2", "special_cluster")], by="suid")
-# cluster 1
-mysurv <- Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)
-myplot <- survfit(mysurv~clin_surv1$clusters1)
+# clin_surv1 <- left_join(clin_surv, markers[, c("suid", "clusters_CD3CD8", "dbl_pos", "special_cluster")], by="suid")
+clin_surv <- left_join(markers_match, 
+                       markers[, c("suid", "clusters_Brooke", "clusters_CD3CD8", "dbl_pos", "special_cluster")], by="suid")
+mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
+
+# clusters_Brooke
+myplot <- survfit(mysurv~clin_surv$clusters_Brooke)
 myplot
-ggsurvplot(myplot, data = clin_surv1,
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on matched patient",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by Brooke", # legend.labs = c("mid-high", "mid-low", "high", "low"), # 4253
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+survdiff(mysurv~clin_surv$race+clin_surv$clusters_Brooke)
+
+# cluster 1
+myplot <- survfit(mysurv~clin_surv$clusters_CD3CD8)
+myplot
+ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on matched patient",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by CD3+/CD8+", legend.labs = c("mid-high", "mid-low", "high", "low"), # 4253
@@ -502,13 +539,13 @@ ggsurvplot(myplot, data = clin_surv1,
            risk.table = TRUE,
            tables.height = 0.2,
            risk.table.title = "Risk table",
-           conf.int = TRUE
+           conf.int = FALSE
 )
-survdiff(mysurv~clin_surv1$race+clin_surv1$clusters1)
+survdiff(mysurv~clin_surv$race+clin_surv$clusters_CD3CD8)
 # cluster 2
-myplot <- survfit(mysurv~clin_surv1$clusters2)
+myplot <- survfit(mysurv~clin_surv$dbl_pos)
 myplot
-ggsurvplot(myplot, data = clin_surv1,
+ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on matched patient",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by all double positive", 
@@ -520,11 +557,11 @@ ggsurvplot(myplot, data = clin_surv1,
            tables.height = 0.2,
            risk.table.title = "Risk table"
 )
-survdiff(mysurv~clin_surv1$race+clin_surv1$clusters2)
+survdiff(mysurv~clin_surv$race+clin_surv$dbl_pos)
 # special_cluster
-myplot <- survfit(mysurv~clin_surv1$special_cluster)
+myplot <- survfit(mysurv~clin_surv$special_cluster)
 myplot
-ggsurvplot(myplot, data = clin_surv1,
+ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on matched patient",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by CD8 then FoxP3", 
@@ -536,7 +573,7 @@ ggsurvplot(myplot, data = clin_surv1,
            tables.height = 0.2,
            risk.table.title = "Risk table"
 )
-survdiff(mysurv~clin_surv1$race+clin_surv1$special_cluster)
+survdiff(mysurv~clin_surv$race+clin_surv$special_cluster)
 
 # Cleaning
 rm(markers_ROIi, markers_ROIp)
