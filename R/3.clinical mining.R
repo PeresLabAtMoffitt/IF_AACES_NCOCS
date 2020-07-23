@@ -109,8 +109,7 @@ clin_surv <- markers_match
 # no event should be 0, when event happened should be 1
 # so will use the var surv_vital that I created alive=0, death=1
 mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
-mysurv
-median(clin_surv$timelastfu)
+# median(clin_surv$timelastfu)
 # do not use this value as the median survival is tbe time at the survivalship aka function = .5
 
 # Plot
@@ -118,20 +117,15 @@ median(clin_surv$timelastfu)
 # can do fleming-harrington or fh2 with log-log too
 # For whole population, default mysurv~1, type= "kaplan-meier")
 myplot <- survfit(mysurv~1) 
-myplot
 plot(myplot)
-plot(myplot, conf.int = "none") # without confidence interval
-abline(h=0.5)
-abline(v=1576) # Here put the median value in the my surv
+# plot(myplot, conf.int = "none") # without confidence interval
+# abline(h=0.5)
+# abline(v=1576) # Here put the median value in the my surv
 # can get a restricted mean 
-print(myplot,print.mean=TRUE)
+# print(myplot,print.mean=TRUE)
 
 # For black and white----
 myplot <- survfit(mysurv~clin_surv$race)
-myplot
-table(clin_surv$race)
-plot(myplot, col= c("red", "blue"))
-
 # jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Survival paired ID.jpg"))
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on matched patient",
@@ -146,7 +140,7 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            # Color
            # palette = c("#E7B800", "#2E9FDF"),
-           conf.int = TRUE
+           conf.int = FALSE
            )
 # dev.off()
 survdiff(mysurv~clin_surv$race)
@@ -169,99 +163,85 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            # Color
            # palette = c("#E7B800", "#2E9FDF"),
-           conf.int = TRUE
+           conf.int = FALSE
 )
 # dev.off()
 survdiff(mysurv~clin_surv$race)
 
 
 # Plot cumhaz for cumulative hazard or event
-plot(myplot, fun="cumhaz")
-plot(myplot, fun="event")
+# plot(myplot, fun="cumhaz")
+# plot(myplot, fun="event")
 
 # What if we look at only Black and comparing lower vs higher BMI----all black patients
 clin_surv <- markers %>% 
   mutate(BMI_fold_increase = BMI_recent/BMI_YA)
 
-clin_surv1 <- clin_surv %>% 
+clin_surv <- clin_surv %>% 
   filter(race == "Black") %>% 
   mutate(BMI_fold_increase = BMI_recent/BMI_YA) %>% 
-  mutate(BMI_grp = ifelse(BMI_fold_increase >=1.444444, "higher", "lower")) %>%  # 1.444444 is the median
+  mutate(BMI_grp = ifelse(BMI_fold_increase >=1.442222, "higher", "lower")) %>%  # 1.442222 is the median
   mutate(BMI_grp = factor(BMI_grp, levels = c("lower", "higher")))
-median(clin_surv1$BMI_fold_increase, na.rm = TRUE)
+median(clin_surv$BMI_fold_increase, na.rm = TRUE)
 
-myplot <- survfit(Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)~clin_surv1$BMI_grp) 
-ggsurvplot(myplot, data = clin_surv1,
-           title = "Survival analysis on matched patient comparing BMI fold increase",
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~BMI_grp, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Effect of BMI increase on Survival within Black population",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "grouped by BMI (median)", legend.labs = c("higher", "lower"),
+           xlab = "Time (days)", legend.title = "grouped by BMI (< or > median)", legend.labs = c("higher", "lower"),
            pval = TRUE, pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
            # Add risk table
            risk.table = TRUE,
            tables.height = 0.2,
-           # tables.theme = theme_cleantable(),
            risk.table.title = "Risk table",
-           # Color
-           # palette = c("#E7B800", "#2E9FDF"),
            conf.int = TRUE
 )
 
 # BMI_recent
-median(clin_surv1$BMI_recent, na.rm = TRUE)
-clin_surv1 <- clin_surv %>% 
-  filter(race == "Black") %>% 
-  mutate(BMI_grp = ifelse(BMI_recent >=30.08423, "higher", "lower")) %>%  # 30.08423 is the median
+median(clin_surv$BMI_recent, na.rm = TRUE)
+clin_surv <- clin_surv %>% 
+  mutate(BMI_grp = ifelse(BMI_recent >=31.00538, "higher", "lower")) %>%  # 31.00538 is the median
   mutate(BMI_grp = factor(BMI_grp, levels = c("lower", "higher")))
 
-myplot <- survfit(Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)~clin_surv1$BMI_grp) 
-ggsurvplot(myplot, data = clin_surv1,
-           title = "Survival analysis on matched patient comparing recent BMI",
+myplot <- survfit(Surv(time = timelastfu, event = $surv_vital)~BMI_grp, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Effect of recent BMI on Survival within Black population",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "Race", # legend.labs = c("higher", "lower"),
+           xlab = "Time (days)", legend.title = "grouped by recent BMI", legend.labs = c("lower", "higher"),
            pval = TRUE, pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
            # Add risk table
            risk.table = TRUE,
            tables.height = 0.2,
-           # tables.theme = theme_cleantable(),
            risk.table.title = "Risk table",
-           # Color
-           # palette = c("#E7B800", "#2E9FDF"),
            conf.int = TRUE
 )
 
 # BMI_YA
-median(clin_surv1$BMI_YA, na.rm = TRUE)
-clin_surv1 <- clin_surv %>% 
-  filter(race == "Black") %>% 
-  mutate(BMI_grp = ifelse(BMI_YA >=21.03354, "higher", "lower")) %>%  # 21.03354 is the median
+median(clin_surv$BMI_YA, na.rm = TRUE)
+clin_surv <- clin_surv %>% 
+  mutate(BMI_grp = ifelse(BMI_YA >=21.14375, "higher", "lower")) %>%  # 21.14375 is the median
   mutate(BMI_grp = factor(BMI_grp, levels = c("lower", "higher")))
 
-myplot <- survfit(Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)~clin_surv1$BMI_grp) 
-ggsurvplot(myplot, data = clin_surv1,
-           title = "Survival analysis on matched patient comparing recent BMI young",
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~BMI_grp, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Effect of BMI at young age on Survival within Black population",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "Race", # legend.labs = c("higher", "lower"),
+           xlab = "Time (days)", legend.title = "grouped by BMI at young age", legend.labs = c("lower", "higher"),
            pval = TRUE, pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
            # Add risk table
            risk.table = TRUE,
            tables.height = 0.2,
-           # tables.theme = theme_cleantable(),
            risk.table.title = "Risk table",
-           # Color
-           # palette = c("#E7B800", "#2E9FDF"),
            conf.int = TRUE
 )
 
-
-
-
-# per BMI----
+# per BMI classification----
 # Black
-clin_surv1 <- clin_surv %>% 
-  filter(race == "Black") %>% 
+# clin_surv1 <- clin_surv %>% 
+#   filter(race == "Black") %>% 
   # mutate(BMI_classification = case_when(
   #   BMI_recent < 18.5	~ "underweight",
   #   BMI_recent >=18.5 & BMI_recent <25 ~ "normal",
@@ -270,9 +250,9 @@ clin_surv1 <- clin_surv %>%
   #   BMI_recent >=35.0 & BMI_recent <40 ~ "obesity II",
   #   BMI_recent >= 40.0 ~ "obesity III"
   # ))
-myplot <- survfit(Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)~clin_surv1$BMI_classification) 
-ggsurvplot(myplot, data = clin_surv1,
-           title = "Survival analysis on Black population comparing recent BMI",
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~BMI_classification, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Effect of BMI classification on Survival within Black population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "BMI classification", # legend.labs = c("higher", "lower"),
            pval = TRUE, pval.coord = c(2100,.53),
@@ -280,34 +260,14 @@ ggsurvplot(myplot, data = clin_surv1,
            # Add risk table
            risk.table = TRUE,
            tables.height = 0.2,
-           # tables.theme = theme_cleantable(),
            risk.table.title = "Risk table",
-           # Color
-           # palette = c("#E7B800", "#2E9FDF"),
            conf.int = FALSE
 )
 
-# BMI	Classification[16]
-# < 18.5	underweight
-# 18.5–24.9	normal weight
-# 25.0–29.9	overweight
-# 30.0–34.9	class I obesity
-# 35.0–39.9	class II obesity
-# ≥ 40.0	  class III obesity  
-
 # Black vs White
 clin_surv <- markers_match
-clin_surv1 <- clin_surv %>% 
-  # mutate(BMI_classification = case_when(
-  #   BMI_recent < 18.5	~ "underweight",
-  #   BMI_recent >=18.5 & BMI_recent <25 ~ "normal",
-  #   BMI_recent >=25.0 & BMI_recent <30 ~ "overweight",
-  #   BMI_recent >=30.0 & BMI_recent <35 ~ "obesity I",
-  #   BMI_recent >=35.0 & BMI_recent <40 ~ "obesity II",
-  #   BMI_recent >= 40.0 ~ "obesity III"
-  # ))
-myplot <- survfit(Surv(time = clin_surv1$timelastfu, event = clin_surv1$surv_vital)~clin_surv1$BMI_classification+clin_surv1$race) 
-ggsurv <- ggsurvplot(myplot, data = clin_surv1,
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~BMI_classification+ race, data = clin_surv) 
+ggsurv <- ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on Black population comparing recent BMI",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
@@ -315,52 +275,34 @@ ggsurv <- ggsurvplot(myplot, data = clin_surv1,
            pval = TRUE, pval.coord = c(2100, .53),
            surv.median.line = c("hv"),
            # Add risk table
-           risk.table = TRUE, tables.height = 0.2, # tables.theme = theme_cleantable(),
+           risk.table = TRUE, tables.height = 0.2,
            risk.table.title = "Risk table",
-           # Color
-           # palette = c("#E7B800", "#2E9FDF"),
            conf.int = FALSE
 )
 # Faceting survival curves
 curv_facet <- ggsurv$plot + facet_grid( ~ race)
 curv_facet
 
-clin_surv1 <- clin_surv %>% 
-  mutate(BMI_classification = case_when(
-    BMI_recent < 18.5	~ "underweight",
-    BMI_recent >=18.5 & BMI_recent <25 ~ "normal",
-    BMI_recent >=25.0 & BMI_recent <30 ~ "overweight",
-    BMI_recent >=30.0 & BMI_recent <35 ~ "obesity I",
-    BMI_recent >=35.0 & BMI_recent <40 ~ "obesity II",
-    BMI_recent >= 40.0 ~ "obesity III"
-  ))
-
-myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~BMI_classification + race, data = clin_surv1) 
-ggsurvplot(myplot, data = clin_surv1,
-                     title = "Survival analysis on Black vs White population comparing recent BMI",
+ggsurvplot(myplot, data = clin_surv,
+                     title = "Survival analysis on Black vs White population comparing BMI classification",
                      font.main = c(16, "bold", "black"),
                      xlab = "Time (days)",
                      legend.title = "BMI classification",
-                     # legend.labs = c("normal", "obesity I", "obesity II", "obesity III", "overweight", "underweight"),
-                     # panel.labs = list(BMI_classification = c("underweight", "normal", "overweight", "obesity I", "obesity II", "obesity III")),
                      pval = TRUE, pval.coord = c(2100, .53),
                      surv.median.line = c("hv"),
                      # Add risk table
-                     risk.table = TRUE, tables.height = 0.2, # tables.theme = theme_cleantable(),
+                     risk.table = TRUE, tables.height = 0.2,
                      risk.table.title = "Risk table",
-                     # Color
-                     # palette = "jco",
-                     color = "BMI_classification",
+                     color = "race",
                      conf.int = FALSE
 ) %>% 
   .$plot +theme_bw() + 
   theme (legend.position = "right")+
-  facet_grid(race ~ .)
+  facet_grid(. ~ BMI_classification)
 
 
 
 # per stage----
-clin_surv <- markers_match
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~stage + race, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on Black vs White population comparing tumor Stage",
@@ -511,10 +453,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pregever",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "pregever")
+                 surv.median.line = c("hv"))
 
 # Per agefbirth----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~agefbirth + race, data = clin_surv) 
@@ -523,15 +462,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "agefbirth",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "agefbirth")
-
-clinical_data$range_BMI <- as.factor(findInterval(clinical_data$BMI_recent,c(0,25,30,35,40,45,50,55,60,65,70,75,80)))
-levels(clinical_data$range_BMI) <-  
-  c("<26","26-30","31-35","36-40","41-45","46-50","51-55","56-60","61-65","65-70", "70-75", 
-    "75-80", ">80")
+                 surv.median.line = c("hv"))
 
 clin_surv$range_agefbirth <- as.factor(findInterval(clin_surv$agefbirth,c(14,20,25,30,35,40)))
 levels(clin_surv$range_agefbirth) <- c("<20","20-24","25-29","30-34","35-39")
@@ -541,12 +472,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "range_agefbirth",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "range_agefbirth")
-clin_surv[, c("agefbirth", "range_agefbirth")]
-
+                 surv.median.line = c("hv"))
 
 # Per hyster----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~hyster +race, data = clin_surv) 
@@ -555,10 +481,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hyster",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "hyster")
+                 surv.median.line = c("hv"))
 
 # Per oophor----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~oophor +race, data = clin_surv) 
@@ -567,10 +490,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "oophor",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "oophor")
+                 surv.median.line = c("hv"))
 
 # Per tubelig----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~tubelig +race, data = clin_surv) 
@@ -579,10 +499,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "tubelig",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "tubelig")
+                 surv.median.line = c("hv"))
 
 # Per ocever----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~ocever +race, data = clin_surv) 
@@ -591,10 +508,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ocever",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "ocever")
+                 surv.median.line = c("hv"))
 
 # Per breastfedever----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~breastfedever +race, data = clin_surv) 
@@ -603,10 +517,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "breastfedever",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "breastfedever")
+                 surv.median.line = c("hv"))
 
 # Per menarch_agecat----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~menarch_agecat +race, data = clin_surv) 
@@ -615,10 +526,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "menarch_agecat",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "menarch_agecat")
+                 surv.median.line = c("hv"))
 
 # Per menopause----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~menopause +race, data = clin_surv) 
@@ -627,10 +535,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "menopause",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "menopause")
+                 surv.median.line = c("hv"))
 
 # Per talcever----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~talcever +race, data = clin_surv) 
@@ -639,10 +544,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "talcever",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "talcever")
+                 surv.median.line = c("hv"))
 
 # Per brcancer----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~brcancer +race, data = clin_surv) 
@@ -651,10 +553,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "brcancer",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "brcancer")
+                 surv.median.line = c("hv"))
 
 # Per brcancermom----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~brcancermom +race, data = clin_surv) 
@@ -663,10 +562,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "brcancermom",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "brcancermom")
+                 surv.median.line = c("hv"))
 
 # Per famhxbr----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~famhxbr +race, data = clin_surv) 
@@ -675,10 +571,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "famhxbr",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "brcancermom")
+                 surv.median.line = c("hv"))
 
 # Per ovcancermom----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~ovcancermom +race, data = clin_surv) 
@@ -687,10 +580,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancermom",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "ovcancermom")
+                 surv.median.line = c("hv"))
 
 # Per ovcancersis----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~ovcancersis +race, data = clin_surv) 
@@ -699,10 +589,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancersis",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "ovcancersis")
+                 surv.median.line = c("hv"))
 
 # Per famhxov----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~famhxov +race, data = clin_surv) 
@@ -711,10 +598,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "famhxov",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "ovcancersis")
+                 surv.median.line = c("hv"))
 
 # Per ovcancerdaughter----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~ovcancerdaughter +race, data = clin_surv) 
@@ -723,10 +607,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancerdaughter",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "ovcancerdaughter")
+                 surv.median.line = c("hv"))
 
 # Per endomet----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~endomet +race, data = clin_surv) 
@@ -735,10 +616,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "endomet",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "endomet")
+                 surv.median.line = c("hv"))
 
 # Per fibroids----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~fibroids +race, data = clin_surv) 
@@ -747,10 +625,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "fibroids",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "fibroids")
+                 surv.median.line = c("hv"))
 
 # Per pid----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~pid +race, data = clin_surv) 
@@ -759,10 +634,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pid",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "pid")
+                 surv.median.line = c("hv"))
 
 # Per pcos----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~pcos +race, data = clin_surv) 
@@ -771,10 +643,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pcos",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "pcos")
+                 surv.median.line = c("hv"))
 
 # Per ovcyst----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~ovcyst +race, data = clin_surv) 
@@ -783,10 +652,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcyst",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "ovcyst")
+                 surv.median.line = c("hv"))
 
 # Per anyfhever----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~anyfhever +race, data = clin_surv) 
@@ -795,10 +661,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "anyfhever",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "anyfhever")
+                 surv.median.line = c("hv"))
 
 # Per eonlyever----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~eonlyever +race, data = clin_surv) 
@@ -807,10 +670,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "eonlyever",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "eonlyever")
+                 surv.median.line = c("hv"))
 
 # Per epever----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~epever +race, data = clin_surv) 
@@ -819,10 +679,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "epever",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "epever")
+                 surv.median.line = c("hv"))
 
 # Per smokever----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~smokever +race, data = clin_surv) 
@@ -831,10 +688,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "smokever",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "smokever")
+                 surv.median.line = c("hv"))
 
 # Per diab----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~diab +race, data = clin_surv) 
@@ -843,10 +697,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "diab",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "diab")
+                 surv.median.line = c("hv"))
 
 # Per hrtdis----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~hrtdis +race, data = clin_surv) 
@@ -855,10 +706,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hrtdis",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv"),
-                 # Color
-                 # palette = "jco",
-                 palette = "hrtdis")
+                 surv.median.line = c("hv"))
 
 # Per hbp----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~hbp +race, data = clin_surv) 
@@ -867,10 +715,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hbp",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv")
-                 # Color
-                 # palette = "jco")
-)
+                 surv.median.line = c("hv"))
 
 # Per hchol----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~hchol +race, data = clin_surv) 
@@ -879,10 +724,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hchol",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv")
-                 # Color
-                 # palette = "jco")
-)
+                 surv.median.line = c("hv"))
 
 # Per osteo----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~osteo +race, data = clin_surv) 
@@ -891,10 +733,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "osteo",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv")
-                 # Color
-                 # palette = "jco")
-)
+                 surv.median.line = c("hv"))
 
 # Per thyrd----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~thyrd +race, data = clin_surv) 
@@ -903,10 +742,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "thyrd",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv")
-                 # Color
-                 # palette = "jco")
-)
+                 surv.median.line = c("hv"))
 
 # Per infert----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~infert +race, data = clin_surv) 
@@ -915,10 +751,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "infert",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv")
-                 # Color
-                 # palette = "jco")
-)
+                 surv.median.line = c("hv"))
 
 # Per cancersite----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~cancersite +race, data = clin_surv) 
@@ -927,10 +760,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "cancersite",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv")
-                 # Color
-                 # palette = "jco")
-)
+                 surv.median.line = c("hv"))
 
 # Per aspirin----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~aspirin +race, data = clin_surv) 
@@ -939,10 +769,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "aspirin",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv")
-                 # Color
-                 # palette = "jco")
-)
+                 surv.median.line = c("hv"))
 
 # Per NSAID----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~NSAID +race, data = clin_surv) 
@@ -951,10 +778,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "NSAID",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv")
-                 # Color
-                 # palette = "jco")
-)
+                 surv.median.line = c("hv"))
 
 # Per aceta----
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~aceta +race, data = clin_surv) 
@@ -963,16 +787,216 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "aceta",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
-                 surv.median.line = c("hv")
-                 # Color
-                 # palette = "jco")
-)
+                 surv.median.line = c("hv"))
 
 # Lymphocytes----
+# CD3
+median(clin_surv$percent_CD3_tumor.i)
+clin_surv <- clin_surv %>% 
+  mutate(CD3 = ifelse(percent_CD3_tumor.i >=1.035165, "higher", "lower")) %>%  # median
+  mutate(CD3 = factor(CD3, levels = c("lower", "higher")))
 
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD3",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+median(clin_surv$percent_CD3_tumor.p, na.rm = TRUE)
+clin_surv <- clin_surv %>% 
+  mutate(CD3 = ifelse(percent_CD3_tumor.p >=1.864843, "higher", "lower")) %>%  # median
+  mutate(CD3 = factor(CD3, levels = c("lower", "higher")))
 
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD3",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+# CD8
+median(clin_surv$percent_CD8_tumor.i)
+clin_surv <- clin_surv %>% 
+  mutate(CD8 = ifelse(percent_CD8_tumor.i >=0.560704, "higher", "lower")) %>%  # median
+  mutate(CD8 = factor(CD3, levels = c("lower", "higher")))
 
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD8 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD8",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+median(clin_surv$percent_CD8_tumor.p, na.rm = TRUE)
+clin_surv <- clin_surv %>% 
+  mutate(CD8 = ifelse(percent_CD8_tumor.p >=0.9094123, "higher", "lower")) %>%  # median
+  mutate(CD8 = factor(CD3, levels = c("lower", "higher")))
 
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD8 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD8",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+
+# CD3CD8
+median(clin_surv$percent_CD3_CD8_tumor.i)
+clin_surv <- clin_surv %>% 
+  mutate(CD3CD8 = ifelse(percent_CD3_CD8_tumor.i >=0.3548757, "higher", "lower")) %>%  # median
+  mutate(CD3CD8 = factor(CD3CD8, levels = c("lower", "higher")))
+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3CD8 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD3CD8",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+median(clin_surv$percent_CD3_CD8_tumor.p, na.rm = TRUE)
+clin_surv <- clin_surv %>% 
+  mutate(CD3CD8 = ifelse(percent_CD3_CD8_tumor.p >=0.6122158, "higher", "lower")) %>%  # median
+  mutate(CD3CD8 = factor(CD3CD8, levels = c("lower", "higher")))
+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3CD8 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD3CD8",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+
+# FoxP3
+median(clin_surv$percent_FoxP3_tumor.i)
+clin_surv <- clin_surv %>% 
+  mutate(FoxP3 = ifelse(percent_FoxP3_tumor.i >=0.2734768, "higher", "lower")) %>%  #edian
+  mutate(FoxP3 = factor(FoxP3, levels = c("lower", "higher")))
+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~FoxP3 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "FoxP3",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+median(clin_surv$percent_FoxP3_tumor.p, na.rm = TRUE)
+clin_surv <- clin_surv %>% 
+  mutate(FoxP3 = ifelse(percent_FoxP3_tumor.p >=0.4100425, "higher", "lower")) %>%  # median
+  mutate(FoxP3 = factor(FoxP3, levels = c("lower", "higher")))
+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~FoxP3 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "FoxP3",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+
+# CD3FoxP3
+median(clin_surv$percent_CD3_FoxP3_tumor.i)
+clin_surv <- clin_surv %>% 
+  mutate(CD3FoxP3 = ifelse(percent_CD3_FoxP3_tumor.i >=0.127227, "higher", "lower")) %>%  # median
+  mutate(CD3FoxP3 = factor(CD3FoxP3, levels = c("lower", "higher")))
+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3FoxP3 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD3FoxP3",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+median(clin_surv$percent_CD3_FoxP3_tumor.p, na.rm = TRUE)
+clin_surv <- clin_surv %>% 
+  mutate(CD3FoxP3 = ifelse(percent_CD3_FoxP3_tumor.p >=0.1929595, "higher", "lower")) %>%  # median
+  mutate(CD3FoxP3 = factor(CD3FoxP3, levels = c("lower", "higher")))
+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3FoxP3 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD3FoxP3",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+
+# CD11b
+median(clin_surv$percent_CD11b_tumor.i)
+clin_surv <- clin_surv %>% 
+  mutate(CD11b = ifelse(percent_CD11b_tumor.i >=0.03248308, "higher", "lower")) %>%  # median
+  mutate(CD11b = factor(CD11b, levels = c("lower", "higher")))
+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11b +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD11b",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+median(clin_surv$percent_CD11b_tumor.p, na.rm = TRUE)
+clin_surv <- clin_surv %>% 
+  mutate(CD11b = ifelse(percent_CD11b_tumor.p >=0.03932533, "higher", "lower")) %>%  # median
+  mutate(CD11b = factor(CD11b, levels = c("lower", "higher")))
+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11b +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD11b",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+
+# CD15
+mean(clin_surv$percent_CD15_tumor.i)
+clin_surv <- clin_surv %>% 
+  mutate(CD15 = ifelse(percent_CD15_tumor.i >=0.08935341, "higher", "lower")) %>%  # mean
+  mutate(CD15 = factor(CD15, levels = c("lower", "higher")))
+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD15 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD15",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+mean(clin_surv$percent_CD15_tumor.p, na.rm = TRUE)
+clin_surv <- clin_surv %>% 
+  mutate(CD15 = ifelse(percent_CD15_tumor.p >=0.09734356, "higher", "lower")) %>%  # mean
+  mutate(CD15 = factor(CD15, levels = c("lower", "higher")))
+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD15 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD15",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+
+# CD11bCD15
+mean(clin_surv$percent_CD11b_CD15_tumor.i)
+clin_surv <- clin_surv %>% 
+  mutate(CD11bCD15 = ifelse(percent_CD11b_CD15_tumor.i >=0.03799938, "higher", "lower")) %>%  # mean
+  mutate(CD11bCD15 = factor(CD11bCD15, levels = c("lower", "higher")))
+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11bCD15 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD11bCD15",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
+
+mean(clin_surv$percent_CD11b_CD15_tumor.p, na.rm = TRUE)
+clin_surv <- clin_surv %>% 
+  mutate(CD11bCD15 = ifelse(percent_CD11b_tumor.p >=0.03022437, "higher", "lower")) %>%  # mean
+  mutate(CD11bCD15 = factor(CD11bCD15, levels = c("lower", "higher")))
+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11bCD15 +race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD11bCD15",
+                 title = "Survival analysis on Black vs White population",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Race",
+                 surv.median.line = c("hv"))
 
 # Cleaning
-rm(clin_surv1, clin_surv, myplot, mysurv)
+rm(clin_surv, myplot, mysurv)
