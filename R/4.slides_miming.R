@@ -485,6 +485,62 @@ variations_ROIip %>%
        subtitle = "Each point represent the mean of up to 3 values")
 # dev.off()
 
+
+# Lymphocytes----
+p1 <- markers %>%
+  gather(key = "markers_cat", value = "value", c(104, 112, 120)) %>% 
+  select(suid, markers_cat, value) %>% 
+  ggplot()+
+  geom_violin(aes(x=markers_cat, y=value), scale = "count")+
+  geom_boxplot(aes(x=markers_cat, y=value), width=.1) +
+ labs(x="Cell type", y="percent", title="CD3+")+
+  scale_x_discrete(labels=c("Stroma","Total",
+                            "Tumor"))
+p2 <- markers %>% 
+  gather(key = "markers_cat", value = "value", c(106, 114, 122)) %>% 
+  select(suid, markers_cat, value) %>% 
+  ggplot()+
+  geom_violin(aes(x=markers_cat, y=value), scale = "count")+
+  geom_boxplot(aes(x=markers_cat, y=value), width=.1) +
+  labs(x="Cell type", y=NULL, title="CD3+CD8+")+
+  scale_x_discrete(labels=c("Stroma","Total",
+                            "Tumor"))
+p3 <- markers %>%
+  gather(key = "markers_cat", value = "value", c(108, 116, 124)) %>% 
+  select(suid, markers_cat, value) %>% 
+  ggplot()+
+  geom_violin(aes(x=markers_cat, y=value), scale = "count")+
+  geom_boxplot(aes(x=markers_cat, y=value), width=.1) +
+  labs(x="Cell type", y=NULL, title="CD3+FoxP3+")+
+  scale_x_discrete(labels=c("Stroma","Total",
+                            "Tumor"))
+p4 <- markers %>% 
+  gather(key = "markers_cat", value = "value", c(109, 117, 125)) %>% 
+  select(suid, markers_cat, value) %>% 
+  ggplot()+
+  geom_violin(aes(x=markers_cat, y=value), scale = "count")+
+  geom_boxplot(aes(x=markers_cat, y=value), width=.1) +
+  labs(x="Cell type", y="percent", title="CD11b+")+
+  scale_x_discrete(labels=c("Stroma","Total",
+                            "Tumor"))
+p5 <- markers %>% 
+  gather(key = "markers_cat", value = "value", c(111, 119, 127)) %>% 
+  select(suid, markers_cat, value) %>% 
+  ggplot()+
+  geom_violin(aes(x=markers_cat, y=value), scale = "count")+
+  geom_boxplot(aes(x=markers_cat, y=value), width=.1) +
+  labs(x="Cell type", y=NULL, title="CD11b+CD15+")+
+  scale_x_discrete(labels=c("Stroma","Total",
+                            "Tumor"))
+gridExtra::grid.arrange(p1,p2,p3,p4,p5,  nrow = 2,
+                        top = "Immune markers Repartition in patient's intratumoral ROIs")
+
+
+
+
+
+
+
 ###################################################################################### IV ### Limiting 28 patients we have ROIs, TMAs----
 
 venn.diagram(
