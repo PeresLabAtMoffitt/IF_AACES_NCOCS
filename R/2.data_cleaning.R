@@ -503,6 +503,64 @@ markers <- full_join(markers_TMA, markers_ROI,
 markers <- left_join(markers, clinical_data, by="suid")
 
 
+######################################################################################## IV ### Create tertile----
+markers <- markers %>% 
+  mutate(temp= case_when(
+    sqrt_CD3_total.i > 0 ~ sqrt_CD3_total.i
+  )) %>% 
+  mutate(tertile = ntile(temp, 3)) %>% 
+  mutate(CD3_gpe = case_when(
+    sqrt_CD3_total.i == 0 ~ "Absent",
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  mutate(temp= case_when(
+    sqrt_CD3_CD8_total.i > 0 ~ sqrt_CD3_CD8_total.i
+  )) %>% 
+  mutate(tertile = ntile(temp, 3)) %>% 
+  mutate(CD3_CD8_gpe = case_when(
+    sqrt_CD3_CD8_total.i == 0 ~ "Absent",
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  mutate(temp= case_when(
+    sqrt_CD3_FoxP3_total.i > 0 ~ sqrt_CD3_FoxP3_total.i
+  )) %>% 
+  mutate(tertile = ntile(temp, 3)) %>% 
+  mutate(CD3_FoxP3_gpe = case_when(
+    sqrt_CD3_FoxP3_total.i == 0 ~ "Absent",
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  mutate(temp= case_when(
+    sqrt_CD11b_total.i > 0 ~ sqrt_CD11b_total.i
+  )) %>% 
+  mutate(tertile = ntile(temp, 3)) %>% 
+  mutate(CD11b_gpe = case_when(
+    sqrt_CD11b_total.i == 0 ~ "Absent",
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  mutate(temp= case_when(
+    sqrt_CD11b_CD15_total.i > 0 ~ sqrt_CD11b_CD15_total.i
+  )) %>% 
+  mutate(tertile = ntile(temp, 3)) %>% 
+  mutate(CD11b_CD15_gpe = case_when(
+    sqrt_CD11b_CD15_total.i == 0 ~ "Absent",
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  select(-c("temp", "tertile"))
+
+
+
+
+
 # # 4.1. Create variation data ----
 # # Look at the variation between each patient and the global mean # Should we mot compare Black and White?
 # # Here compare the mean of % cells to global study % cells
