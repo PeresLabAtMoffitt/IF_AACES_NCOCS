@@ -267,6 +267,8 @@ ROI_tumor$suid <- str_match(ROI_tumor$image_tag,
                             "(Peres_P1_AACES.|Peres_P1_AACEES.|Peres_P1_OV|Peres_P1.|)([:digit:]*)")[,3]
 ROI_stroma$suid <- str_match(ROI_stroma$image_tag, 
                              "(Peres_P1_AACES.|Peres_P1_AACEES.|Peres_P1_OV|Peres_P1.|)([:digit:]*)")[,3]
+ROI_total$suid <- str_match(ROI_total$image_tag, 
+                             "(Peres_P1_AACES.|Peres_P1_AACEES.|Peres_P1_OV|Peres_P1.|)([:digit:]*)")[,3]
 
 
 # 2.3.Merging stroma and tumor for TMAs and ROIs, Add % tumor cells and % stroma cells within each ROI/TMA core----
@@ -274,15 +276,18 @@ ROI_stroma$suid <- str_match(ROI_stroma$image_tag,
 # for the TMA cores, intratumoral ROIs, and peripheral ROIs. 
 # Also assess the variation by case in terms of the % tumor and % stroma. 
 
-ROI_global <- merge.data.frame(ROI_tumor, ROI_stroma %>% select(-c("intratumoral_i_vs_peripheral_p_", "suid")),
-                               by.x = "image_tag", by.y = "image_tag",
-                               all = TRUE) %>% 
-  mutate(total_cell_number = tumor_total_cells + stroma_total_cells
+ROI_global <- full_join(ROI_tumor, ROI_stroma %>% select(-c("intratumoral_i_vs_peripheral_p_", "suid")),
+                               by = "image_tag") %>% 
+  full_join(., ROI_total %>% select(-c("intratumoral_i_vs_peripheral_p_", "suid")),
+                   by = "image_tag") %>% 
+  # mutate(total_cell_number = tumor_total_cells + stroma_total_cells
+  #        ) %>% 
+  mutate(percent_tumor = round((tumor_total_cells / total_cells)*100, 2) # Calculate percent of tumor cell
          ) %>% 
-  mutate(percent_tumor = round((tumor_total_cells / total_cell_number)*100, 2) # Calculate percent of tumor cell
+  mutate(percent_stroma = round((stroma_total_cells / total_cells)*100, 2) # Calculate percent of stromal cell
          ) %>% 
-  mutate(percent_stroma = round((stroma_total_cells / total_cell_number)*100, 2) # Calculate percent of stromal cell
-         ) %>% 
+  mutate(percent_total = round((total_cells / total_cells)*100, 2) # Calculate percent of stromal cell
+  ) %>% 
   mutate_at(("intratumoral_i_vs_peripheral_p_"), ~ case_when(
     intratumoral_i_vs_peripheral_p_ == "p" ~ "Peripheral",
     intratumoral_i_vs_peripheral_p_ == "i" ~ "Intratumoral")
@@ -396,6 +401,7 @@ markers_ROIi <- ROI_global %>%
   summarize(
     mean_tumor = mean(percent_tumor),
     mean_stroma = mean(percent_stroma),
+    mean_total = mean(percent_total),
     variance_tumor = var(percent_tumor),
     variance_stroma = var(percent_stroma),
     percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells),
@@ -413,10 +419,20 @@ markers_ROIi <- ROI_global %>%
     percent_CD3_FoxP3_stroma = mean(stroma_percent_cd3plus_foxp3plus_positive_cells),
     percent_CD11b_stroma = mean(stroma_percent_cd11b_opal_620_positive_cells),
     percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
-    percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells)
+    percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells),
+    
+    percent_CD3_total = mean(percent_cd3_opal_650_positive_cells),
+    percent_CD8_total = mean(percent_cd8_opal_570_positive_cells),
+    percent_CD3_CD8_total = mean(percent_cd3plus_cd8plus_positive_cells),
+    percent_FoxP3_total = mean(percent_foxp3_opal_540_positive_cells),
+    percent_CD3_FoxP3_total = mean(percent_cd3plus_foxp3plus_positive_cells),
+    percent_CD11b_total = mean(percent_cd11b_opal_620_positive_cells),
+    percent_CD15_total = mean(percent_cd15_opal_520_positive_cells),
+    percent_CD11b_CD15_total = mean(percent_cd11bplus_cd15plus_positive_cells)
   )
 markers_ROIi$tumor_variation <- markers_ROIi$mean_tumor - mean(ROI_global$percent_tumor)
 markers_ROIi$stroma_variation <- markers_ROIi$mean_stroma - mean(ROI_global$percent_stroma)
+markers_ROIi$total_variation <- markers_ROIi$mean_stroma - mean(ROI_global$percent_stroma)
 #
 markers_ROIp <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
@@ -424,6 +440,7 @@ markers_ROIp <- ROI_global %>%
   summarize(
     mean_tumor = mean(percent_tumor),
     mean_stroma = mean(percent_stroma),
+    mean_total = mean(percent_total),
     variance_tumor = var(percent_tumor),
     variance_stroma = var(percent_stroma),
     percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells),
@@ -441,25 +458,41 @@ markers_ROIp <- ROI_global %>%
     percent_CD3_FoxP3_stroma = mean(stroma_percent_cd3plus_foxp3plus_positive_cells),
     percent_CD11b_stroma = mean(stroma_percent_cd11b_opal_620_positive_cells),
     percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
-    percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells)
+    percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells),
+    percent_CD3_total = mean(percent_cd3_opal_650_positive_cells),
+    percent_CD8_total = mean(percent_cd8_opal_570_positive_cells),
+    percent_CD3_CD8_total = mean(percent_cd3plus_cd8plus_positive_cells),
+    percent_FoxP3_total = mean(percent_foxp3_opal_540_positive_cells),
+    percent_CD3_FoxP3_total = mean(percent_cd3plus_foxp3plus_positive_cells),
+    percent_CD11b_total = mean(percent_cd11b_opal_620_positive_cells),
+    percent_CD15_total = mean(percent_cd15_opal_520_positive_cells),
+    percent_CD11b_CD15_total = mean(percent_cd11bplus_cd15plus_positive_cells)
   )
 markers_ROIp$tumor_variation <- markers_ROIp$mean_tumor - mean(ROI_global$percent_tumor)
 markers_ROIp$stroma_variation <- markers_ROIp$mean_stroma - mean(ROI_global$percent_stroma)
+markers_ROIp$total_variation <- markers_ROIp$mean_total - mean(ROI_global$percent_total)
 
 markers_ROI <- full_join(markers_ROIi, markers_ROIp,
                          by= "suid", suffix= c(".i", ".p"))
 
-sqrt.markers <- sqrt(markers_ROI[,c(6:21, 28:43)])
+sqrt.markers <- sqrt(markers_ROI[,c(7:30, 39:62)])
 colnames(sqrt.markers) <- c("sqrt_CD3_tumor.i", "sqrt_CD8_tumor.i", "sqrt_CD3_CD8_tumor.i", "sqrt_FoxP3_tumor.i",
                             "sqrt_CD3_FoxP3_tumor.i", "sqrt_CD11b_tumor.i", "sqrt_CD15_tumor.i", 
                             "sqrt_CD11b_CD15_tumor.i", "sqrt_CD3_stroma.i", "sqrt_CD8_stroma.i",
                             "sqrt_CD3_CD8_stroma.i", "sqrt_FoxP3_stroma.i", "sqrt_CD3_FoxP3_stroma.i",
                             "sqrt_CD11b_stroma.i", "sqrt_CD15_stroma.i", "sqrt_CD11b_CD15_stroma.i",
+                            "sqrt_CD3_total.i", "sqrt_CD8_total.i", "sqrt_CD3_CD8_total.i",
+                            "sqrt_FoxP3_total.i", "sqrt_CD3_FoxP3_total.i", "sqrt_CD11b_total.i",      
+                            "sqrt_CD15_total.i", "sqrt_CD11b_CD15_total.i",
+                            
                             "sqrt_CD3_tumor.p", "sqrt_CD8_tumor.p", "sqrt_CD3_CD8_tumor.p", "sqrt_FoxP3_tumor.p",
                             "sqrt_CD3_FoxP3_tumor.p", "sqrt_CD11b_tumor.p", "sqrt_CD15_tumor.p", 
                             "sqrt_CD11b_CD15_tumor.p", "sqrt_CD3_stroma.p", "sqrt_CD8_stroma.p",
                             "sqrt_CD3_CD8_stroma.p", "sqrt_FoxP3_stroma.p", "sqrt_CD3_FoxP3_stroma.p",
-                            "sqrt_CD11b_stroma.p", "sqrt_CD15_stroma.p", "sqrt_CD11b_CD15_stroma.p")
+                            "sqrt_CD11b_stroma.p", "sqrt_CD15_stroma.p", "sqrt_CD11b_CD15_stroma.p",
+                            "sqrt_CD3_total.p", "sqrt_CD8_total.p", "sqrt_CD3_CD8_total.p",
+                            "sqrt_FoxP3_total.p", "sqrt_CD3_FoxP3_total.p", "sqrt_CD11b_total.p",      
+                            "sqrt_CD15_total.p", "sqrt_CD11b_CD15_total.p")
 markers_ROI <- cbind(markers_ROI, sqrt.markers)
 
 
