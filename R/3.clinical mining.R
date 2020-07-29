@@ -789,7 +789,59 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "aceta",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Lymphocytes----
+# Lymphocytes no race for intratumoral stromal+tumor using quartiles----
+clin_surv <- markers
+# CD3
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_gpe, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+                 title = "Survival analysis on overall population \nseparated by CD3+ lymphocyte occupancy",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "CD3+",
+                 surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2600, .52))
+# CD3_CD8
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_CD8_gpe, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by CD3+CD8+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD3+CD8+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2500, .52))
+# CD3_FoxP3
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3_gpe, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by CD3+FoxP3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD3+FoxP3+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2100, .52))
+# CD11b+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11b_gpe, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by CD11b+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD11b+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2800, .52))
+# CD11b+CD15+
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15_gpe, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by CD11b+CD15+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD11b+CD15+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(3700, .52))
+
+
+
+
+# Lymphocytes keep----
+clin_surv <- markers_match
 # CD3
 median(clin_surv$percent_CD3_tumor.i)
 clin_surv <- clin_surv %>% 
