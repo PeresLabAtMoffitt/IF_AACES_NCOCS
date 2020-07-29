@@ -789,6 +789,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "aceta",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
+
 # Lymphocytes no race for intratumoral stromal+tumor using quartiles----
 clin_surv <- markers
 # CD3
@@ -800,6 +801,10 @@ ggsurvplot(myplot, data = clin_surv,
                  legend.title = "CD3+",
                  surv.median.line = c("hv"),
            pval = TRUE, pval.coord = c(2600, .52))
+# Cox CD3
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_gpe, data = clin_surv) 
+summary(myplot)
+
 # CD3_CD8
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_CD8_gpe, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
@@ -809,6 +814,10 @@ ggsurvplot(myplot, data = clin_surv,
            legend.title = "CD3+CD8+",
            surv.median.line = c("hv"),
            pval = TRUE, pval.coord = c(2500, .52))
+# Cox
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_CD8_gpe, data = clin_surv) 
+summary(myplot)
+
 # CD3_FoxP3
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3_gpe, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
@@ -818,6 +827,10 @@ ggsurvplot(myplot, data = clin_surv,
            legend.title = "CD3+FoxP3+",
            surv.median.line = c("hv"),
            pval = TRUE, pval.coord = c(2100, .52))
+# Cox
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3_gpe, data = clin_surv) 
+summary(myplot)
+
 # CD11b+
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11b_gpe, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
@@ -826,7 +839,11 @@ ggsurvplot(myplot, data = clin_surv,
            xlab = "Time (days)",
            legend.title = "CD11b+",
            surv.median.line = c("hv"),
-           pval = TRUE, pval.coord = c(2800, .52))
+           pval = TRUE, pval.coord = c(2500, .52))
+# Cox
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11b_gpe, data = clin_surv) 
+summary(myplot)
+
 # CD11b+CD15+
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15_gpe, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
@@ -835,8 +852,10 @@ ggsurvplot(myplot, data = clin_surv,
            xlab = "Time (days)",
            legend.title = "CD11b+CD15+",
            surv.median.line = c("hv"),
-           pval = TRUE, pval.coord = c(3700, .52))
-
+           pval = TRUE, pval.coord = c(3000, .52))
+# Cox
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15_gpe, data = clin_surv) 
+summary(myplot)
 
 
 

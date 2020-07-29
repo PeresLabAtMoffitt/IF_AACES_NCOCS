@@ -315,23 +315,24 @@ markers_ROI %>%
   annotation_logticks(sides="lb")
 colour=percent_CD3_FoxP3_tumor.i<1
 
+
 #####
 
 # 2.3.Clustering----
 # Need to remove NAs
-markers <- markers[!is.na(markers$sqrt_CD3_tumor.i),]
+markers <- markers %>% filter(!is.na( markers[,c(104:111)] ))
 # Do not take CD3 alone for clustering beacuse contain effector, regulator, helper, gamma delta
 # Do not take FoxP3 alone because tumor cells can express FoxP3
 # Do not take CD11b alone because CD3CD11b can be NK cells
 # CD11bCD15 are myeloid cells prevent other immune cells to traffic into the tumor
 
 # 2.3.0.clusters 1_by_Brooke # She only took intratumoral but all markers simple and doubled staining
-clust <- Mclust(markers[,c(85:99)], G = 5)
+clust <- Mclust(markers[,c(104:111)], G = 5)
 summary(clust)
 markers$clusters_Brooke <- clust$classification
 
 markers %>% 
-  gather(key = "markers_cat", value = "value", c(86, 88:91)) %>% 
+  gather(key = "markers_cat", value = "value", c(104:111)) %>% 
   select(suid, clusters_Brooke, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_Brooke, color=clusters_Brooke))+
   geom_boxplot()+

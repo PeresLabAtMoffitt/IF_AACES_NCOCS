@@ -508,57 +508,57 @@ markers <- markers %>%
   mutate(temp= case_when(
     sqrt_CD3_total.i > 0 ~ sqrt_CD3_total.i
   )) %>% 
-  mutate(tertile = ntile(temp, 3)) %>% 
+  mutate(tertile = ntile(sqrt_CD3_total.i, 3)) %>% 
   mutate(CD3_gpe = case_when(
-    sqrt_CD3_total.i == 0 ~ "Absent",
+    # sqrt_CD3_total.i == 0 ~ "Absent",
     tertile == 1 ~ "Low",
     tertile == 2 ~ "Medium",
     tertile == 3 ~ "High",
   )) %>% 
+  mutate(CD3_gpe = factor(.$CD3_gpe, levels = c("Low","Medium","High"))) %>% 
   mutate(temp= case_when(
     sqrt_CD3_CD8_total.i > 0 ~ sqrt_CD3_CD8_total.i
   )) %>% 
-  mutate(tertile = ntile(temp, 3)) %>% 
+  mutate(tertile = ntile(sqrt_CD3_CD8_total.i, 3)) %>% 
   mutate(CD3_CD8_gpe = case_when(
-    sqrt_CD3_CD8_total.i == 0 ~ "Absent",
+    # sqrt_CD3_CD8_total.i == 0 ~ "Absent",
     tertile == 1 ~ "Low",
     tertile == 2 ~ "Medium",
     tertile == 3 ~ "High",
   )) %>% 
+  mutate(CD3_CD8_gpe = factor(.$CD3_CD8_gpe, levels = c("Low","Medium","High"))) %>% 
   mutate(temp= case_when(
     sqrt_CD3_FoxP3_total.i > 0 ~ sqrt_CD3_FoxP3_total.i
   )) %>% 
-  mutate(tertile = ntile(temp, 3)) %>% 
+  mutate(tertile = ntile(sqrt_CD3_FoxP3_total.i, 3)) %>% 
   mutate(CD3_FoxP3_gpe = case_when(
-    sqrt_CD3_FoxP3_total.i == 0 ~ "Absent",
+    # sqrt_CD3_FoxP3_total.i == 0 ~ "Absent",
     tertile == 1 ~ "Low",
     tertile == 2 ~ "Medium",
     tertile == 3 ~ "High",
   )) %>% 
+  mutate(CD3_FoxP3_gpe = factor(.$CD3_FoxP3_gpe, levels = c("Low","Medium","High"))) %>% 
   mutate(temp= case_when(
     sqrt_CD11b_total.i > 0 ~ sqrt_CD11b_total.i
   )) %>% 
-  mutate(tertile = ntile(temp, 3)) %>% 
+  mutate(tertile = ntile(sqrt_CD11b_total.i, 2)) %>% 
   mutate(CD11b_gpe = case_when(
-    sqrt_CD11b_total.i == 0 ~ "Absent",
+    # sqrt_CD11b_total.i == 0 ~ "Absent",
     tertile == 1 ~ "Low",
-    tertile == 2 ~ "Medium",
-    tertile == 3 ~ "High",
+    tertile == 2 ~ "High"
   )) %>% 
+  mutate(CD11b_gpe = factor(.$CD11b_gpe, levels = c("Low","High"))) %>% 
   mutate(temp= case_when(
     sqrt_CD11b_CD15_total.i > 0 ~ sqrt_CD11b_CD15_total.i
   )) %>% 
-  mutate(tertile = ntile(temp, 3)) %>% 
+  mutate(tertile = ntile(sqrt_CD11b_CD15_total.i, 2)) %>% 
   mutate(CD11b_CD15_gpe = case_when(
-    sqrt_CD11b_CD15_total.i == 0 ~ "Absent",
+    # sqrt_CD11b_CD15_total.i == 0 ~ "Absent",
     tertile == 1 ~ "Low",
-    tertile == 2 ~ "Medium",
-    tertile == 3 ~ "High",
+    tertile == 2 ~ "High"
   )) %>% 
+  mutate(CD11b_CD15_gpe = factor(.$CD11b_CD15_gpe, levels = c("Low","Medium","High"))) %>% 
   select(-c("temp", "tertile"))
-
-
-
 
 
 # # 4.1. Create variation data ----
