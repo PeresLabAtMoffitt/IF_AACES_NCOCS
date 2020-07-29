@@ -6,6 +6,8 @@ plan <- drake_plan(
   
   ROI_stroma_ = rois_import(fs::path("","Volumes","Peres_Research")),
   
+  ROI_total_ = roi_import(fs::path("","Volumes","Peres_Research")),
+  
   # ROI_remove = roir_import(fs::path("","Volumes","Peres_Research")),
   #-----------------------------------------------------------------------------------------------------------------
   TMA1_tumor = tmat_import(fs::path("","Volumes","Peres_Research")),
@@ -44,6 +46,7 @@ plan <- drake_plan(
   TMA_tumor = var_names(TMA_tumor_),
   TMA_stroma = var_names(TMA_stroma_),
   ROI_tumor = var_names(ROI_tumor_),
-  ROI_stroma = var_names(ROI_stroma_)
+  ROI_stroma = var_names(ROI_stroma_),
+  ROI_total = var_names(ROI_total_)
 
 )

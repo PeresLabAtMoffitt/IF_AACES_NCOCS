@@ -21,6 +21,11 @@ rois_import <- function(path){
               "/K99_R00/Image analysis data/Immune marker count data/Peres P1 ROI Analysis with location_updated 1-24-2020.xlsx"
   ), sheet = "Stroma", .name_repair = fct_name_repair)
 }
+roi_import <- function(path){
+  readxl::read_xlsx(paste0(path,
+                           "/K99_R00/Image analysis data/Immune marker count data/Peres P1 ROI Analysis with location_updated 1-24-2020.xlsx"
+  ), sheet = "Peres P1 Total ROI", .name_repair = fct_name_repair)
+}
 # roir_import <- function(path){
 #   readxl::read_xlsx(paste0(path,
 #               "/K99_R00/Image analysis data/Immune marker count data/Peres P1 ROI Analysis with location_updated 1-24-2020.xlsx"
