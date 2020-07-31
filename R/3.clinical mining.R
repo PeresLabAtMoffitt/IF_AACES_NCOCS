@@ -793,7 +793,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "aceta",
 # Lymphocytes no race for intratumoral stromal+tumor using quartiles----
 clin_surv <- markers
 # CD3
-myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_gpe, data = clin_surv) 
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
                  title = "Survival analysis on overall population \nseparated by CD3+ lymphocyte occupancy",
                  font.main = c(16, "bold", "black"),
@@ -802,11 +802,61 @@ ggsurvplot(myplot, data = clin_surv,
                  surv.median.line = c("hv"),
            pval = TRUE, pval.coord = c(2600, .52))
 # Cox CD3
-myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_gpe, data = clin_surv) 
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_total.i, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_total.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD3
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3t_grp, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by tumoral CD3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumoral CD3+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2600, .52))
+# Cox CD3
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3t_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_tumor.i, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3t_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_tumor.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+## CD3 stroma
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3s_grp, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by stromal CD3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stromal CD3+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2600, .52))
+#
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3s_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_stroma.i, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3s_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_stroma.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
 
 # CD3_CD8
-myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_CD8_gpe, data = clin_surv) 
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_CD8_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on overall population \nseparated by CD3+CD8+ lymphocyte occupancy",
            font.main = c(16, "bold", "black"),
@@ -815,24 +865,125 @@ ggsurvplot(myplot, data = clin_surv,
            surv.median.line = c("hv"),
            pval = TRUE, pval.coord = c(2500, .52))
 # Cox
-myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_CD8_gpe, data = clin_surv) 
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_CD8_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_CD8_total.i, data = clin_surv) 
 summary(myplot)
 
-# CD3_FoxP3
-myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3_gpe, data = clin_surv) 
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_CD8_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_CD8_total.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD3_CD8 tumor
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_CD8t_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on overall population \nseparated by CD3+FoxP3+ lymphocyte occupancy",
+           title = "Survival analysis on overall population \nseparated by tumoral CD3+CD8+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumor CD3+CD8+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2500, .52))
+# Cox
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_CD8t_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_CD8_tumor.i, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_CD8t_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_CD8_tumor.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD3_CD8 stroma
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_CD8s_grp, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by stromal CD3+CD8+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stroma CD3+CD8+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2500, .52))
+# Cox
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_CD8s_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_CD8_stroma.i, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_CD8s_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_CD8_stroma.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+
+# CD3_FoxP3
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3_grp, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by tumoral CD3+FoxP3+ lymphocyte occupancy",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "CD3+FoxP3+",
            surv.median.line = c("hv"),
            pval = TRUE, pval.coord = c(2100, .52))
 # Cox
-myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3_gpe, data = clin_surv) 
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_FoxP3_total.i, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_FoxP3_total.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD3_FoxP3 tumor
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3t_grp, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by tumoral CD3+FoxP3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumor CD3+FoxP3+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2100, .52))
+# Cox
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3t_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_FoxP3_tumor.i, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3t_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_FoxP3_tumor.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD3_FoxP3 stroma
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3s_grp, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by stromal CD3+FoxP3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stroma CD3+FoxP3+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2100, .52))
+# Cox
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3s_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_FoxP3_stroma.i, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD3_FoxP3s_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD3_FoxP3_stroma.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
 
 # CD11b+
-myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11b_gpe, data = clin_surv) 
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11b_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on overall population \nseparated by CD11b+ lymphocyte occupancy",
            font.main = c(16, "bold", "black"),
@@ -841,11 +992,61 @@ ggsurvplot(myplot, data = clin_surv,
            surv.median.line = c("hv"),
            pval = TRUE, pval.coord = c(2500, .52))
 # Cox
-myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11b_gpe, data = clin_surv) 
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11b_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD11b_total.i, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11b_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD11b_total.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD11b+ tumor
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11bt_grp, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by tumoral CD11b+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumoral CD11b+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2500, .52))
+# Cox
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11bt_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD11b_tumor.i, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11bt_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD11b_tumor.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD11b+ stroma
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11bs_grp, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by stromal CD11b+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stromal CD11b+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2500, .52))
+# Cox
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11bs_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD11b_stroma.i, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11bs_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD11b_stroma.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
 
 # CD11b+CD15+
-myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15_gpe, data = clin_surv) 
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on overall population \nseparated by CD11b+CD15+ lymphocyte occupancy",
            font.main = c(16, "bold", "black"),
@@ -854,9 +1055,58 @@ ggsurvplot(myplot, data = clin_surv,
            surv.median.line = c("hv"),
            pval = TRUE, pval.coord = c(3000, .52))
 # Cox
-myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15_gpe, data = clin_surv) 
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD11b_CD15_total.i, data = clin_surv) 
 summary(myplot)
 
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD11b_CD15_total.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD11b+CD15+ tumor
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15t_grp, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by tumoral CD11b+CD15+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumor CD11b+CD15+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(3000, .52))
+# Cox
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15t_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD11b_CD15_tumor.i, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15t_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD11b_CD15_tumor.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD11b+CD15+ stroma
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15s_grp, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by stromal CD11b+CD15+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stromal CD11b+CD15+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(3000, .52))
+# Cox
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15s_grp, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD11b_CD15_stroma.i, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~CD11b_CD15s_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu, event = surv_vital)~percent_CD11b_CD15_stroma.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
 
 
 # Lymphocytes keep----

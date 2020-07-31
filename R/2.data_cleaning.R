@@ -618,7 +618,7 @@ markers <- markers %>%
     tertile == 2 ~ "High",
   )) %>% 
   mutate(CD11b_CD15t_grp = factor(.$CD11b_CD15t_grp, levels = c("Low","High"))) %>% 
-  mutate(tertile = ntile(sqrt_CD11b_stroma.i, 2)) %>% 
+  mutate(tertile = ntile(sqrt_CD11b_CD15_stroma.i, 2)) %>% 
   mutate(CD11b_CD15s_grp = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High",
