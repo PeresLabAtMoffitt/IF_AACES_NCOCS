@@ -60,6 +60,21 @@ icc(
   type = "consistency", unit = "average" # Consistency: for repeated measurements by the same rater,
 )
 
+# ICC immune markers- look at ppt for more
+ICC_ROIi_CD11bCD15_ov <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>%
+  select(c("suid", "cd11bplus_cd15plus_cells"))
+ICC_ROIi_CD11bCD15_ov <- dcast(setDT(ICC_ROIi_CD11bCD15_ov), suid ~ rowid(suid), 
+                  value.var = "cd11bplus_cd15plus_cells") %>% 
+  select(c(2:4))
+
+ICC(ICC_ROIi_CD11bCD15_ov)
+icc(
+  ICC_ROIi_CD11bCD15_ov, model = "twoway", 
+  type = "consistency", unit = "average"
+)
+
+
 # Cleaning
 rm(ICC_TMA, ICC_ROIi, ICC_ROIp, ICC_d_ROIi, ICC_p_ROIi)
 
@@ -534,6 +549,90 @@ p5 <- markers %>%
                             "Tumor"))
 gridExtra::grid.arrange(p1,p2,p3,p4,p5,  nrow = 2,
                         top = "Immune markers Repartition in patient's intratumoral ROIs")
+
+
+# Survival Tumor, Stroma, overall
+clin_surv <- markers %>% 
+  gather(key = "location", value = "value", c("sqrt_CD3_tumor.i", "sqrt_CD3_stroma.i", "sqrt_CD3_total.i")) %>% 
+  select(c("suid", "location", "value", "timelastfu", "surv_vital"))
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by CD3+ lymphocyte location",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "location",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2600, .52),
+           conf.int = TRUE,
+           # Color
+           palette = c("blue", "lightgrey", "yellow"),
+           linetype = c("solid", "dashed", "dotted")
+)
+
+clin_surv <- markers %>% 
+  gather(key = "location", value = "value", c("sqrt_CD3_CD8_tumor.i", "sqrt_CD3_CD8_stroma.i", "sqrt_CD3_CD8_total.i")) %>% 
+  select(c("suid", "location", "value", "timelastfu", "surv_vital"))
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by CD3+ lymphocyte location",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "location",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2600, .52),
+           conf.int = TRUE,
+           # Color
+           palette = c("blue", "lightgrey", "yellow"),
+           linetype = c("solid", "dashed", "dotted"))
+
+clin_surv <- markers %>% 
+  gather(key = "location", value = "value", c("sqrt_CD3_FoxP3_tumor.i", "sqrt_CD3_FoxP3_stroma.i", "sqrt_CD3_FoxP3_total.i")) %>% 
+  select(c("suid", "location", "value", "timelastfu", "surv_vital"))
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by CD3+ lymphocyte location",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "location",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2600, .52),
+           conf.int = TRUE,
+           # Color
+           palette = c("blue", "lightgrey", "yellow"),
+           linetype = c("solid", "dashed", "dotted"))
+
+clin_surv <- markers %>% 
+  gather(key = "location", value = "value", c("sqrt_CD11b_tumor.i", "sqrt_CD11b_stroma.i", "sqrt_CD11b_total.i")) %>% 
+  select(c("suid", "location", "value", "timelastfu", "surv_vital"))
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by CD3+ lymphocyte location",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "location",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2600, .52),
+           conf.int = TRUE,
+           # Color
+           palette = c("blue", "lightgrey", "yellow"),
+           linetype = c("solid", "dashed", "dotted"))
+
+clin_surv <- markers %>% 
+  gather(key = "location", value = "value", c("sqrt_CD11b_CD15_tumor.i", "sqrt_CD11b_CD15_stroma.i", "sqrt_CD11b_CD15_total.i")) %>% 
+  select(c("suid", "location", "value", "timelastfu", "surv_vital"))
+myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on overall population \nseparated by CD3+ lymphocyte location",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "location",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2600, .52),
+           conf.int = TRUE,
+           # Color
+           palette = c("blue", "lightgrey", "yellow"),
+           linetype = c("solid", "dashed", "dotted"))
+
 
 
 
