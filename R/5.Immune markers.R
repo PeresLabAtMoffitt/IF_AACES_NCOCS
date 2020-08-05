@@ -20,7 +20,7 @@ cols <-
 #   coord_flip()+
 #   labs(y="% cells", title="Immune Markers Repartition in TMAs", fill='Immune \nMarkers')
 
-markers_TMA %>% gather("cell_type", "percent", 2:17) %>% 
+markers_TMA %>% gather("cell_type", "percent", 4:19) %>% # wrong----
   ggplot(aes(x=suid, y=percent, fill=cell_type)) +
   geom_bar(stat="identity")+
   coord_flip()+
@@ -250,6 +250,35 @@ p8 <- ggplot(markers_ROI, aes(x=percent_CD11b_CD15_tumor.p, y=percent_CD11b_CD15
   stat_regline_equation(label.y.npc = 1)
 gridExtra::grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, ncol = 5)
 
+# Conclusions to take
+# More+ CD3-CD8 outside the tumor but good trend = 3 L out for 2 L in = not bad
+# More++ CD3-FoxP outside the tumor = 4 L out for 2.2 L in
+# Same CD11b-CD15 outside the tumor = 1.1 L out for 1 L in
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# FoxP3 alone - CD3-FoxP3
+# Look at survival
+# Look at CD8 presence
+
+
+
+
+
 
 # 2.2.Ratio:Immune cells vs tumor cell----
 ggplot(markers_ROI, aes(x=mean_tumor.i, y=percent_CD3_tumor.i))+
@@ -311,7 +340,11 @@ markers_ROI %>%
   #geom_point(aes(x=percent_CD3_CD8_tumor.i, y=percent_CD3_FoxP3_tumor.i, ))+ 
   scale_y_continuous(trans = "log10")+
   scale_x_continuous(trans = "log10")+
-  annotation_logticks(sides="lb")
+  annotation_logticks(sides="lb") +
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = .6, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  stat_regline_equation(label.y.npc = .75)
 colour=percent_CD3_FoxP3_tumor.i<1
 
 

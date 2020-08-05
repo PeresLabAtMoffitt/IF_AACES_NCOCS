@@ -199,14 +199,14 @@ gridExtra::grid.arrange(p1, p2, p3, p4, nrow = 2,
 # Density plot----------------------------------------------------------------------------------------------------------------------------
 # jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/density ROI tumor.jpg"))
 ggplot(ROI_global, aes(tumor_total_cells, linetype = intratumoral_i_vs_peripheral_p_)) +
-  geom_density(alpha=.3, color = "#8707A6FF") +
+  geom_density(alpha=.3, color = "darkred") +
   theme_minimal() +
   scale_linetype_manual(name = "Sample \nPosition", values = 1:2) +
   labs(x="Tumor", y="Sample Count", title="Cell Type Repartition in ROIs")
 # dev.off()
 # jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/density ROI stroma.jpg"))
 ggplot(ROI_global, aes(stroma_total_cells, linetype = intratumoral_i_vs_peripheral_p_)) +
-  geom_density(alpha=.3, color = "#00204DFF") +
+  geom_density(alpha=.3, color = "orange") +
   theme_minimal() +
   scale_linetype_manual(name = "Sample \nPosition", values = 1:2) +
   labs(x="Stroma", y="Sample Count", title="Cell Type Repartition in ROIs", color='Sample \nPosition')
@@ -218,7 +218,7 @@ ggplot(ROI_global, aes(tumor_total_cells, linetype=intratumoral_i_vs_peripheral_
   geom_density(aes(stroma_total_cells, linetype=intratumoral_i_vs_peripheral_p_, color = "stroma"),
                fill = "#00204DFF", alpha = .1) +
   theme_minimal() +
-  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  scale_color_manual(values = c("orange", "darkred")) +
   scale_linetype_manual(name = "Sample \nPosition", labels = c("Intratumoral", "Peripheral"), values = 1:2) +
   labs(x="Amount of Cell", y="Sample Count", title="Cell Type Repartition in ROIs", color="Cell Type")
 # dev.off()
@@ -228,7 +228,7 @@ ggplot(TMA_global, aes(tumor_total_cells, color = "Tumor")) +
   geom_density() +
   geom_density(aes(stroma_total_cells, color = "Stroma")) +
   theme_minimal() +
-  scale_color_manual(values = c("#00204DFF", "#8707A6FF")) +
+  scale_color_manual(values = c("orange", "darkred")) +
   scale_linetype_manual(name = "Sample \nPosition", values = 1:2) +
   labs(x="Amount of Cell", y="Sample Count", title="Cell Type Repartition in TMAs", color="Cell Type")
 # dev.off()
@@ -574,7 +574,7 @@ clin_surv <- markers %>%
   select(c("suid", "location", "value", "timelastfu", "surv_vital"))
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on overall population \nseparated by CD3+ lymphocyte location",
+           title = "Survival analysis on overall population \nseparated by CD3+CD8+ lymphocyte location",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "location",
@@ -590,7 +590,7 @@ clin_surv <- markers %>%
   select(c("suid", "location", "value", "timelastfu", "surv_vital"))
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on overall population \nseparated by CD3+ lymphocyte location",
+           title = "Survival analysis on overall population \nseparated by CD3+FoxP3+ lymphocyte location",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "location",
@@ -606,7 +606,7 @@ clin_surv <- markers %>%
   select(c("suid", "location", "value", "timelastfu", "surv_vital"))
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on overall population \nseparated by CD3+ lymphocyte location",
+           title = "Survival analysis on overall population \nseparated by CD11b+ lymphocyte location",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "location",
@@ -622,7 +622,7 @@ clin_surv <- markers %>%
   select(c("suid", "location", "value", "timelastfu", "surv_vital"))
 myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on overall population \nseparated by CD3+ lymphocyte location",
+           title = "Survival analysis on overall population \nseparated by CD11b+CD15 lymphocyte location",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "location",
@@ -1035,7 +1035,7 @@ mat <- cor(markers_28[, c("percent_CD3_tumor_tma", "percent_CD3_tumor.i", "perce
 corrplot(mat)
 corrplot.mixed(mat)
 
-jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation Immune markers for 28 patients.jpg"),
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation Immune markers for 28 patients.jpg"),
      width = 1300, height = 800, quality = 100)
 ggcorrplot(mat, hc.order = FALSE, method = "square", 
            # outline.col = "darkblue", # the outline of the circle or sqare
@@ -1050,7 +1050,7 @@ ggcorrplot(mat, hc.order = FALSE, method = "square",
            tl.cex = 10, tl.col = "red", tl.srt = 40,
            digits = 2
 )
-dev.off()
+# dev.off()
 
 mat <- cor(markers_28[, c("percent_CD3_tumor_tma", "percent_CD3_tumor.i", "percent_CD8_tumor_tma", "percent_CD8_tumor.i",
                           "percent_CD3_CD8_tumor_tma", "percent_CD3_CD8_tumor.i", "percent_FoxP3_tumor_tma", "percent_FoxP3_tumor.i",
@@ -1065,8 +1065,8 @@ mat1 <- cor(markers_28[, c("percent_CD11b_tumor_tma", "percent_CD11b_tumor.i",
                           "percent_CD15_stroma_tma", "percent_CD15_stroma.i", "percent_CD11b_CD15_stroma_tma", "percent_CD11b_CD15_stroma.i")],
            use = "pairwise.complete.obs")
 
-jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation Immune markers for 28 patients separated.jpg"),
-     width = 1300, height = 800, quality = 100)
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation Immune markers for 28 patients separated.jpg"),
+#      width = 1300, height = 800, quality = 100)
 p1 <- ggcorrplot(mat, hc.order = FALSE, method = "square", 
                  # outline.col = "darkblue", # the outline of the circle or sqare
                  # hc.method = "complete",
@@ -1094,7 +1094,7 @@ p2 <- ggcorrplot(mat1, hc.order = FALSE, method = "square",
                  digits = 2
 )
 gridExtra::grid.arrange(p1, p2, ncol = 2, top="Immune markers correlation in TMA vs Intratumoral ROI")
-dev.off()
+# dev.off()
 
 mat <- cor(markers_28[, c("percent_CD11b_tumor_tma", "percent_CD11b_tumor.i",
                            "percent_CD15_tumor_tma", "percent_CD15_tumor.i", "percent_CD11b_CD15_tumor_tma", "percent_CD11b_CD15_tumor.i",
@@ -1107,8 +1107,8 @@ mat1 <- cor(markers_28[, c("percent_CD11b_tumor_tma", "percent_CD11b_tumor.p",
                            "percent_CD15_stroma_tma", "percent_CD15_stroma.p", "percent_CD11b_CD15_stroma_tma", "percent_CD11b_CD15_stroma.p")],
             use = "pairwise.complete.obs")
 
-jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation CD11bCD15 for 28 patients intra or periph vs TMA.jpg"),
-     width = 1300, height = 800, quality = 100)
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation CD11bCD15 for 28 patients intra or periph vs TMA.jpg"),
+#      width = 1300, height = 800, quality = 100)
 p1 <- ggcorrplot(mat, hc.order = FALSE, method = "square", 
                  # outline.col = "darkblue", # the outline of the circle or sqare
                  # hc.method = "complete",
@@ -1136,19 +1136,19 @@ p2 <- ggcorrplot(mat1, hc.order = FALSE, method = "square",
                  digits = 2
 )
 gridExtra::grid.arrange(p1, p2, ncol = 2, top="Immune markers correlation in TMA vs Intratumoral or Peripheral ROI")
-dev.off()
+# dev.off()
 
 # Pairwise
-jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Pairwise tumor stromal cells for 28 patients.jpg"),
-     width = 1300, height = 800, quality = 100)
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Pairwise tumor stromal cells for 28 patients.jpg"),
+#      width = 1300, height = 800, quality = 100)
 pairs.panels(markers_28[c("mean_tumor_tma", "mean_stroma_tma",
                        "mean_tumor.i", "mean_stroma.i",
                        "mean_tumor.p", "mean_stroma.p"
 )])
-dev.off()
+# dev.off()
 
-jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Pairwise Immune markers CD3CD8FoxP3 for 28 patients.jpg"),
-     width = 1300, height = 800, quality = 100)
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Pairwise Immune markers CD3CD8FoxP3 for 28 patients.jpg"),
+#      width = 1300, height = 800, quality = 100)
 pairs.panels(markers_28[c("percent_CD3_tumor_tma", "percent_CD3_tumor.i", "percent_CD8_tumor_tma", "percent_CD8_tumor.i",
                        "percent_CD3_CD8_tumor_tma", "percent_CD3_CD8_tumor.i", "percent_FoxP3_tumor_tma", "percent_FoxP3_tumor.i",
                        "percent_CD3_FoxP3_tumor_tma", "percent_CD3_FoxP3_tumor.i",
@@ -1156,15 +1156,15 @@ pairs.panels(markers_28[c("percent_CD3_tumor_tma", "percent_CD3_tumor.i", "perce
                        "percent_CD3_CD8_stroma_tma", "percent_CD3_CD8_stroma.i", "percent_FoxP3_stroma_tma", "percent_FoxP3_stroma.i",
                        "percent_CD3_FoxP3_stroma_tma", "percent_CD3_FoxP3_stroma.i"
 )])
-dev.off()
-jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Pairwise Immune markers CD11bCD15 for 28 patients.jpg"),
-     width = 1300, height = 800, quality = 100)
+# dev.off()
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Pairwise Immune markers CD11bCD15 for 28 patients.jpg"),
+#      width = 1300, height = 800, quality = 100)
 pairs.panels(markers_28[c("percent_CD11b_tumor_tma", "percent_CD11b_tumor.i",
                              "percent_CD15_tumor_tma", "percent_CD15_tumor.i", "percent_CD11b_CD15_tumor_tma", "percent_CD11b_CD15_tumor.i",
                              "percent_CD11b_stroma_tma", "percent_CD11b_stroma.i", 
                              "percent_CD15_stroma_tma", "percent_CD15_stroma.i", "percent_CD11b_CD15_stroma_tma", "percent_CD11b_CD15_stroma.i"
 )])
-dev.off()
+# dev.off()
 
 # Why is there a difference?
 table <- as.data.table(markers_28[c("percent_CD3_tumor_tma", "percent_CD3_tumor.i", "percent_CD8_tumor_tma", "percent_CD8_tumor.i",
@@ -1182,6 +1182,7 @@ table
 
 
 # Cleaning
-rm(p1, p2, p3, mat, mat1, variations_TMA, variations_ROI, variations_ROIip, var_cor)
+rm(p1, p2, p3, p4, p5, clin_surv, curv_facet, ggsurv, myplot,
+   mat, mat1, variations_TMA, variations_ROI, variations_ROIip, var_cor, table)
 # End ----
 

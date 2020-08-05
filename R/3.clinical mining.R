@@ -1,6 +1,4 @@
 ################################################################################################################# I ### Basic plots----
-
-
 # Proportion cancer characteristic between Black and White
 clinical_data %>% 
   group_by(cancersite, race) %>% 
@@ -1321,3 +1319,4 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD11bCD15",
 
 # Cleaning
 rm(clin_surv, myplot, mysurv)
+
