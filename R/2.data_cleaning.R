@@ -244,11 +244,12 @@ clinical_data <- full_join(cases_match,
 
 
 ######################################################################################### II ### Cleaning TMAs, ROIs data----
-# Keep the control slides for comparaison?----
+# Keep the control slides for comparison?----
 # other_tissue = 1 are controls used for QC purposes
 # They may be benign or cancerous tissue from other anatomical sites - like tonsil or spleen
 # TMA_Tctrl <- TMA_tumor %>% filter(!is.na(other_tissue))
 # TMA_Sctrl <- TMA_stroma %>% filter(!is.na(other_tissue))
+
 
 # 2.1.Remove the TMA IDs from patient excluded from the study----
 # Should only be done for TMAs
@@ -261,6 +262,7 @@ TMA_stroma <-
   TMA_stroma[(!grepl(uid, TMA_stroma$suid)),] %>% 
   filter(!is.na(suid))
 # Did it for ROIs too in case but no cases to remove
+
 
 # 2.2.Create suid for ROIs----
 ROI_tumor$suid <- str_match(ROI_tumor$image_tag, 
@@ -276,7 +278,8 @@ ROI_total$suid <- str_match(ROI_total$image_tag,
 # for the TMA cores, intratumoral ROIs, and peripheral ROIs. 
 # Also assess the variation by case in terms of the % tumor and % stroma. 
 
-ROI_global <- full_join(ROI_tumor, ROI_stroma %>% select(-c("intratumoral_i_vs_peripheral_p_", "suid")),
+ROI_global <- 
+  full_join(ROI_tumor, ROI_stroma %>% select(-c("intratumoral_i_vs_peripheral_p_", "suid")),
                                by = "image_tag") %>% 
   full_join(., ROI_total %>% select(-c("intratumoral_i_vs_peripheral_p_", "suid")),
                    by = "image_tag") %>% 
@@ -322,7 +325,7 @@ TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma %>% select(-suid),
                                all = TRUE) %>% 
   mutate(total_cell_number = tumor_total_cells + stroma_total_cells
          ) %>% 
-  mutate(percent_tumor = round((tumor_total_cells / total_cell_number)*100, 2)
+  mutate(percent_tumor = round((tumor_total_cells / total_cell_number)*100, 2) # Need to change when adding total---------------------------------
          ) %>% 
   mutate(percent_stroma = round((stroma_total_cells / total_cell_number)*100, 2)
          ) %>% 
@@ -353,20 +356,15 @@ TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma %>% select(-suid),
 
 ######################################################################################### III ### Summarize new var----
 # 3.1.Summarize immune markers----
-# For each case, calculate the average cell density (number of cells positive 
-# for each marker per mm2 of tumor/stroma) of the markers below across the TMA cores, 
-# intratumoral ROIs, and peripheral ROIs (separately – overall, tumor, and stroma). 
-# Potentially create some sort of variable denoting an immune hot or immune cold tumor – 
-# or something along those lines?
 
 # Using % Cell
-## Add sqrt transformation if better with 0
+## Add sqrt transformation
 markers_TMA <- group_by(TMA_global, suid) %>%
   summarize(
     mean_tumor = mean(percent_tumor),
     mean_stroma = mean(percent_stroma),
-    variance_tumor = var(percent_tumor),
-    variance_stroma = var(percent_stroma),
+    # variance_tumor = var(percent_tumor),
+    # variance_stroma = var(percent_stroma),
     percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells),
     percent_CD8_tumor = mean(tumor_percent_cd8_opal_570_positive_cells),
     percent_CD3_CD8_tumor = mean(tumor_percent_cd3plus_cd8plus_positive_cells),
@@ -386,7 +384,7 @@ markers_TMA <- group_by(TMA_global, suid) %>%
   )
 markers_TMA$tumor_variation <- markers_TMA$mean_tumor - mean(TMA_global$percent_tumor)
 markers_TMA$stroma_variation <- markers_TMA$mean_stroma - mean(TMA_global$percent_stroma)
-sqrt.markers <- sqrt(markers_TMA[,c(6:21)])
+sqrt.markers <- sqrt(markers_TMA[,c(4:19)])
 colnames(sqrt.markers) <- c("sqrt_CD3_tumor", "sqrt_CD8_tumor", "sqrt_CD3_CD8_tumor", "sqrt_FoxP3_tumor",
                             "sqrt_CD3_FoxP3_tumor", "sqrt_CD11b_tumor", "sqrt_CD15_tumor", 
                             "sqrt_CD11b_CD15_tumor", "sqrt_CD3_stroma", "sqrt_CD8_stroma",
@@ -402,8 +400,8 @@ markers_ROIi <- ROI_global %>%
     mean_tumor = mean(percent_tumor),
     mean_stroma = mean(percent_stroma),
     mean_total = mean(percent_total),
-    variance_tumor = var(percent_tumor),
-    variance_stroma = var(percent_stroma),
+    # variance_tumor = var(percent_tumor),
+    # variance_stroma = var(percent_stroma),
     percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells),
     percent_CD8_tumor = mean(tumor_percent_cd8_opal_570_positive_cells),
     percent_CD3_CD8_tumor = mean(tumor_percent_cd3plus_cd8plus_positive_cells),
@@ -441,8 +439,8 @@ markers_ROIp <- ROI_global %>%
     mean_tumor = mean(percent_tumor),
     mean_stroma = mean(percent_stroma),
     mean_total = mean(percent_total),
-    variance_tumor = var(percent_tumor),
-    variance_stroma = var(percent_stroma),
+    # variance_tumor = var(percent_tumor),
+    # variance_stroma = var(percent_stroma),
     percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells),
     percent_CD8_tumor = mean(tumor_percent_cd8_opal_570_positive_cells),
     percent_CD3_CD8_tumor = mean(tumor_percent_cd3plus_cd8plus_positive_cells),
@@ -475,7 +473,7 @@ markers_ROIp$total_variation <- markers_ROIp$mean_total - mean(ROI_global$percen
 markers_ROI <- full_join(markers_ROIi, markers_ROIp,
                          by= "suid", suffix= c(".i", ".p"))
 
-sqrt.markers <- sqrt(markers_ROI[,c(7:30, 39:62)])
+sqrt.markers <- sqrt(markers_ROI[,c(5:28, 35:58)])
 colnames(sqrt.markers) <- c("sqrt_CD3_tumor.i", "sqrt_CD8_tumor.i", "sqrt_CD3_CD8_tumor.i", "sqrt_FoxP3_tumor.i",
                             "sqrt_CD3_FoxP3_tumor.i", "sqrt_CD11b_tumor.i", "sqrt_CD15_tumor.i", 
                             "sqrt_CD11b_CD15_tumor.i", "sqrt_CD3_stroma.i", "sqrt_CD8_stroma.i",
@@ -497,17 +495,17 @@ markers_ROI <- cbind(markers_ROI, sqrt.markers)
 
 
 ######################################################################################## IV ### Merging all df----
-colnames(markers_TMA)[2:39] <- paste(colnames(markers_TMA)[2:39], "tma", sep = "_")
+colnames(markers_TMA)[2:ncol(markers_TMA)] <- paste(colnames(markers_TMA)[2:ncol(markers_TMA)], "tma", sep = "_")
 markers <- full_join(markers_TMA, markers_ROI,
                      by= "suid")
 markers <- left_join(markers, clinical_data, by="suid")
 
 
-######################################################################################## IV ### Create tertile----
+######################################################################################## IV ### Create tertile group----
 markers <- markers %>% 
-  mutate(temp= case_when(
-    sqrt_CD3_total.i > 0 ~ sqrt_CD3_total.i
-  )) %>% 
+  # mutate(temp= case_when(
+  #   sqrt_CD3_total.i > 0 ~ sqrt_CD3_total.i
+  # )) %>% 
   mutate(tertile = ntile(sqrt_CD3_total.i, 3)) %>% 
   mutate(CD3_grp = case_when(
     # sqrt_CD3_total.i == 0 ~ "Absent",
@@ -531,9 +529,9 @@ markers <- markers %>%
   )) %>% 
   mutate(CD3s_grp = factor(.$CD3s_grp, levels = c("Low","Medium","High"))) %>% 
   
-  mutate(temp= case_when(
-    sqrt_CD3_CD8_total.i > 0 ~ sqrt_CD3_CD8_total.i
-  )) %>% 
+  # mutate(temp= case_when(
+  #   sqrt_CD3_CD8_total.i > 0 ~ sqrt_CD3_CD8_total.i
+  # )) %>% 
   mutate(tertile = ntile(sqrt_CD3_CD8_total.i, 3)) %>% 
   mutate(CD3_CD8_grp = case_when(
     tertile == 1 ~ "Low",
@@ -556,9 +554,9 @@ markers <- markers %>%
   )) %>% 
   mutate(CD3_CD8s_grp = factor(.$CD3_CD8s_grp, levels = c("Low","Medium","High"))) %>% 
   
-  mutate(temp= case_when(
-    sqrt_CD3_FoxP3_total.i > 0 ~ sqrt_CD3_FoxP3_total.i
-  )) %>% 
+  # mutate(temp= case_when(
+  #   sqrt_CD3_FoxP3_total.i > 0 ~ sqrt_CD3_FoxP3_total.i
+  # )) %>% 
   mutate(tertile = ntile(sqrt_CD3_FoxP3_total.i, 3)) %>% 
   mutate(CD3_FoxP3_grp = case_when(
     tertile == 1 ~ "Low",
@@ -581,9 +579,9 @@ markers <- markers %>%
   )) %>% 
   mutate(CD3_FoxP3s_grp = factor(.$CD3_FoxP3s_grp, levels = c("Low","Medium","High"))) %>% 
   
-  mutate(temp= case_when(
-    sqrt_CD11b_total.i > 0 ~ sqrt_CD11b_total.i
-  )) %>% 
+  # mutate(temp= case_when(
+  #   sqrt_CD11b_total.i > 0 ~ sqrt_CD11b_total.i
+  # )) %>% 
   mutate(tertile = ntile(sqrt_CD11b_total.i, 2)) %>% 
   mutate(CD11b_grp = case_when(
     tertile == 1 ~ "Low",
@@ -663,11 +661,7 @@ markers_match <-  markers %>% drop_na(pair_id) %>%
 
 
 ######################################################################################## VII ### to look----
-# cases_match <- cases_match %>% mutate(suid = as.character(suid))
-# # 3.2.Add case_match to clinical_data
-# clinical_data <- full_join(cases_match, 
-#                            clinical_data,
-#                            by= "suid")
+
 # # 3.3.Add case_match and race to ROI data
 cases_match <- left_join(cases_match,
                          clinical_data %>% select("suid", "race"),
@@ -679,7 +673,7 @@ cases_match1 <- dcast(setDT(cases_match), pair_id ~ rowid(pair_id),
 
 
 # Cleaning
-rm(uid, TMAcases_remove, TMA_tumor, TMA_stroma, ROI_tumor, ROI_stroma,
+rm(uid, TMAcases_remove, TMA_tumor, TMA_stroma, ROI_tumor, ROI_stroma, ROI_total,
    common_ROITMA_IDs, cases_match1, sqrt.markers, markers_ROIi, markers_ROIp,
    cases_match)
 
