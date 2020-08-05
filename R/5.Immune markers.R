@@ -276,7 +276,62 @@ gridExtra::grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, ncol = 5)
 # Look at CD8 presence
 
 
+############################################################################################### Immunoscore calculation
+# https://jitc.biomedcentral.com/articles/10.1186/s40425-016-0161-x
+# The best performing algorithm to compute the Immunoscore has been defined in the large international SITC -
+#   led retrospective validation study [1, 2] conducted on more than 3800 St I-III colon cancer patients, 
+# Briefly, for each marker (CD3 & CD8) and each zone (CT & IM), densities distributions have been established 
+# on the study training set; for each parameter of a tested sample (CD3, CD8, CT, IM), a percentile is derived 
+# from these distributions. An average percentile is calculated based on these 4 values. The Immunoscore® is 
+# reported as IS-0, 1 – 2 – 3 – 4 based on the following average percentile classes respectively: 
+#   [0 %; 10 %] - [>10 %; 25 %] - [>25 %; 70 %] - [>70 %; 95 %] - [>95 %; 100 %].
+# CD3 and CD8 in two regions (CT and IM)
 
+# distribution CD3 intra
+quantile(markers$percent_CD3_total.i, c(.10, .25, .70, .95), na.rm = TRUE) 
+# then make group
+markers <- markers %>% 
+  mutate(im_score_CD3_i = case_when(
+    percent_CD3_total.i <= 0.07032047 ~ 0,
+    percent_CD3_total.i <= 0.26840250 ~ 1,
+    percent_CD3_total.i <= 2.85094280 ~ 2,
+    percent_CD3_total.i <= 11.04111793 ~ 3,
+    percent_CD3_total.i > 11.04111793 ~ 4 
+  ))
+# distribution CD3 periph
+quantile(markers$percent_CD3_total.p, c(.10, .25, .70, .95), na.rm = TRUE) 
+# then make group
+markers <- markers %>% 
+  mutate(im_score_CD3_p = case_when(
+    percent_CD3_total.p <= 0.358800 ~ 0,
+    percent_CD3_total.p <= 2.211365 ~ 1,
+    percent_CD3_total.p <= 9.771132 ~ 2,
+    percent_CD3_total.p <= 21.798675 ~ 3,
+    percent_CD3_total.p > 21.798675 ~ 4 
+  ))
+# distribution CD8 intra
+quantile(markers$percent_CD8_total.i, c(.10, .25, .70, .95), na.rm = TRUE) 
+# then make group
+markers <- markers %>% 
+  mutate(im_score_CD8_i = case_when(
+    percent_CD8_total.i <= 0.03775067 ~ 0,
+    percent_CD8_total.i <= 0.13945733 ~ 1,
+    percent_CD8_total.i <= 1.66763110 ~ 2,
+    percent_CD8_total.i <= 6.12415420 ~ 3,
+    percent_CD8_total.i > 6.12415420 ~ 4 
+  ))
+# distribution CD8 periph
+quantile(markers$percent_CD8_total.p, c(.10, .25, .70, .95), na.rm = TRUE) 
+# then make group
+markers <- markers %>% 
+  mutate(im_score_CD8_p = case_when(
+    percent_CD8_total.p <= 0.1647357 ~ 0,
+    percent_CD8_total.p <= 0.7962177 ~ 1,
+    percent_CD8_total.p <= 4.7375837 ~ 2,
+    percent_CD8_total.p <= 12.3039435 ~ 3,
+    percent_CD8_total.p > 12.3039435 ~ 4 
+  ))
+# Mean of all scores...
 
 
 
