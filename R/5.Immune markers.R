@@ -198,7 +198,66 @@ rm(df1, df2, cols)
 
 
 ########################################################################################## II ### Immune hot vs cold----
+############################################################################################### Immunoscore calculation----
+# https://jitc.biomedcentral.com/articles/10.1186/s40425-016-0161-x
+# The best performing algorithm to compute the Immunoscore has been defined in the large international SITC -
+#   led retrospective validation study [1, 2] conducted on more than 3800 St I-III colon cancer patients, 
+# Briefly, for each marker (CD3 & CD8) and each zone (CT & IM), densities distributions have been established 
+# on the study training set; for each parameter of a tested sample (CD3, CD8, CT, IM), a percentile is derived 
+# from these distributions. An average percentile is calculated based on these 4 values. The Immunoscore® is 
+# reported as IS-0, 1 – 2 – 3 – 4 based on the following average percentile classes respectively: 
+#   [0 %; 10 %] - [>10 %; 25 %] - [>25 %; 70 %] - [>70 %; 95 %] - [>95 %; 100 %].
+# CD3 and CD8 in two regions (CT and IM)
+
+# distribution CD3 intra
+quantile(markers$percent_CD3_total.i, c(.10, .25, .70, .95), na.rm = TRUE) 
+# distribution CD3 periph
+quantile(markers$percent_CD3_total.p, c(.10, .25, .70, .95), na.rm = TRUE) 
+# distribution CD8 intra
+quantile(markers$percent_CD8_total.i, c(.10, .25, .70, .95), na.rm = TRUE) 
+# distribution CD8 periph
+quantile(markers$percent_CD8_total.p, c(.10, .25, .70, .95), na.rm = TRUE) 
+# Calculate percentile for each patient for CD3, 8, i, p
+markers <- markers %>% 
+  mutate(percentile_score_CD3_i = ntile(percent_CD3_total.i, 100) ) %>% 
+  mutate(percentile_score_CD3_p = ntile(percent_CD3_total.p, 100) ) %>% 
+  mutate(percentile_score_CD8_i = ntile(percent_CD8_total.i, 100) ) %>% 
+  mutate(percentile_score_CD8_p = ntile(percent_CD8_total.p, 100) ) %>%
+  mutate(percentile_score_mean = rowMeans(markers[c("percentile_score_CD3_i", "percentile_score_CD3_p", "percentile_score_CD8_i", "percentile_score_CD8_p")])) %>% 
+  mutate(immunoscore_ = case_when(
+    percentile_score_mean <= 10 ~ 0,
+    percentile_score_mean <= 25 ~ 1,
+    percentile_score_mean <= 70 ~ 2,
+    percentile_score_mean <= 95 ~ 3,
+    percentile_score_mean > 95 ~ 4 
+  ))
+# Survival
+clin_surv <- markers
+mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
+myplot <- survfit(mysurv~clin_surv$immunoscore_)
+myplot
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on matched patient",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "Immunoscore", # legend.labs = c("mid-high", "mid-low", "high", "low"), # 4253
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+survdiff(mysurv~clin_surv$race+clin_surv$clusters_Brooke)
+
+
 # 2.1.Exclusion: Immune markers difference between periph and intra.----
+# Here
+# https://dm5migu4zj3pb.cloudfront.net/manuscripts/96000/96313/cache/96313.3-20190319160739-covered-253bed37ca4c1ab43d105aefdf7b5536.pdf
+# https://github.com/bhklab/EpiStromaImmune
+# They estimate accumulation in the periph is the double of the intra numbers when exclusion
+# That could be logical when looking at CD11b-CD15 are same intra and periph
+# May even need to go 1.5 times nut lets see.
+
 p1 <- ggplot(markers_ROI, aes(x=percent_CD3_tumor.p, y=percent_CD3_tumor.i))+
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
@@ -250,82 +309,19 @@ p8 <- ggplot(markers_ROI, aes(x=percent_CD11b_CD15_tumor.p, y=percent_CD11b_CD15
   stat_regline_equation(label.y.npc = 1)
 gridExtra::grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, ncol = 5)
 
-# Conclusions to take
+# Conclusions to take home
 # More+ CD3-CD8 outside the tumor but good trend = 3 L out for 2 L in = not bad
 # More++ CD3-FoxP outside the tumor = 4 L out for 2.2 L in
 # Same CD11b-CD15 outside the tumor = 1.1 L out for 1 L in
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# +
 
 # FoxP3 alone - CD3-FoxP3
 # Look at survival
 # Look at CD8 presence
 
 
-############################################################################################### Immunoscore calculation
-# https://jitc.biomedcentral.com/articles/10.1186/s40425-016-0161-x
-# The best performing algorithm to compute the Immunoscore has been defined in the large international SITC -
-#   led retrospective validation study [1, 2] conducted on more than 3800 St I-III colon cancer patients, 
-# Briefly, for each marker (CD3 & CD8) and each zone (CT & IM), densities distributions have been established 
-# on the study training set; for each parameter of a tested sample (CD3, CD8, CT, IM), a percentile is derived 
-# from these distributions. An average percentile is calculated based on these 4 values. The Immunoscore® is 
-# reported as IS-0, 1 – 2 – 3 – 4 based on the following average percentile classes respectively: 
-#   [0 %; 10 %] - [>10 %; 25 %] - [>25 %; 70 %] - [>70 %; 95 %] - [>95 %; 100 %].
-# CD3 and CD8 in two regions (CT and IM)
 
-# distribution CD3 intra
-quantile(markers$percent_CD3_total.i, c(.10, .25, .70, .95), na.rm = TRUE) 
-# distribution CD3 periph
-quantile(markers$percent_CD3_total.p, c(.10, .25, .70, .95), na.rm = TRUE) 
-# distribution CD8 intra
-quantile(markers$percent_CD8_total.i, c(.10, .25, .70, .95), na.rm = TRUE) 
-# distribution CD8 periph
-quantile(markers$percent_CD8_total.p, c(.10, .25, .70, .95), na.rm = TRUE) 
-# Calculate percentile for each patient for CD3, 8, i, p
-markers <- markers %>% 
-  mutate(percentile_score_CD3_i = ntile(percent_CD3_total.i, 100) ) %>% 
-  mutate(percentile_score_CD3_p = ntile(percent_CD3_total.p, 100) ) %>% 
-  mutate(percentile_score_CD8_i = ntile(percent_CD8_total.i, 100) ) %>% 
-  mutate(percentile_score_CD8_p = ntile(percent_CD8_total.p, 100) ) %>%
-  mutate(percentile_score_mean = rowMeans(markers[c("percentile_score_CD3_i", "percentile_score_CD3_p", "percentile_score_CD8_i", "percentile_score_CD8_p")])) %>% 
-  mutate(immunoscore_ = case_when(
-    percentile_score_mean <= 10 ~ 0,
-    percentile_score_mean <= 25 ~ 1,
-    percentile_score_mean <= 70 ~ 2,
-    percentile_score_mean <= 95 ~ 3,
-    percentile_score_mean > 95 ~ 4 
-  ))
-# Survival
-clin_surv <- markers
-mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
-myplot <- survfit(mysurv~clin_surv$immunoscore_)
-myplot
-ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on matched patient",
-           font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "Immunoscore", # legend.labs = c("mid-high", "mid-low", "high", "low"), # 4253
-           pval = TRUE, # pval.coord = c(2100,.53),
-           surv.median.line = c("hv"),
-           risk.table = TRUE,
-           tables.height = 0.2,
-           risk.table.title = "Risk table",
-           conf.int = FALSE
-)
-survdiff(mysurv~clin_surv$race+clin_surv$clusters_Brooke)
 
 
 
@@ -523,8 +519,10 @@ p3 <- clust_markers %>% filter(!is.na(race)) %>%
 gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 
-# 2.3.3.clusters 1_CD3-CD8 then FoxP3
-clust <- Mclust(clust_markers[106], G = 2)
+# 2.3.3.clusters_special
+### 2.3.3.1_CD3-CD8 then FoxP3
+clust_markers <- markers %>% filter(!is.na( markers$"sqrt_CD3_CD8_tumor.i" ))
+clust <- Mclust(clust_markers$"sqrt_CD3_CD8_tumor.i", G = 2)
 summary(clust)
 clust_markers$clusters_CD38 <- clust$classification
 clust_markers$clusters_CD38 <- factor(clust_markers$clusters_CD38, 
@@ -532,7 +530,7 @@ clust_markers$clusters_CD38 <- factor(clust_markers$clusters_CD38,
                                 labels = c("low", "high"))
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c(106, 108:111)) %>% 
+  gather(key = "markers_cat", value = "value", sqrt_CD3_total.i:sqrt_CD11b_CD15_total.i) %>%
   select(suid, clusters_CD38, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_CD38, color=clusters_CD38))+
   geom_boxplot()+
@@ -602,6 +600,32 @@ clust_markers <- clust_markers %>%
     clusters_FoxP3 == "low" ~ "hot", # low Fox aka hot
     clusters_FoxP3 == "high" ~ "immunosupressed", # high Fox aka immunosupp
   ))
+
+# Cluster low into cold or excluded
+b <- clust_markers %>% filter(clusters_CD38 == "low")
+b <- b %>% mutate(ratio_IP = percent_CD3_CD8_total.p / percent_CD3_CD8_total.i) %>% 
+  mutate(excluded_cluster = case_when(
+    ratio_IP < 2 ~ "cold",
+    ratio_IP >=2 ~ "excluded"
+  ))
+c <- b %>% filter(percent_CD3_CD8_total.i > 0, !is.na(.$ratio_IP) )
+clust <- Mclust(c$ratio_IP, G = 2)
+c[c("ratio_IP", "percent_CD3_CD8_total.p", "percent_CD3_CD8_total.i")]
+summary(clust)#----------------------------------------------------------------------------------------------------Here!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Survival by cluster
