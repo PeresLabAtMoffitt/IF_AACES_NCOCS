@@ -601,15 +601,41 @@ clust_markers <- clust_markers %>%
     clusters_FoxP3 == "high" ~ "immunosupressed", # high Fox aka immunosupp
   ))
 
-# Cluster low into cold or excluded
+# Cluster low into cold or excluded--------------------------------------------------------------------------------
 b <- clust_markers %>% filter(clusters_CD38 == "low")
 b <- b %>% mutate(ratio_IP = percent_CD3_CD8_total.p / percent_CD3_CD8_total.i) %>% 
   mutate(excluded_cluster = case_when(
     ratio_IP < 2 ~ "cold",
     ratio_IP >=2 ~ "excluded"
   ))
+
+b %>% 
+  gather(key = "markers_cat", value = "value", 340) %>% 
+  select(suid, clusters_excluded, excluded_cluster, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=excluded_cluster, color=excluded_cluster))+ # Take home: bad separation, MORE outliers
+  geom_boxplot()+
+  facet_grid(.~ markers_cat)
+
+# Try another by clustering
 c <- b %>% filter(percent_CD3_CD8_total.i > 0, !is.na(.$ratio_IP) )
 clust <- Mclust(c$ratio_IP, G = 2)
+summary(clust)
+c$clusters_excluded <- clust$classification
+c$clusters_excluded <- factor(c$clusters_excluded, 
+                           levels = c(1, 2),
+                           labels = c("cold", "excluded"))
+c %>% 
+  gather(key = "markers_cat", value = "value", 340) %>% 
+  select(suid, clusters_excluded, excluded_cluster, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_excluded, color=clusters_excluded))+
+  geom_boxplot()+
+  facet_grid(.~ markers_cat)
+
+
+clust_markers <- left_join(clust_markers, c[, c("suid", "clusters_excluded")], by= "suid")
+
+
+c[c("ratio_IP", "excluded_cluster", "clusters_excluded")]
 c[c("ratio_IP", "percent_CD3_CD8_total.p", "percent_CD3_CD8_total.i")]
 summary(clust)#----------------------------------------------------------------------------------------------------Here!
 
