@@ -556,8 +556,44 @@ p3 <- clust_markers %>% filter(!is.na(race)) %>%
   stat_compare_means(label = "p.format")  
 gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
-### 2.3.3.2_ then FoxP3
-# let's take a look at survival between FoxP3_all, FoxP3_alone, FoxP3_CD3
+
+### 2.3.3.2_ Cluster low into cold or excluded----
+b <- clust_markers %>% filter(clusters_CD38 == "low")
+b <- b %>% mutate(ratio_IP = percent_CD3_CD8_total.p / percent_CD3_CD8_total.i) %>% # Check for INf-------------------
+  mutate(excluded_cluster = case_when(
+    ratio_IP < 2 ~ "cold",
+    ratio_IP >=2 ~ "excluded"
+  ))
+
+b %>% 
+  gather(key = "markers_cat", value = "value", 340) %>% 
+  select(suid, clusters_excluded, excluded_cluster, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=excluded_cluster, color=excluded_cluster))+ # Take home: bad separation, MORE outliers
+  geom_boxplot()+
+  facet_grid(.~ markers_cat)
+
+# Try another by clustering
+c <- b %>% filter(percent_CD3_CD8_total.i > 0, !is.na(.$ratio_IP) )
+clust <- Mclust(c$ratio_IP, G = 2)
+summary(clust)
+c$clusters_excluded <- clust$classification
+c$clusters_excluded <- factor(c$clusters_excluded, 
+                              levels = c(1, 2),
+                              labels = c("cold", "excluded"))
+c %>% 
+  gather(key = "markers_cat", value = "value", 340) %>% 
+  select(suid, clusters_excluded, excluded_cluster, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_excluded, color=clusters_excluded))+
+  geom_boxplot()+
+  facet_grid(.~ markers_cat)
+
+
+clust_markers <- left_join(clust_markers, c[, c("suid", "clusters_excluded")], by= "suid")
+
+
+c[c("ratio_IP", "excluded_cluster", "clusters_excluded")]
+c[c("ratio_IP", "percent_CD3_CD8_total.p", "percent_CD3_CD8_total.i")]
+summary(clust)#----------------------------------------------------------------------------------------------------Here!
 
 
 
@@ -566,7 +602,101 @@ gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 
 
-# Idea cluster ratio CD8/Foxp
+### 2.3.3.3_ then immunosuppressed
+
+# https://www.nature.com/articles/s41573-018-0007-y.pdf
+# Following neoadjuvant
+# chemotherapy (NAC), these patients had an increased
+# ratio of intratumoural CD8+ T cells to FOXP3+ cells200.
+# This event was accompanied by a clonal expansion of
+# antitumour T cells that correlated with response to NAC, 
+# followed by a complete pathological response200. After
+# chemotherapy, the absence of autophagy-related protein
+# LC3B (LC3B+) puncta and a low CD8+ to FOXP3+ cells
+# ratio were associated with a bad prognosis in patients
+# with breast cancer201,202
+
+# The decreased percentages of intratumour
+# CD4+CD25+FOXP3+ T  cells were accompanied by
+# increased CD8+ T cell infiltrates, CD8+ T cell proliferation, increased levels of effector memory T cells and
+# overall enhanced antitumour activity268.
+
+# CD11b
+# The chemokine XC receptor 1 (XCR1) and its ligand
+# lymphotactin (XCL1) regulate migration and function
+# of CD103+CD11b− DCs182–184. 
+
+# https://www.spandidos-publications.com/10.3892/mco.2013.107
+# Although FOXP3 expression in tumor cells was of no prognostic significance, FOXP3+ lymphocytes were
+# significantly associated with poor overall survival 
+# FOXP3 exhibited a heterogeneous subcellular localization in tumor cells 
+# (cytoplasm, 31%; nucleus, 26%; both, 6%) and, although cytoplasmic FOXP3 was associated with poor OS (P=0.058), 
+# nuclear FOXP3 demonstrated a significant association with improved OS (p=0.016). Furthermore, 
+# when patients were grouped according to their expression of tumor cytoplasmic FOXP3 and lymphocyte FOXP3, 
+# there were notable differences in the Kaplan-Meier curves for OS (P<0.001), with a high infiltration of 
+# FOXP3+ lymphocytes accompanied by a cytoplasmic FOXP3+ tumor being the most detrimental phenotype.
+# FOXP3 plays a crucial role in the generation of immunosuppressive CD4+CD25+ regulatory T cells (Tregs), 
+# which induce immune tolerance to antigens
+# tumor-expressed FOXP3, Hinz et al previously reported that FOXP3 expression in a pancreatic cancer cell 
+# line inhibited the proliferation of anti-CD3/anti-CD28-stimulated T cells without impeding their activation 
+
+# Ovarian
+# https://clincancerres.aacrjournals.org/content/24/22/5685.long
+# In agreement with these findings, bulk Treg cells purified from ovarian tumors had enhanced suppressive 
+# capacity when compared with melanoma-infiltrating Treg cells (Fig. 6D). These results showed that the 
+# immunologic receptor expression pattern including increased 4-1BB, PD-1, and ICOS expression defines 
+# highly activated and suppressive Treg cells that infiltrate ovarian tumors.
+# https://iji.sums.ac.ir/?sid=Entrez:PubMed&id=pmid:24975967&key=2014.11.2.105
+# A trend toward higher Treg cells was observed in higher stages of ovarian cancer (III+IV) in comparison 
+# to lower stages (I+II) (6.5 ± 3.2% vs. 4.44 ± 2.7%, p=0.2). Higher percentage of Treg cells was also 
+# observed in the patients with high CA125 (CA-125 >100 U/mL) in comparison to those with low CA-125 serum 
+# level (CA-125 ≤100 U/mL) although the difference was not significant (6.44 versus 4.18%, p=0.19).
+# https://pubmed.ncbi.nlm.nih.gov/24244610/
+# The total numbers of CD4(+)CD25(+)FOXP3(+) Tregs, CD4(+)CD25(+)FOXP3(-), CD3(+) and CD8(+) cells were not 
+# significantly different between the groups. However, higher ratios of CD8(+)/CD4(+)CD25(+)FOXP3(+) Treg, 
+# CD8(+)/CD4(+) and CD8/CD4(+)CD25(+)FOXP3(-) cells were seen in the good outcome group when compared to the
+# patients with poor outcome. These data show for the first time that the ratios of CD8(+) to both 
+# CD4(+)CD25(+)FOXP3(+) Tregs and CD4(+)CD25(+)FOXP3(-) T cells are associated with disease outcome in 
+# ovarian cancer. The association being apparent in ratios rather than absolute count of T cells suggests 
+# that the effector/suppressor ratio may be a more important indicator of outcome than individual cell count. 
+# Thus, immunotherapy strategies that modify the ratio of CD4(+)CD25(+)FOXP3(+) Tregs or CD4(+)CD25(+)FOXP3(-) 
+# T cells to CD8(+) effector cells may be useful in improving outcomes in ovarian cancer.
+# # In yet a more recent study, Milne and colleagues showed, in high grade serous ovarian cancer, that the count 
+# of intraepithelial cells singly stained for FOXP3+ was associated with greatly improved survival [20]. However, 
+# their study did not specifically define the cell type expressing FOXP3. Given that other cells in addition to T 
+# cells express FOXP3 (e.g., tumor cells and B cells), the significance of that work, while interesting, 
+# remains unclear [21,22].
+
+
+# let's take a look at survival between FoxP3_all, FoxP3_alone, FoxP3_CD3?
+
+
+
+
+
+
+# Idea cluster ratio CD3CD8/CD3Foxp3
+a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+  mutate(ratio_eff_suppr = percent_CD3_CD8_total.i / percent_CD3_FoxP3_tumor.i) %>% 
+  filter(is.finite(ratio_eff_suppr))
+clust <- Mclust(a$ratio_eff_suppr, G = 2) # clust on ratio
+summary(clust)
+a$clusters_immsuppr <- clust$classification
+a$clusters_immsuppr <- factor(a$clusters_immsuppr, 
+                           levels = c(1, 2),
+                           labels = c("low", "high"))
+a %>% 
+  gather(key = "markers_cat", value = "value", ratio_eff_suppr) %>% 
+  select(suid, clusters_immsuppr, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_immsuppr, color=clusters_immsuppr))+
+  geom_boxplot()+
+  facet_grid(.~ clusters_immsuppr)
+
+clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_immsuppr")], by= "suid")
+
+
+
+
 
 # clustering
 a <- clust_markers %>% filter(clusters_CD38 == "high") # 2 is high in CD38
@@ -612,44 +742,6 @@ clust_markers <- clust_markers %>%
     clusters_FoxP3 == "low" ~ "hot", # low Fox aka hot
     clusters_FoxP3 == "high" ~ "immunosupressed", # high Fox aka immunosupp
   ))
-
-# Cluster low into cold or excluded--------------------------------------------------------------------------------
-b <- clust_markers %>% filter(clusters_CD38 == "low")
-b <- b %>% mutate(ratio_IP = percent_CD3_CD8_total.p / percent_CD3_CD8_total.i) %>% 
-  mutate(excluded_cluster = case_when(
-    ratio_IP < 2 ~ "cold",
-    ratio_IP >=2 ~ "excluded"
-  ))
-
-b %>% 
-  gather(key = "markers_cat", value = "value", 340) %>% 
-  select(suid, clusters_excluded, excluded_cluster, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=excluded_cluster, color=excluded_cluster))+ # Take home: bad separation, MORE outliers
-  geom_boxplot()+
-  facet_grid(.~ markers_cat)
-
-# Try another by clustering
-c <- b %>% filter(percent_CD3_CD8_total.i > 0, !is.na(.$ratio_IP) )
-clust <- Mclust(c$ratio_IP, G = 2)
-summary(clust)
-c$clusters_excluded <- clust$classification
-c$clusters_excluded <- factor(c$clusters_excluded, 
-                           levels = c(1, 2),
-                           labels = c("cold", "excluded"))
-c %>% 
-  gather(key = "markers_cat", value = "value", 340) %>% 
-  select(suid, clusters_excluded, excluded_cluster, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=clusters_excluded, color=clusters_excluded))+
-  geom_boxplot()+
-  facet_grid(.~ markers_cat)
-
-
-clust_markers <- left_join(clust_markers, c[, c("suid", "clusters_excluded")], by= "suid")
-
-
-c[c("ratio_IP", "excluded_cluster", "clusters_excluded")]
-c[c("ratio_IP", "percent_CD3_CD8_total.p", "percent_CD3_CD8_total.i")]
-summary(clust)#----------------------------------------------------------------------------------------------------Here!
 
 
 
