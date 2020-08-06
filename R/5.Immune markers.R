@@ -521,8 +521,8 @@ gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 # 2.3.3.clusters_special
 ### 2.3.3.1_CD3-CD8 first
-clust_markers <- markers %>% filter(!is.na( markers$"sqrt_CD3_CD8_tumor.i" ))
-clust <- Mclust(clust_markers$"sqrt_CD3_CD8_tumor.i", G = 2)
+clust_markers <- markers %>% filter(!is.na( sqrt_CD3_CD8_tumor.i ))
+clust <- Mclust(clust_markers$sqrt_CD3_CD8_tumor.i, G = 2)
 summary(clust)
 clust_markers$clusters_CD38 <- clust$classification
 clust_markers$clusters_CD38 <- factor(clust_markers$clusters_CD38, 
@@ -559,21 +559,21 @@ gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 ### 2.3.3.2_ Cluster low into cold or excluded----
 b <- clust_markers %>% filter(clusters_CD38 == "low")
-b <- b %>% mutate(ratio_IP = percent_CD3_CD8_total.p / percent_CD3_CD8_total.i) %>% # Check for INf-------------------
+b <- b %>% mutate(ratio_IP = percent_CD3_CD8_tumor.p / percent_CD3_CD8_tumor.i) %>% # Check for INf-------------------
   mutate(excluded_cluster = case_when(
     ratio_IP < 2 ~ "cold",
     ratio_IP >=2 ~ "excluded"
   ))
 
 b %>% 
-  gather(key = "markers_cat", value = "value", 340) %>% 
-  select(suid, clusters_excluded, excluded_cluster, markers_cat, value) %>% 
+  gather(key = "markers_cat", value = "value", ratio_IP) %>% 
+  select(suid, excluded_cluster, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=excluded_cluster, color=excluded_cluster))+ # Take home: bad separation, MORE outliers
   geom_boxplot()+
   facet_grid(.~ markers_cat)
 
-# Try another by clustering
-c <- b %>% filter(percent_CD3_CD8_total.i > 0, !is.na(.$ratio_IP) )
+# Try another by clustering ######################################### Need to compare ratio separation or ratio cluster
+c <- b %>% filter(is.finite(ratio_IP))
 clust <- Mclust(c$ratio_IP, G = 2)
 summary(clust)
 c$clusters_excluded <- clust$classification
@@ -581,23 +581,18 @@ c$clusters_excluded <- factor(c$clusters_excluded,
                               levels = c(1, 2),
                               labels = c("cold", "excluded"))
 c %>% 
-  gather(key = "markers_cat", value = "value", 340) %>% 
+  gather(key = "markers_cat", value = "value", ratio_IP) %>% 
   select(suid, clusters_excluded, excluded_cluster, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_excluded, color=clusters_excluded))+
   geom_boxplot()+
-  facet_grid(.~ markers_cat)
+  facet_grid(.~ clusters_excluded)
 
 
-clust_markers <- left_join(clust_markers, c[, c("suid", "clusters_excluded")], by= "suid")
+clust_markers <- left_join(clust_markers, c[, c("suid", "excluded_cluster", "clusters_excluded")], by= "suid")
 
 
 c[c("ratio_IP", "excluded_cluster", "clusters_excluded")]
 c[c("ratio_IP", "percent_CD3_CD8_total.p", "percent_CD3_CD8_total.i")]
-summary(clust)#----------------------------------------------------------------------------------------------------Here!
-
-
-
-
 
 
 
@@ -677,7 +672,7 @@ summary(clust)#-----------------------------------------------------------------
 
 # Idea cluster ratio CD3CD8/CD3Foxp3
 a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
-  mutate(ratio_eff_suppr = percent_CD3_CD8_total.i / percent_CD3_FoxP3_tumor.i) %>% 
+  mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD3_FoxP3_tumor.i) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2) # clust on ratio
 summary(clust)
@@ -695,12 +690,9 @@ a %>%
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_immsuppr")], by= "suid")
 
 
-
-
-
 # clustering
 a <- clust_markers %>% filter(clusters_CD38 == "high") # 2 is high in CD38
-clust <- Mclust(a[108], G = 2) # clust on CD3-FoxP3
+clust <- Mclust(a$percent_CD3_FoxP3_tumor.i, G = 2) # clust on CD3-FoxP3
 summary(clust)
 a$clusters_FoxP3 <- clust$classification
 a$clusters_FoxP3 <- factor(a$clusters_FoxP3, 
@@ -733,35 +725,34 @@ p3 <- clust_markers %>% filter(!is.na(race)) %>%
   geom_jitter(shape=16, position=position_jitter(0.2))+
   facet_grid(.~ clusters_FoxP3)+
   stat_compare_means(label = "p.format")  
-gridExtra::grid.arrange(p1, p2, p3, ncol=3)
+gridExtra::grid.arrange(p1, p2, p3, ncol=3)############################ Need compare ration 8/fox and fox high lox cluster----
 
-# Combine cluster CD38 and cluster FoxP3
+# Combine all special cluster CD38 and cluster FoxP3
 clust_markers <- clust_markers %>% 
   mutate(special_cluster = case_when(
     clusters_CD38 == "low" ~ "cold", # lox CD8 aka cold
     clusters_FoxP3 == "low" ~ "hot", # low Fox aka hot
     clusters_FoxP3 == "high" ~ "immunosupressed", # high Fox aka immunosupp
+  )) %>% 
+  mutate(special_cluster2 = case_when(
+    clusters_CD38 == "low" &
+      clusters_excluded == "cold" ~ "cold",
+    clusters_CD38 == "low" &
+      clusters_excluded == "excluded" ~ "excluded",
+    clusters_CD38 == "high" &
+      clusters_immsuppr == "low" ~ "hot",
+    clusters_CD38 == "high" &
+      clusters_immsuppr == "high" ~ "immunosuppressed"
   ))
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Survival by cluster
-# clin_surv1 <- left_join(clin_surv, clust_markers[, c("suid", "clusters_CD3CD8", "dbl_pos", "special_cluster")], by="suid")
+# Survival by cluster---
 clin_surv <- left_join(markers, 
-                       clust_markers[, c("suid", "clusters_Brooke", "clusters_CD3CD8", "dbl_pos", "special_cluster")], by="suid")
+                       clust_markers[, c("suid", "clusters_Brooke", "clusters_CD3CD8", "dbl_pos",
+                                         "clusters_CD38", "excluded_cluster",
+                                         "clusters_excluded", "clusters_immsuppr", "clusters_FoxP3",
+                                         "special_cluster", "special_cluster2")], by="suid")
 mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
 
 # clusters_Brooke
@@ -827,6 +818,28 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table"
 )
 survdiff(mysurv~clin_surv$race+clin_surv$special_cluster)
+# special_cluster2
+myplot <- survfit(mysurv~clin_surv$special_cluster2)
+myplot
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on matched patient",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by ...", 
+           # legend.labs = c("cold", "hot", "immunosuppressed"), 
+           conf.int = FALSE,
+           pval = TRUE, # pval.coord = c(2100,.53), 
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table"
+)
+survdiff(mysurv~clin_surv$race+clin_surv$special_cluster)
+
+
+
+
+
+
 
 # Same clustering with Stroma----
 # 2.3.1.clusters 1_by_CD3-CD8 stroma
