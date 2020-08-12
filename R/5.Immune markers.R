@@ -399,23 +399,24 @@ colour=percent_CD3_FoxP3_tumor.i<1
 
 # 2.3.Clustering----
 # Need to remove NAs
-clust_markers <- markers %>% filter(!is.na( markers[,c(104:111)] ))
+clust_markers <- markers %>% filter(!is.na(markers$sqrt_CD3_CD8_tumor.i ))
 # Do not take CD3 alone for clustering beacuse contain effector, regulator, helper, gamma delta
 # Do not take FoxP3 alone because tumor cells can express FoxP3
 # Do not take CD11b alone because CD3CD11b can be NK cells
 # CD11bCD15 are myeloid cells prevent other immune cells to traffic into the tumor
 
 
-# 2.3.0.clusters 1_by_Brooke # She only took intratumoral but all markers simple and doubled staining
-clust <- Mclust(clust_markers[,104:111], G = 5)
+# 2.3.0.clusters 1_by_Brooke # She took only intratumoral but all markers simple and doubled staining
+clust <- Mclust(clust_markers[,c(98:121)], G = 5)
 summary(clust)
 clust_markers$clusters_Brooke <- clust$classification
 clust_markers$clusters_Brooke <- factor(clust_markers$clusters_Brooke, 
                                         levels = c(4, 2, 3, 5, 1),
-                                        labels = c("low", "mid-low", "mid", "mid-high", "high"))
+                                        labels = c("mid-high", "mid-low", "high", "low", "mid"))
+# clust_markers <- left_join(clust_markers, clust[, c("suid", "clusters_Brooke")], by= "suid")
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c(104:111)) %>% 
+  gather(key = "markers_cat", value = "value", c(98:105)) %>% 
   select(suid, clusters_Brooke, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_Brooke, color=clusters_Brooke))+
   geom_boxplot()+
@@ -443,7 +444,7 @@ gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 # Cluster for tumor
 # 2.3.1.clusters 1_by_CD3-CD8
-clust <- Mclust(clust_markers[106], G = 5)
+clust <- Mclust(clust_markers$sqrt_CD3_CD8_tumor.i, G = 5)
 summary(clust)
 clust_markers$clusters_CD3CD8 <- clust$classification
 clust_markers$clusters_CD3CD8 <- factor(clust_markers$clusters_CD3CD8, 
@@ -478,7 +479,7 @@ p3 <- clust_markers %>% filter(!is.na(race)) %>%
 gridExtra::grid.arrange(p1, p2, p3, ncol=3)
   
 # 2.3.2.clusters 2_by_all double positive
-clust <- Mclust(clust_markers[,c(106, 108, 111)], G = 5)
+clust <- Mclust(clust_markers[,c("sqrt_CD3_CD8_tumor.i", "sqrt_CD3_FoxP3_tumor.i", "sqrt_CD11b_CD15_tumor.i")], G = 5)
 summary(clust)
 clust_markers$dbl_pos <- clust$classification
 clust_markers$dbl_pos <- factor(clust_markers$dbl_pos, 
@@ -521,7 +522,7 @@ gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 # 2.3.3.clusters_special
 ### 2.3.3.1_CD3-CD8 first
-clust_markers <- markers %>% filter(!is.na( sqrt_CD3_CD8_tumor.i ))
+# clust_markers <- markers %>% filter(!is.na( sqrt_CD3_CD8_tumor.i ))
 clust <- Mclust(clust_markers$sqrt_CD3_CD8_tumor.i, G = 2)
 summary(clust)
 clust_markers$clusters_CD38 <- clust$classification
@@ -559,7 +560,7 @@ gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 ### 2.3.3.2_ Cluster low into cold or excluded----
 b <- clust_markers %>% filter(clusters_CD38 == "low")
-b <- b %>% mutate(ratio_IP = percent_CD3_CD8_tumor.p / percent_CD3_CD8_tumor.i) %>% # Check for INf-------------------
+b <- b %>% mutate(ratio_IP = percent_CD3_CD8_tumor.p / percent_CD3_CD8_tumor.i) %>%
   mutate(excluded_cluster = case_when(
     ratio_IP < 2 ~ "cold",
     ratio_IP >=2 ~ "excluded"
@@ -580,19 +581,15 @@ c$clusters_excluded <- clust$classification
 c$clusters_excluded <- factor(c$clusters_excluded, 
                               levels = c(1, 2),
                               labels = c("cold", "excluded"))
+clust_markers <- left_join(clust_markers, c[, c("suid", "excluded_cluster", "clusters_excluded")], by= "suid")
+
 c %>% 
   gather(key = "markers_cat", value = "value", ratio_IP) %>% 
   select(suid, clusters_excluded, excluded_cluster, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_excluded, color=clusters_excluded))+
-  geom_boxplot()+
-  facet_grid(.~ clusters_excluded)
+  geom_boxplot()
 
 
-clust_markers <- left_join(clust_markers, c[, c("suid", "excluded_cluster", "clusters_excluded")], by= "suid")
-
-
-c[c("ratio_IP", "excluded_cluster", "clusters_excluded")]
-c[c("ratio_IP", "percent_CD3_CD8_total.p", "percent_CD3_CD8_total.i")]
 
 
 
@@ -670,7 +667,7 @@ c[c("ratio_IP", "percent_CD3_CD8_total.p", "percent_CD3_CD8_total.i")]
 
 
 
-# Idea cluster ratio CD3CD8/CD3Foxp3
+# cluster ratio CD3CD8/CD3Foxp3
 a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD3_FoxP3_tumor.i) %>% 
   filter(is.finite(ratio_eff_suppr))
@@ -679,33 +676,31 @@ summary(clust)
 a$clusters_immsuppr <- clust$classification
 a$clusters_immsuppr <- factor(a$clusters_immsuppr, 
                            levels = c(1, 2),
-                           labels = c("low", "high"))
+                           labels = c("immunosuppressed", "hot"))
+clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_immsuppr")], by= "suid")
+
 a %>% 
   gather(key = "markers_cat", value = "value", ratio_eff_suppr) %>% 
   select(suid, clusters_immsuppr, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_immsuppr, color=clusters_immsuppr))+
-  geom_boxplot()+
-  facet_grid(.~ clusters_immsuppr)
-
-clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_immsuppr")], by= "suid")
+  geom_boxplot()
 
 
 # clustering
-a <- clust_markers %>% filter(clusters_CD38 == "high") # 2 is high in CD38
+# a <- clust_markers %>% filter(clusters_CD38 == "high") # 2 is high in CD38
 clust <- Mclust(a$percent_CD3_FoxP3_tumor.i, G = 2) # clust on CD3-FoxP3
 summary(clust)
 a$clusters_FoxP3 <- clust$classification
 a$clusters_FoxP3 <- factor(a$clusters_FoxP3, 
                                       levels = c(1, 2),
-                                      labels = c("low", "high"))
+                                      labels = c("hot", "immunosuppressed"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_FoxP3")], by= "suid")
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c(106, 108:111)) %>% 
-  select(suid, clusters_FoxP3, markers_cat, value) %>% 
+  gather(key = "markers_cat", value = "value", percent_CD3_FoxP3_tumor.i) %>% 
+  select(suid, markers_cat, clusters_FoxP3, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_FoxP3, color=clusters_FoxP3))+
-  geom_boxplot()+
-  facet_grid(.~ markers_cat)
+  geom_boxplot()
 
 p1 <- clust_markers %>% filter(!is.na(race)) %>% 
   ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor.i, color=clusters_FoxP3))+
@@ -731,8 +726,8 @@ gridExtra::grid.arrange(p1, p2, p3, ncol=3)############################ Need com
 clust_markers <- clust_markers %>% 
   mutate(special_cluster = case_when(
     clusters_CD38 == "low" ~ "cold", # lox CD8 aka cold
-    clusters_FoxP3 == "low" ~ "hot", # low Fox aka hot
-    clusters_FoxP3 == "high" ~ "immunosupressed", # high Fox aka immunosupp
+    clusters_FoxP3 == "hot" ~ "hot", # low Fox aka hot
+    clusters_FoxP3 == "immunosuppressed" ~ "immunosuppressed", # high Fox aka immunosupp
   )) %>% 
   mutate(special_cluster2 = case_when(
     clusters_CD38 == "low" &
@@ -740,9 +735,39 @@ clust_markers <- clust_markers %>%
     clusters_CD38 == "low" &
       clusters_excluded == "excluded" ~ "excluded",
     clusters_CD38 == "high" &
-      clusters_immsuppr == "low" ~ "hot",
+      clusters_immsuppr == "immunosupressed" ~ "immunosupressed",
     clusters_CD38 == "high" &
-      clusters_immsuppr == "high" ~ "immunosuppressed"
+      clusters_immsuppr == "hot" ~ "hot"
+  )) %>% 
+  mutate(special_cluster3 = case_when(
+    clusters_CD38 == "low" &
+      excluded_cluster == "cold" ~ "cold",
+    clusters_CD38 == "low" &
+      excluded_cluster == "excluded" ~ "excluded",
+    clusters_CD38 == "high" &
+      clusters_immsuppr == "immunosupressed" ~ "immunosupressed",
+    clusters_CD38 == "high" &
+      clusters_immsuppr == "hot" ~ "hot"
+  )) %>% 
+  mutate(special_cluster4 = case_when(
+    clusters_CD38 == "low" &
+      clusters_excluded == "cold" ~ "cold",
+    clusters_CD38 == "low" &
+      clusters_excluded == "excluded" ~ "excluded",
+    clusters_CD38 == "high" &
+      clusters_FoxP3 == "hot" ~ "hot",
+    clusters_CD38 == "high" &
+      clusters_FoxP3 == "immunosuppressed" ~ "immunosuppressed"
+  )) %>% 
+  mutate(special_cluster5 = case_when(
+    clusters_CD38 == "low" &
+      excluded_cluster == "cold" ~ "cold",
+    clusters_CD38 == "low" &
+      excluded_cluster == "excluded" ~ "excluded",
+    clusters_CD38 == "high" &
+      clusters_FoxP3 == "hot" ~ "hot",
+    clusters_CD38 == "high" &
+      clusters_FoxP3 == "immunosuppressed" ~ "immunosuppressed"
   ))
 
 
@@ -752,16 +777,18 @@ clin_surv <- left_join(markers,
                        clust_markers[, c("suid", "clusters_Brooke", "clusters_CD3CD8", "dbl_pos",
                                          "clusters_CD38", "excluded_cluster",
                                          "clusters_excluded", "clusters_immsuppr", "clusters_FoxP3",
-                                         "special_cluster", "special_cluster2")], by="suid")
+                                         "special_cluster", "special_cluster2", "special_cluster3", 
+                                         "special_cluster4", "special_cluster5")], by="suid")
 mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
 
 # clusters_Brooke
 myplot <- survfit(mysurv~clin_surv$clusters_Brooke)
 myplot
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on matched patient",
+           title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "clustered by Brooke", # legend.labs = c("mid-high", "mid-low", "high", "low"), # 4253
+           xlab = "Time (days)", legend.title = "clustered by Brooke",
+           legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
            pval = TRUE, # pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
            risk.table = TRUE,
@@ -775,9 +802,10 @@ survdiff(mysurv~clin_surv$race+clin_surv$clusters_Brooke)
 myplot <- survfit(mysurv~clin_surv$clusters_CD3CD8)
 myplot
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on matched patient",
+           title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "clustered by CD3+/CD8+", #legend.labs = c("mid-high", "mid-low", "high", "low"), # 4253
+           xlab = "Time (days)", legend.title = "clustered by CD3+/CD8+", 
+           legend.labs = c("high", "mid", "mid-high", "mid-low"), # 4253
            pval = TRUE, # pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
            risk.table = TRUE,
@@ -786,14 +814,14 @@ ggsurvplot(myplot, data = clin_surv,
            conf.int = FALSE
 )
 survdiff(mysurv~clin_surv$race+clin_surv$clusters_CD3CD8)
-# cluster 2
+# cluster dbl_pos
 myplot <- survfit(mysurv~clin_surv$dbl_pos)
 myplot
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on matched patient",
+           title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by all double positive", 
-           # legend.labs = c("mid", "mid-high", "low", "mid-low", "high"), # 52143 
+           legend.labs = c("high", "low", "mid", "mid-high", "mid-low"), 
            conf.int = FALSE,
            pval = TRUE, # pval.coord = c(2100,.53), 
            surv.median.line = c("hv"),
@@ -806,10 +834,10 @@ survdiff(mysurv~clin_surv$race+clin_surv$dbl_pos)
 myplot <- survfit(mysurv~clin_surv$special_cluster)
 myplot
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on matched patient",
+           title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by CD8 then FoxP3", 
-           legend.labs = c("cold", "hot", "immunosuppressed"), 
+           # legend.labs = c("cold", "hot", "immunosuppressed"), 
            conf.int = FALSE,
            pval = TRUE, # pval.coord = c(2100,.53), 
            surv.median.line = c("hv"),
@@ -822,9 +850,9 @@ survdiff(mysurv~clin_surv$race+clin_surv$special_cluster)
 myplot <- survfit(mysurv~clin_surv$special_cluster2)
 myplot
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on matched patient",
+           title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "clustered by ...", 
+           xlab = "Time (days)", legend.title = "clustered by CD8 -ratioCD8<2 -ratioCD8/FoxP3", 
            # legend.labs = c("cold", "hot", "immunosuppressed"), 
            conf.int = FALSE,
            pval = TRUE, # pval.coord = c(2100,.53), 
@@ -833,10 +861,55 @@ ggsurvplot(myplot, data = clin_surv,
            tables.height = 0.2,
            risk.table.title = "Risk table"
 )
-survdiff(mysurv~clin_surv$race+clin_surv$special_cluster)
-
-
-
+survdiff(mysurv~clin_surv$race+clin_surv$special_cluster2)
+# special_cluster3
+myplot <- survfit(mysurv~clin_surv$special_cluster3)
+myplot
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by  CD8 -ratioCD8cluster -ratioCD8/FoxP3", 
+           # legend.labs = c("cold", "hot", "immunosuppressed"), 
+           conf.int = FALSE,
+           pval = TRUE, # pval.coord = c(2100,.53), 
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table"
+)
+survdiff(mysurv~clin_surv$race+clin_surv$special_cluster3)
+# special_cluster4
+myplot <- survfit(mysurv~clin_surv$special_cluster4)
+myplot
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by CD8 -ratioCD8<2 -FoxP3", 
+           # legend.labs = c("cold", "hot", "immunosuppressed"), 
+           conf.int = FALSE,
+           pval = TRUE, # pval.coord = c(2100,.53), 
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table"
+)
+survdiff(mysurv~clin_surv$race+clin_surv$special_cluster4)
+# special_cluster5
+myplot <- survfit(mysurv~clin_surv$special_cluster5)
+myplot
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by CD8 -ratioCD8clustaer -FoxP3", 
+           # legend.labs = c("cold", "hot", "immunosuppressed"), 
+           conf.int = FALSE,
+           pval = TRUE, # pval.coord = c(2100,.53), 
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table"
+)
+survdiff(mysurv~clin_surv$race+clin_surv$special_cluster5)
 
 
 
