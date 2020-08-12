@@ -648,21 +648,103 @@ markers <- markers %>%
   select(-c("temp", "tertile"))
 
 
-# # 4.1. Create variation data ----
-# # Look at the variation between each patient and the global mean # Should we mot compare Black and White?
-# # Here compare the mean of % cells to global study % cells
-# variations_TMA <- group_by(TMA_global, suid) %>% 
-#   # summarize(mean_tumor = mean(percent_tumor), mean_stroma = mean(percent_stroma),
-#   #           variance_tumor = var(percent_tumor), variance_stroma = var(percent_stroma)) %>% 
+# 4.1. Create variation data ----
+# Look at the variation between each patient and the global mean # Should we mot compare Black and White?
+# Here compare the mean of % cells to global study % cells
+colnames(markers)
+markers %>% summarise_each(funs(mean(., na.rm = TRUE)))
+
+var_markers <- data.frame(
+  tumor_variation_tma = c(markers$mean_tumor_tma - mean(markers$mean_tumor_tma, na.rm = TRUE)),
+  tumor_variation_tma = c(markers$mean_stroma_tma - mean(markers$mean_stroma_tma, na.rm = TRUE)),
+  var_CD3_tumor_tma = c(markers$percent_CD3_tumor_tma - mean(markers$percent_CD3_tumor_tma, na.rm = TRUE)),
+  var_CD8_tumor_tma = c(markers$percent_CD8_tumor_tma - mean(markers$percent_CD8_tumor_tma, na.rm = TRUE)),
+  var_CD3_CD8_tumor_tma = c(markers$percent_CD3_CD8_tumor_tma - mean(markers$percent_CD3_CD8_tumor_tma, na.rm = TRUE)),
+  var_FoxP3_tumor_tma = c(markers$percent_FoxP3_tumor_tma - mean(markers$percent_FoxP3_tumor_tma, na.rm = TRUE)),
+  var_CD3_FoxP3_tumor_tma = c(markers$percent_CD3_FoxP3_tumor_tma - mean(markers$percent_CD3_FoxP3_tumor_tma, na.rm = TRUE)),
+  var_CD11b_tumor_tma = c(markers$percent_CD11b_tumor_tma - mean(markers$percent_CD11b_tumor_tma, na.rm = TRUE)),
+  var_CD15_tumor_tma = c(markers$percent_CD15_tumor_tma - mean(markers$percent_CD15_tumor_tma, na.rm = TRUE)),
+  var_CD11b_CD15_tumor_tma = c(markers$percent_CD11b_CD15_tumor_tma - mean(markers$percent_CD11b_CD15_tumor_tma, na.rm = TRUE)),
+  var_CD3_stroma_tma = c(markers$percent_CD3_stroma_tma - mean(markers$percent_CD3_stroma_tma, na.rm = TRUE)),
+  var_CD8_stroma_tma = c(markers$percent_CD8_stroma_tma - mean(markers$percent_CD8_stroma_tma, na.rm = TRUE)),
+  var_CD3_CD8_stroma_tma = c(markers$percent_CD3_CD8_stroma_tma - mean(markers$percent_CD3_CD8_stroma_tma, na.rm = TRUE)),
+  var_FoxP3_stroma_tma = c(markers$percent_FoxP3_stroma_tma - mean(markers$percent_FoxP3_stroma_tma, na.rm = TRUE)),
+  var_CD3_FoxP3_stroma_tma = c(markers$percent_CD3_FoxP3_stroma_tma - mean(markers$percent_CD3_FoxP3_stroma_tma, na.rm = TRUE)),
+  var_CD11b_stroma_tma = c(markers$percent_CD11b_stroma_tma - mean(markers$percent_CD11b_stroma_tma, na.rm = TRUE)),
+  var_CD15_stroma_tma = c(markers$percent_CD15_stroma_tma - mean(markers$percent_CD15_stroma_tma, na.rm = TRUE)),
+  var_CD11b_CD15_stroma_tma = c(markers$percent_CD11b_CD15_stroma_tma - mean(markers$percent_CD11b_CD15_stroma_tma, na.rm = TRUE)),
+  var_CD3_total_tma = c(markers$percent_CD3_total_tma - mean(markers$percent_CD3_total_tma, na.rm = TRUE)),
+  var_CD8_total_tma = c(markers$percent_CD8_total_tma - mean(markers$percent_CD8_total_tma, na.rm = TRUE)),
+  var_CD3_CD8_total_tma = c(markers$percent_CD3_CD8_total_tma - mean(markers$percent_CD3_CD8_total_tma, na.rm = TRUE)),
+  var_FoxP3_total_tma = c(markers$percent_FoxP3_total_tma - mean(markers$percent_FoxP3_total_tma, na.rm = TRUE)),
+  
+  tumor_variation.i = c(markers$mean_tumor.i - mean(markers$mean_tumor.i, na.rm = TRUE)),
+  tumor_variation.i = c(markers$mean_stroma.i - mean(markers$mean_stroma.i, na.rm = TRUE)),
+  var_CD3_tumor.i = c(markers$percent_CD3_tumor.i - mean(markers$percent_CD3_tumor.i, na.rm = TRUE)),
+  var_CD8_tumor.i = c(markers$percent_CD8_tumor.i - mean(markers$percent_CD8_tumor.i, na.rm = TRUE)),
+  var_CD3_CD8_tumor.i = c(markers$percent_CD3_CD8_tumor.i - mean(markers$percent_CD3_CD8_tumor.i, na.rm = TRUE)),
+  var_FoxP3_tumor.i = c(markers$percent_FoxP3_tumor.i - mean(markers$percent_FoxP3_tumor.i, na.rm = TRUE)),
+  var_CD3_FoxP3_tumor.i = c(markers$percent_CD3_FoxP3_tumor.i - mean(markers$percent_CD3_FoxP3_tumor.i, na.rm = TRUE)),
+  var_CD11b_tumor.i = c(markers$percent_CD11b_tumor.i - mean(markers$percent_CD11b_tumor.i, na.rm = TRUE)),
+  var_CD15_tumor.i = c(markers$percent_CD15_tumor.i - mean(markers$percent_CD15_tumor.i, na.rm = TRUE)),
+  var_CD11b_CD15_tumor.i = c(markers$percent_CD11b_CD15_tumor.i - mean(markers$percent_CD11b_CD15_tumor.i, na.rm = TRUE)),
+  var_CD3_stroma.i = c(markers$percent_CD3_stroma.i - mean(markers$percent_CD3_stroma.i, na.rm = TRUE)),
+  var_CD8_stroma.i = c(markers$percent_CD8_stroma.i - mean(markers$percent_CD8_stroma.i, na.rm = TRUE)),
+  var_CD3_CD8_stroma.i = c(markers$percent_CD3_CD8_stroma.i - mean(markers$percent_CD3_CD8_stroma.i, na.rm = TRUE)),
+  var_FoxP3_stroma.i = c(markers$percent_FoxP3_stroma.i - mean(markers$percent_FoxP3_stroma.i, na.rm = TRUE)),
+  var_CD3_FoxP3_stroma.i = c(markers$percent_CD3_FoxP3_stroma.i - mean(markers$percent_CD3_FoxP3_stroma.i, na.rm = TRUE)),
+  var_CD11b_stroma.i = c(markers$percent_CD11b_stroma.i - mean(markers$percent_CD11b_stroma.i, na.rm = TRUE)),
+  var_CD15_stroma.i = c(markers$percent_CD15_stroma.i - mean(markers$percent_CD15_stroma.i, na.rm = TRUE)),
+  var_CD11b_CD15_stroma.i = c(markers$percent_CD11b_CD15_stroma.i - mean(markers$percent_CD11b_CD15_stroma.i, na.rm = TRUE)),
+  var_CD3_total.i = c(markers$percent_CD3_total.i - mean(markers$percent_CD3_total.i, na.rm = TRUE)),
+  var_CD8_total.i = c(markers$percent_CD8_total.i - mean(markers$percent_CD8_total.i, na.rm = TRUE)),
+  var_CD3_CD8_total.i = c(markers$percent_CD3_CD8_total.i - mean(markers$percent_CD3_CD8_total.i, na.rm = TRUE)),
+  var_FoxP3_total.i = c(markers$percent_FoxP3_total.i - mean(markers$percent_FoxP3_total.i, na.rm = TRUE)),
+  
+  tumor_variation.p = c(markers$mean_tumor.p - mean(markers$mean_tumor.p, na.rm = TRUE)),
+  tumor_variation.p = c(markers$mean_stroma.p - mean(markers$mean_stroma.p, na.rm = TRUE)),
+  var_CD3_tumor.p = c(markers$percent_CD3_tumor.p - mean(markers$percent_CD3_tumor.p, na.rm = TRUE)),
+  var_CD8_tumor.p = c(markers$percent_CD8_tumor.p - mean(markers$percent_CD8_tumor.p, na.rm = TRUE)),
+  var_CD3_CD8_tumor.p = c(markers$percent_CD3_CD8_tumor.p - mean(markers$percent_CD3_CD8_tumor.p, na.rm = TRUE)),
+  var_FoxP3_tumor.p = c(markers$percent_FoxP3_tumor.p - mean(markers$percent_FoxP3_tumor.p, na.rm = TRUE)),
+  var_CD3_FoxP3_tumor.p = c(markers$percent_CD3_FoxP3_tumor.p - mean(markers$percent_CD3_FoxP3_tumor.p, na.rm = TRUE)),
+  var_CD11b_tumor.p = c(markers$percent_CD11b_tumor.p - mean(markers$percent_CD11b_tumor.p, na.rm = TRUE)),
+  var_CD15_tumor.p = c(markers$percent_CD15_tumor.p - mean(markers$percent_CD15_tumor.p, na.rm = TRUE)),
+  var_CD11b_CD15_tumor.p = c(markers$percent_CD11b_CD15_tumor.p - mean(markers$percent_CD11b_CD15_tumor.p, na.rm = TRUE)),
+  var_CD3_stroma.p = c(markers$percent_CD3_stroma.p - mean(markers$percent_CD3_stroma.p, na.rm = TRUE)),
+  var_CD8_stroma.p = c(markers$percent_CD8_stroma.p - mean(markers$percent_CD8_stroma.p, na.rm = TRUE)),
+  var_CD3_CD8_stroma.p = c(markers$percent_CD3_CD8_stroma.p - mean(markers$percent_CD3_CD8_stroma.p, na.rm = TRUE)),
+  var_FoxP3_stroma.p = c(markers$percent_FoxP3_stroma.p - mean(markers$percent_FoxP3_stroma.p, na.rm = TRUE)),
+  var_CD3_FoxP3_stroma.p = c(markers$percent_CD3_FoxP3_stroma.p - mean(markers$percent_CD3_FoxP3_stroma.p, na.rm = TRUE)),
+  var_CD11b_stroma.p = c(markers$percent_CD11b_stroma.p - mean(markers$percent_CD11b_stroma.p, na.rm = TRUE)),
+  var_CD15_stroma.p = c(markers$percent_CD15_stroma.p - mean(markers$percent_CD15_stroma.p, na.rm = TRUE)),
+  var_CD11b_CD15_stroma.p = c(markers$percent_CD11b_CD15_stroma.p - mean(markers$percent_CD11b_CD15_stroma.p, na.rm = TRUE)),
+  var_CD3_total.p = c(markers$percent_CD3_total.p - mean(markers$percent_CD3_total.p, na.rm = TRUE)),
+  var_CD8_total.p = c(markers$percent_CD8_total.p - mean(markers$percent_CD8_total.p, na.rm = TRUE)),
+  var_CD3_CD8_total.p = c(markers$percent_CD3_CD8_total.p - mean(markers$percent_CD3_CD8_total.p, na.rm = TRUE)),
+  var_FoxP3_total.p = c(markers$percent_FoxP3_total.p - mean(markers$percent_FoxP3_total.p, na.rm = TRUE))
+)
+uid <- paste(unique(common_ROITMA_IDs$Subject_IDs), collapse = '|')
+var_markers28 <- var_markers[(grepl(uid, var_markers$suid)),]
+
+# variation <- group_by(markers, suid) %>%
+#   summarize(mean_tumor = mean(percent_tumor), mean_stroma = mean(percent_stroma), mean_total = mean(percent_total),
+#             variance_tumor = var(percent_tumor), variance_stroma = var(percent_stroma)) %>%
 #   mutate(ID = seq(1:nrow(.)))
-# 
-# 
+
+
+
+# variations_TMA <- group_by(markers, suid) %>%
+#   summarize(mean_tumor = mean(percent_tumor), mean_stroma = mean(percent_stroma), mean_total = mean(percent_total),
+#             variance_tumor = var(percent_tumor), variance_stroma = var(percent_stroma)) %>%
+#   mutate(ID = seq(1:nrow(.)))
+
 # variations_ROIip <- group_by(ROI_global, suid, intratumoral_i_vs_peripheral_p_) %>% # mean of % cells separated by intra or perip
-#   # summarize(mean_tumor = mean(percent_tumor), mean_stroma = mean(percent_stroma),
-#   #           variance_tumor = var(percent_tumor), variance_stroma = var(percent_stroma))
+#   summarize(mean_tumor = mean(percent_tumor), mean_stroma = mean(percent_stroma),
+#             variance_tumor = var(percent_tumor), variance_stroma = var(percent_stroma))
 # setDT(variations_ROIip)[, ID := .GRP, .(suid)]
-# # variations_ROIip$tumor_variation <- variations_ROIip$mean_tumor - mean(ROI_global$percent_tumor)
-# # variations_ROIip$stroma_variation <- variations_ROIip$mean_stroma - mean(ROI_global$percent_stroma)
+# variations_ROIip$tumor_variation <- variations_ROIip$mean_tumor - mean(ROI_global$percent_tumor)
+# variations_ROIip$stroma_variation <- variations_ROIip$mean_stroma - mean(ROI_global$percent_stroma)
 # 
 # # Will commented because, after checking, it is not a good idea to combined all suid (I + P)
 # variations_ROI <- group_by(variations_ROIip, suid) %>%

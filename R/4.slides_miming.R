@@ -1036,7 +1036,7 @@ corrplot(mat)
 corrplot.mixed(mat)
 
 # jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation Immune markers for 28 patients.jpg"),
-     width = 1300, height = 800, quality = 100)
+#      width = 1300, height = 800, quality = 100)
 ggcorrplot(mat, hc.order = FALSE, method = "square", 
            # outline.col = "darkblue", # the outline of the circle or sqare
            # hc.method = "complete",
@@ -1180,6 +1180,83 @@ table <- as.data.table(markers_28[c("percent_CD3_tumor_tma", "percent_CD3_tumor.
 )])
 table
 
+# Correlation with total cells
+mat <-
+  cor(markers_28[, c("percent_CD3_total_tma", "percent_CD8_total_tma", "percent_CD3_CD8_total_tma", "percent_FoxP3_total_tma",
+    "percent_CD3_FoxP3_total_tma", "percent_CD11b_total_tma", "percent_CD15_total_tma", "percent_CD11b_CD15_total_tma",
+    "percent_CD3_total.i", "percent_CD8_total.i", "percent_CD3_CD8_total.i", "percent_FoxP3_total.i", 
+    "percent_CD3_FoxP3_total.i", "percent_CD11b_total.i", "percent_CD15_total.i", "percent_CD11b_CD15_total.i")],
+  use = "pairwise.complete.obs")
+corrplot.mixed(mat)
+
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation .jpg"),
+#      width = 1300, height = 800, quality = 100)
+ggcorrplot(mat, hc.order = FALSE, method = "square", 
+           # outline.col = "darkblue", # the outline of the circle or sqare
+           # hc.method = "complete",
+           type = "upper", # show the top half panel
+           lab = TRUE, lab_col = "darkblue", lab_size = 2.5, # add correlation nbr, col and size of the correlation nbr
+           title = "Immune markers correlation in TMA vs Intratumoral ROI",
+           show.legend = TRUE, legend.title = "Correlation", show.diag = TRUE,
+           # colors = viridis::inferno(n=3),
+           # p.mat = pmat, # Add correlation significance
+           sig.level = 0.05, insig = c("pch", "blank"), pch = 4, pch.col = "black", pch.cex = 10, 
+           tl.cex = 10, tl.col = "red", tl.srt = 40,
+           digits = 2
+)
+# dev.off()
+
+# sqrt
+mat <-
+  cor(markers_28[, c("sqrt_CD3_total_tma", "sqrt_CD8_total_tma", "sqrt_CD3_CD8_total_tma", "sqrt_FoxP3_total_tma",
+                     "sqrt_CD3_FoxP3_total_tma", "sqrt_CD11b_total_tma", "sqrt_CD15_total_tma", "sqrt_CD11b_CD15_total_tma",
+                     "percent_CD3_total.i", "percent_CD8_total.i", "percent_CD3_CD8_total.i", "percent_FoxP3_total.i",
+                     "percent_CD3_FoxP3_total.i", "percent_CD11b_total.i", "percent_CD15_total.i", "percent_CD11b_CD15_total.i")],
+      use = "pairwise.complete.obs")
+corrplot.mixed(mat)
+
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation .jpg"),
+#      width = 1300, height = 800, quality = 100)
+ggcorrplot(mat, hc.order = FALSE, method = "square", 
+           # outline.col = "darkblue", # the outline of the circle or sqare
+           # hc.method = "complete",
+           type = "upper", # show the top half panel
+           lab = TRUE, lab_col = "darkblue", lab_size = 2.5, # add correlation nbr, col and size of the correlation nbr
+           title = "Immune markers correlation in TMA vs Intratumoral ROI",
+           show.legend = TRUE, legend.title = "Correlation", show.diag = TRUE,
+           # colors = viridis::inferno(n=3),
+           # p.mat = pmat, # Add correlation significance
+           sig.level = 0.05, insig = c("pch", "blank"), pch = 4, pch.col = "black", pch.cex = 10, 
+           tl.cex = 10, tl.col = "red", tl.srt = 40,
+           digits = 2
+)
+# dev.off()
+
+# var
+
+mat <-
+  cor(markers_28[, c(
+    
+  )],
+      use = "pairwise.complete.obs")
+corrplot.mixed(mat)
+
+# jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation .jpg"),
+#      width = 1300, height = 800, quality = 100)
+ggcorrplot(mat, hc.order = FALSE, method = "square", 
+           # outline.col = "darkblue", # the outline of the circle or sqare
+           # hc.method = "complete",
+           type = "upper", # show the top half panel
+           lab = TRUE, lab_col = "darkblue", lab_size = 2.5, # add correlation nbr, col and size of the correlation nbr
+           title = "Immune markers correlation in TMA vs Intratumoral ROI",
+           show.legend = TRUE, legend.title = "Correlation", show.diag = TRUE,
+           # colors = viridis::inferno(n=3),
+           # p.mat = pmat, # Add correlation significance
+           sig.level = 0.05, insig = c("pch", "blank"), pch = 4, pch.col = "black", pch.cex = 10, 
+           tl.cex = 10, tl.col = "red", tl.srt = 40,
+           digits = 2
+)
+# dev.off()
 
 # Cleaning
 rm(p1, p2, p3, p4, p5, clin_surv, curv_facet, ggsurv, myplot,
