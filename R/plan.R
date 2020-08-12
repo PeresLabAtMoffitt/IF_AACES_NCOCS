@@ -12,9 +12,11 @@ plan <- drake_plan(
   #-----------------------------------------------------------------------------------------------------------------
   TMA1_tumor = tmat_import(fs::path("","Volumes","Peres_Research")),
   TMA1_stroma = tmas_import(fs::path("","Volumes","Peres_Research")),
+  TMA1_total = tma17_import(fs::path("","Volumes","Peres_Research")),
   
   TMA2_tumor = tma2t_import(fs::path("","Volumes","Peres_Research")),
   TMA2_stroma = tma2s_import(fs::path("","Volumes","Peres_Research")),
+  TMA2_total = tma18_import(fs::path("","Volumes","Peres_Research")),
   #-----------------------------------------------------------------------------------------------------------------
   TMAcases_remove = case_remove_import(fs::path("","Volumes","Peres_Research")),
   common_ROITMA_IDs = common_ROITMA_import(fs::path("","Volumes","Peres_Research")),
@@ -42,9 +44,11 @@ plan <- drake_plan(
   ## 2-bind TMA together
   TMA_tumor_ = binding(TMA1_tumor,TMA2_tumor),
   TMA_stroma_ = binding(TMA1_stroma,TMA2_stroma), 
+  TMA_total_ = binding(TMA1_total,TMA2_total), 
   # Update variable names
   TMA_tumor = var_names(TMA_tumor_),
   TMA_stroma = var_names(TMA_stroma_),
+  TMA_total = var_names(TMA_total_),
   ROI_tumor = var_names(ROI_tumor_),
   ROI_stroma = var_names(ROI_stroma_),
   ROI_total = var_names(ROI_total_)

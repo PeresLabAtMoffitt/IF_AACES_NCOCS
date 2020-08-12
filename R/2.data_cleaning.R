@@ -261,6 +261,9 @@ TMA_tumor <-
 TMA_stroma <-
   TMA_stroma[(!grepl(uid, TMA_stroma$suid)),] %>% 
   filter(!is.na(suid))
+TMA_total <-
+  TMA_total[(!grepl(uid, TMA_total$suid)),] %>% 
+  filter(!is.na(suid))
 # Did it for ROIs too in case but no cases to remove
 
 
@@ -320,15 +323,19 @@ ROI_global <-
   # mutate(CD11b_CD15perc_stroma_mm2 = stroma_percent_cd11bplus_cd15plus_positive_cells/stroma_area_analyzed_mm2_)
 
 
-TMA_global <- merge.data.frame(TMA_tumor, TMA_stroma %>% select(-suid),
-                               by.x = "image_tag", by.y = "image_tag",
-                               all = TRUE) %>% 
-  mutate(total_cell_number = tumor_total_cells + stroma_total_cells
+TMA_global <- 
+  full_join(TMA_tumor, TMA_stroma %>% select(-suid),
+            by = "image_tag") %>% 
+  full_join(., TMA_total %>% select(-suid),
+            by = "image_tag") %>% 
+  # mutate(total_cell_number = tumor_total_cells + stroma_total_cells
+  #        ) %>% 
+  mutate(percent_tumor = round((tumor_total_cells / total_cells)*100, 2) # Need to change when adding total---------------------------------
          ) %>% 
-  mutate(percent_tumor = round((tumor_total_cells / total_cell_number)*100, 2) # Need to change when adding total---------------------------------
+  mutate(percent_stroma = round((stroma_total_cells / total_cells)*100, 2)
          ) %>% 
-  mutate(percent_stroma = round((stroma_total_cells / total_cell_number)*100, 2)
-         ) %>% 
+  mutate(percent_total = round((total_cells / total_cells)*100, 2) # Calculate percent of stromal cell
+  ) %>% 
   mutate(suid = as.character(suid)) %>% 
   select(suid, everything())# %>% 
   # mutate(CD3_tumor_mm2 = (tumor_cd3_opal_650_positive_cells/tumor_area_analyzed_mm2_)) %>% 
@@ -363,6 +370,7 @@ markers_TMA <- group_by(TMA_global, suid) %>%
   summarize(
     mean_tumor = mean(percent_tumor),
     mean_stroma = mean(percent_stroma),
+    mean_total = mean(percent_total),
     # variance_tumor = var(percent_tumor),
     # variance_stroma = var(percent_stroma),
     percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells),
@@ -380,16 +388,30 @@ markers_TMA <- group_by(TMA_global, suid) %>%
     percent_CD3_FoxP3_stroma = mean(stroma_percent_cd3plus_foxp3plus_positive_cells),
     percent_CD11b_stroma = mean(stroma_percent_cd11b_opal_620_positive_cells),
     percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
-    percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells)
+    percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells),
+    
+    percent_CD3_total = mean(percent_cd3_opal_650_positive_cells),
+    percent_CD8_total = mean(percent_cd8_opal_570_positive_cells),
+    percent_CD3_CD8_total = mean(percent_cd3plus_cd8plus_positive_cells),
+    percent_FoxP3_total = mean(percent_foxp3_opal_540_positive_cells),
+    percent_CD3_FoxP3_total = mean(percent_cd3plus_foxp3plus_positive_cells),
+    percent_CD11b_total = mean(percent_cd11b_opal_620_positive_cells),
+    percent_CD15_total = mean(percent_cd15_opal_520_positive_cells),
+    percent_CD11b_CD15_total = mean(percent_cd11bplus_cd15plus_positive_cells)
   )
 markers_TMA$tumor_variation <- markers_TMA$mean_tumor - mean(TMA_global$percent_tumor)
 markers_TMA$stroma_variation <- markers_TMA$mean_stroma - mean(TMA_global$percent_stroma)
-sqrt.markers <- sqrt(markers_TMA[,c(4:19)])
+markers_TMA$total_variation <- markers_TMA$mean_stroma - mean(TMA_global$percent_stroma)
+sqrt.markers <- sqrt(markers_TMA[,c(5:28)])
 colnames(sqrt.markers) <- c("sqrt_CD3_tumor", "sqrt_CD8_tumor", "sqrt_CD3_CD8_tumor", "sqrt_FoxP3_tumor",
                             "sqrt_CD3_FoxP3_tumor", "sqrt_CD11b_tumor", "sqrt_CD15_tumor", 
-                            "sqrt_CD11b_CD15_tumor", "sqrt_CD3_stroma", "sqrt_CD8_stroma",
+                            "sqrt_CD11b_CD15_tumor", 
+                            "sqrt_CD3_stroma", "sqrt_CD8_stroma",
                             "sqrt_CD3_CD8_stroma", "sqrt_FoxP3_stroma", "sqrt_CD3_FoxP3_stroma",
-                            "sqrt_CD11b_stroma", "sqrt_CD15_stroma", "sqrt_CD11b_CD15_stroma")
+                            "sqrt_CD11b_stroma", "sqrt_CD15_stroma", "sqrt_CD11b_CD15_stroma",
+                            "sqrt_CD3_total", "sqrt_CD8_total",
+                            "sqrt_CD3_CD8_total", "sqrt_FoxP3_total", "sqrt_CD3_FoxP3_total",
+                            "sqrt_CD11b_total", "sqrt_CD15_total", "sqrt_CD11b_CD15_total")
 markers_TMA <- cbind(markers_TMA, sqrt.markers)
 
 #
@@ -673,7 +695,8 @@ cases_match1 <- dcast(setDT(cases_match), pair_id ~ rowid(pair_id),
 
 
 # Cleaning
-rm(uid, TMAcases_remove, TMA_tumor, TMA_stroma, ROI_tumor, ROI_stroma, ROI_total,
+rm(uid, TMAcases_remove, TMA_tumor, TMA_stroma, TMA_total,
+   ROI_tumor, ROI_stroma, ROI_total,
    common_ROITMA_IDs, cases_match1, sqrt.markers, markers_ROIi, markers_ROIp,
    cases_match)
 

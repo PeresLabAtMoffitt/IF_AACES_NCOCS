@@ -45,6 +45,11 @@ tmas_import <- function(path){
                 "/K99_R00/Image analysis data/Immune marker count data/Peres P1 AACES 2017 TMA Summary.xlsx"
   ), sheet = "Stroma", .name_repair = fct_name_repair)
 }
+tma17_import <- function(path){
+  readxl::read_xlsx(paste0(path,
+                "/K99_R00/Image analysis data/Immune marker count data/Peres P1 AACES 2017 TMA Summary.xlsx"
+  ), sheet = "Peres P1 AACES 2017 TMA", .name_repair = fct_name_repair)
+}
 tma2t_import <- function(path){
   readxl::read_xlsx(paste0(path,
                 "/K99_R00/Image analysis data/Immune marker count data/Peres P1 AACES 2018 TMA Summary.xlsx"
@@ -54,6 +59,11 @@ tma2s_import <- function(path){
   readxl::read_xlsx(paste0(path,
                 "/K99_R00/Image analysis data/Immune marker count data/Peres P1 AACES 2018 TMA Summary.xlsx"
   ), sheet = "Stroma", .name_repair = fct_name_repair)
+}
+tma18_import <- function(path){
+  readxl::read_xlsx(paste0(path,
+                "/K99_R00/Image analysis data/Immune marker count data/Peres P1 AACES 2018 TMA Summary.xlsx"
+  ), sheet = "Peres P1 AACES 2018 TMA", .name_repair = fct_name_repair)
 }
 #-----------------------------------------------------------------------------------------------------------------
 case_remove_import <- function(path){
