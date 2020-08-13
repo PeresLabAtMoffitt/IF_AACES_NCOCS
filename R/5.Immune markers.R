@@ -407,7 +407,7 @@ clust_markers <- markers %>% filter(!is.na(markers$sqrt_CD3_CD8_tumor.i ))
 
 
 # 2.3.0.clusters 1_by_Brooke # She took only intratumoral but all markers simple and doubled staining
-clust <- Mclust(clust_markers[,c(98:121)], G = 5)
+clust <- Mclust(clust_markers[,c(116:123)], G = 5)
 summary(clust)
 clust_markers$clusters_Brooke <- clust$classification
 clust_markers$clusters_Brooke <- factor(clust_markers$clusters_Brooke, 
@@ -416,7 +416,7 @@ clust_markers$clusters_Brooke <- factor(clust_markers$clusters_Brooke,
 # clust_markers <- left_join(clust_markers, clust[, c("suid", "clusters_Brooke")], by= "suid")
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c(98:105)) %>% 
+  gather(key = "markers_cat", value = "value", c(116:123)) %>% 
   select(suid, clusters_Brooke, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_Brooke, color=clusters_Brooke))+
   geom_boxplot()+
@@ -442,6 +442,44 @@ p3 <- clust_markers %>% filter(!is.na(race)) %>%
   stat_compare_means(label = "p.format")  
 gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
+# Cluster for tumor+stroma/intra+periph
+# 2.3.1.clusters 1_tumor+stroma/intra+periph
+clust_markers <- markers %>% filter( !is.na(markers[,c(116:131)]), !is.na(markers[,c(140:155)])  )
+
+clust <- Mclust(clust_markers[,c(116:131,140:155)], G = 5)
+summary(clust)
+clust_markers$clusters_all_IandP <- clust$classification
+clust_markers$clusters_all_IandP <- factor(clust_markers$clusters_all_IandP, 
+                                        levels = c(1 , 2, 3, 4, 5),
+                                        labels = c("mid", "mid-low", "high", "mid-high", "low"))
+
+clust_markers %>% 
+  gather(key = "markers_cat", value = "value", c(116:131)) %>% 
+  select(suid, clusters_all_IandP, markers_cat, value) %>% 
+  ggplot(aes(x=markers_cat, y=value,  color=markers_cat))+
+  geom_boxplot()+
+  facet_grid(.~ clusters_all_IandP)
+
+p1 <- clust_markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor.i, color=clusters_all_IandP))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_all_IandP)+
+  stat_compare_means(label = "p.format")
+p2 <- clust_markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD3_FoxP3_tumor.i, color=clusters_all_IandP))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_all_IandP)+
+  stat_compare_means(label = "p.format")
+p3 <- clust_markers %>% filter(!is.na(race)) %>% 
+  ggplot(aes(x=race, y=sqrt_CD11b_CD15_tumor.i, color=clusters_all_IandP))+
+  geom_boxplot()+
+  geom_jitter(shape=16, position=position_jitter(0.2))+
+  facet_grid(.~ clusters_all_IandP)+
+  stat_compare_means(label = "p.format")  
+gridExtra::grid.arrange(p1, p2, p3, ncol=3)
+
 # Cluster for tumor
 # 2.3.1.clusters 1_by_CD3-CD8
 clust <- Mclust(clust_markers$sqrt_CD3_CD8_tumor.i, G = 5)
@@ -452,7 +490,7 @@ clust_markers$clusters_CD3CD8 <- factor(clust_markers$clusters_CD3CD8,
                                         labels = c("low", "mid-low", "mid", "mid-high", "high"))
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c(106, 108:111)) %>% 
+  gather(key = "markers_cat", value = "value", c(116:123)) %>% 
   select(suid, clusters_CD3CD8, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_CD3CD8, color=clusters_CD3CD8))+
   geom_boxplot()+
@@ -487,7 +525,7 @@ clust_markers$dbl_pos <- factor(clust_markers$dbl_pos,
                                         labels = c("low", "mid-low", "mid", "mid-high", "high"))
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c(106, 108:111)) %>% 
+  gather(key = "markers_cat", value = "value", c(116:123)) %>% 
   select(suid, dbl_pos, markers_cat, value) %>% 
   ggplot(aes(x=suid, group=dbl_pos, color=dbl_pos))+
   geom_boxplot(aes(y=value))+
@@ -772,15 +810,15 @@ clust_markers <- clust_markers %>%
 
 
 
-# Survival by cluster---
+######################################################################################## II ### Survival by cluster---
 clin_surv <- left_join(markers, 
-                       clust_markers[, c("suid", "clusters_Brooke", "clusters_CD3CD8", "dbl_pos",
+                       clust_markers[, c("suid", "clusters_Brooke", "clusters_all_IandP", "clusters_CD3CD8", "dbl_pos",
                                          "clusters_CD38", "excluded_cluster",
                                          "clusters_excluded", "clusters_immsuppr", "clusters_FoxP3",
                                          "special_cluster", "special_cluster2", "special_cluster3", 
                                          "special_cluster4", "special_cluster5")], by="suid")
 mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
-
+# 2.1.Does Intratumoral tumor+stroma markers are predictive?----
 # clusters_Brooke
 myplot <- survfit(mysurv~clin_surv$clusters_Brooke)
 myplot
@@ -798,6 +836,28 @@ ggsurvplot(myplot, data = clin_surv,
 )
 survdiff(mysurv~clin_surv$race+clin_surv$clusters_Brooke)
 
+# 2.2.Does Intratumoral+Peripheral tumor+stroma markers are predictive?----
+# clusters_all_IandP
+myplot <- survfit(mysurv~clin_surv$clusters_all_IandP)
+myplot
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by Brooke",
+           # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+survdiff(mysurv~clin_surv$race+clin_surv$clusters_Brooke)
+
+# 2.3.Does Peripheral tumor+stroma markers are predictive?-------------------------------------------------------
+
+
+# 2.4.Does Intratumoral tumor CD3CD8 are predictive?----
 # cluster 1
 myplot <- survfit(mysurv~clin_surv$clusters_CD3CD8)
 myplot
@@ -814,6 +874,8 @@ ggsurvplot(myplot, data = clin_surv,
            conf.int = FALSE
 )
 survdiff(mysurv~clin_surv$race+clin_surv$clusters_CD3CD8)
+
+# 2.5.Does Intratumoral tumor double positive are predictive?----
 # cluster dbl_pos
 myplot <- survfit(mysurv~clin_surv$dbl_pos)
 myplot
@@ -830,6 +892,8 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table"
 )
 survdiff(mysurv~clin_surv$race+clin_surv$dbl_pos)
+
+# 2.6.Does special clustering (excluded,immunosupp, hot, cold) is predictive?----
 # special_cluster
 myplot <- survfit(mysurv~clin_surv$special_cluster)
 myplot

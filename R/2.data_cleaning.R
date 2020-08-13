@@ -651,12 +651,11 @@ markers <- markers %>%
 # 4.1. Create variation data ----
 # Look at the variation between each patient and the global mean # Should we mot compare Black and White?
 # Here compare the mean of % cells to global study % cells
-colnames(markers)
-markers %>% summarise_each(funs(mean(., na.rm = TRUE)))
 
 var_markers <- data.frame(
+  suid = markers$suid,
   tumor_variation_tma = c(markers$mean_tumor_tma - mean(markers$mean_tumor_tma, na.rm = TRUE)),
-  tumor_variation_tma = c(markers$mean_stroma_tma - mean(markers$mean_stroma_tma, na.rm = TRUE)),
+  stroma_variation_tma = c(markers$mean_stroma_tma - mean(markers$mean_stroma_tma, na.rm = TRUE)),
   var_CD3_tumor_tma = c(markers$percent_CD3_tumor_tma - mean(markers$percent_CD3_tumor_tma, na.rm = TRUE)),
   var_CD8_tumor_tma = c(markers$percent_CD8_tumor_tma - mean(markers$percent_CD8_tumor_tma, na.rm = TRUE)),
   var_CD3_CD8_tumor_tma = c(markers$percent_CD3_CD8_tumor_tma - mean(markers$percent_CD3_CD8_tumor_tma, na.rm = TRUE)),
@@ -679,7 +678,7 @@ var_markers <- data.frame(
   var_FoxP3_total_tma = c(markers$percent_FoxP3_total_tma - mean(markers$percent_FoxP3_total_tma, na.rm = TRUE)),
   
   tumor_variation.i = c(markers$mean_tumor.i - mean(markers$mean_tumor.i, na.rm = TRUE)),
-  tumor_variation.i = c(markers$mean_stroma.i - mean(markers$mean_stroma.i, na.rm = TRUE)),
+  stroma_variation.i = c(markers$mean_stroma.i - mean(markers$mean_stroma.i, na.rm = TRUE)),
   var_CD3_tumor.i = c(markers$percent_CD3_tumor.i - mean(markers$percent_CD3_tumor.i, na.rm = TRUE)),
   var_CD8_tumor.i = c(markers$percent_CD8_tumor.i - mean(markers$percent_CD8_tumor.i, na.rm = TRUE)),
   var_CD3_CD8_tumor.i = c(markers$percent_CD3_CD8_tumor.i - mean(markers$percent_CD3_CD8_tumor.i, na.rm = TRUE)),
@@ -702,7 +701,7 @@ var_markers <- data.frame(
   var_FoxP3_total.i = c(markers$percent_FoxP3_total.i - mean(markers$percent_FoxP3_total.i, na.rm = TRUE)),
   
   tumor_variation.p = c(markers$mean_tumor.p - mean(markers$mean_tumor.p, na.rm = TRUE)),
-  tumor_variation.p = c(markers$mean_stroma.p - mean(markers$mean_stroma.p, na.rm = TRUE)),
+  stroma_variation.p = c(markers$mean_stroma.p - mean(markers$mean_stroma.p, na.rm = TRUE)),
   var_CD3_tumor.p = c(markers$percent_CD3_tumor.p - mean(markers$percent_CD3_tumor.p, na.rm = TRUE)),
   var_CD8_tumor.p = c(markers$percent_CD8_tumor.p - mean(markers$percent_CD8_tumor.p, na.rm = TRUE)),
   var_CD3_CD8_tumor.p = c(markers$percent_CD3_CD8_tumor.p - mean(markers$percent_CD3_CD8_tumor.p, na.rm = TRUE)),

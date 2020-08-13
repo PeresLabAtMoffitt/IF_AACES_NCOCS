@@ -78,7 +78,66 @@ icc(
 # Cleaning
 rm(ICC_TMA, ICC_ROIi, ICC_ROIp, ICC_d_ROIi, ICC_p_ROIi)
 
-###################################################################################### II ### Create population table----
+
+###################################################################################### II ### TMA vs ROI----
+
+# Kappa stat
+# https://www.datanovia.com/en/lessons/cohens-kappa-in-r-for-two-categorical-variables/#:~:text=Cohen's%20Kappa%20in%20R%3A%20For%20Two%20Categorical%20Variables,-20%20mins&text=Cohen's%20kappa%20(Jacob%20Cohen%201960,methods%20rating%20on%20categorical%20scales.&text=The%20Cohen's%20kappa%20is%20a,that%20removes%20this%20chance%20agreement.
+
+# To get categorical var, create tertile
+df.tertile <- data.frame(
+  suid = markers_28$suid,
+  tumor_tert_tma = ntile(markers_28$mean_tumor_tma, 4),
+  stroma_tert_tma = ntile(markers_28$mean_stroma_tma, 4),
+  tert_CD3_tumor_tma = ntile(markers_28$percent_CD3_tumor_tma, 4),
+  tert_CD8_tumor_tma = ntile(markers_28$percent_CD8_tumor_tma, 4),
+  tert_CD3_CD8_tumor_tma = ntile(markers_28$percent_CD3_CD8_tumor_tma, 4),
+  tert_FoxP3_tumor_tma = ntile(markers_28$percent_FoxP3_tumor_tma, 4),
+  tert_CD3_FoxP3_tumor_tma = ntile(markers_28$percent_CD3_FoxP3_tumor_tma, 4),
+  tert_CD11b_tumor_tma = ntile(markers_28$percent_CD11b_tumor_tma, 4),
+  tert_CD15_tumor_tma = ntile(markers_28$percent_CD15_tumor_tma, 4),
+  tert_CD11b_CD15_tumor_tma = ntile(markers_28$percent_CD11b_CD15_tumor_tma, 4),
+  tert_CD3_stroma_tma = ntile(markers_28$percent_CD3_stroma_tma, 4),
+  tert_CD8_stroma_tma = ntile(markers_28$percent_CD8_stroma_tma, 4),
+  tert_CD3_CD8_stroma_tma = ntile(markers_28$percent_CD3_CD8_stroma_tma, 4),
+  tert_FoxP3_stroma_tma = ntile(markers_28$percent_FoxP3_stroma_tma, 4),
+  tert_CD3_FoxP3_stroma_tma = ntile(markers_28$percent_CD3_FoxP3_stroma_tma, 4),
+  tert_CD11b_stroma_tma = ntile(markers_28$percent_CD11b_stroma_tma, 4),
+  tert_CD15_stroma_tma = ntile(markers_28$percent_CD15_stroma_tma, 4),
+  tert_CD11b_CD15_stroma_tma = ntile(markers_28$percent_CD11b_CD15_stroma_tma, 4),
+  tert_CD3_total_tma = ntile(markers_28$percent_CD3_total_tma, 4),
+  tert_CD8_total_tma = ntile(markers_28$percent_CD8_total_tma, 4),
+  tert_CD3_CD8_total_tma = ntile(markers_28$percent_CD3_CD8_total_tma, 4),
+  tert_FoxP3_total_tma = ntile(markers_28$percent_FoxP3_total_tma, 4),
+  
+  tumor_tert.i = ntile(markers_28$mean_tumor.i, 4),
+  stroma_tert.i = ntile(markers_28$mean_stroma.i, 4),
+  tert_CD3_tumor.i = ntile(markers_28$percent_CD3_tumor.i, 4),
+  tert_CD8_tumor.i = ntile(markers_28$percent_CD8_tumor.i, 4),
+  tert_FoxP3_tumor.i = ntile(markers_28$percent_FoxP3_tumor.i, 4),
+  tert_CD3_FoxP3_tumor.i = ntile(markers_28$percent_CD3_FoxP3_tumor.i, 4),
+  tert_CD11b_tumor.i = ntile(markers_28$percent_CD11b_tumor.i, 4),
+  tert_CD15_tumor.i = ntile(markers_28$percent_CD15_tumor.i, 4),
+  tert_CD11b_CD15_tumor.i = ntile(markers_28$percent_CD11b_CD15_tumor.i, 4),
+  tert_CD3_stroma.i = ntile(markers_28$percent_CD3_stroma.i, 4),
+  tert_CD8_stroma.i = ntile(markers_28$percent_CD8_stroma.i, 4),
+  tert_CD3_CD8_stroma.i = ntile(markers_28$percent_CD3_CD8_stroma.i, 4),
+  tert_FoxP3_stroma.i = ntile(markers_28$percent_FoxP3_stroma.i, 4),
+  tert_CD3_FoxP3_stroma.i = ntile(markers_28$percent_CD3_FoxP3_stroma.i, 4),
+  tert_CD11b_stroma.i = ntile(markers_28$percent_CD11b_stroma.i, 4),
+  tert_CD15_stroma.i = ntile(markers_28$percent_CD15_stroma.i, 4),
+  tert_CD11b_CD15_stroma.i = ntile(markers_28$percent_CD11b_CD15_stroma.i, 4),
+  tert_CD3_total.i = ntile(markers_28$percent_CD3_total.i, 4),
+  tert_CD8_total.i = ntile(markers_28$percent_CD8_total.i, 4),
+  tert_CD3_CD8_total.i = ntile(markers_28$percent_CD3_CD8_total.i, 4),
+  tert_FoxP3_total.i = ntile(markers_28$percent_FoxP3_total.i, 4))
+
+xtabs(tert_CD3_tumor_tma ~ tert_CD3_tumor.i, df.tertile)
+xtabs(suid ~ tert_CD3_tumor_tma + tert_CD3_tumor.i, df.tertile)
+
+
+
+###################################################################################### III ### Create population table----
 table <- matrix(c("", "Tumor", "Stroma",
                   "TMA", "", "",
                   "mean", round(mean(TMA_global$percent_tumor),2), round(mean(TMA_global$percent_stroma),2),
@@ -1233,25 +1292,31 @@ ggcorrplot(mat, hc.order = FALSE, method = "square",
 # dev.off()
 
 # var
-
+colnames(var_markers28)
 mat <-
-  cor(markers_28[, c(
-    
-  )],
+  cor(var_markers28[, c("var_CD3_tumor_tma", "var_CD8_tumor_tma",
+                        "var_CD3_CD8_tumor_tma", "var_FoxP3_tumor_tma", "var_CD3_FoxP3_tumor_tma", "var_CD11b_tumor_tma",
+                        "var_CD15_tumor_tma", "var_CD11b_CD15_tumor_tma", "var_CD3_stroma_tma", "var_CD8_stroma_tma",
+                        "var_CD3_CD8_stroma_tma", "var_FoxP3_stroma_tma", "var_CD3_FoxP3_stroma_tma", "var_CD11b_stroma_tma",
+                        "var_CD15_stroma_tma", "var_CD11b_CD15_stroma_tma", "var_CD3_total_tma", "var_CD8_total_tma",
+                        "var_CD3_CD8_total_tma", "var_FoxP3_total_tma",
+                        
+                        "var_CD3_tumor.i", "var_CD8_tumor.i", "var_CD3_CD8_tumor.i",
+                        "var_FoxP3_tumor.i", "var_CD3_FoxP3_tumor.i", "var_CD11b_tumor.i", "var_CD15_tumor.i",
+                        "var_CD11b_CD15_tumor.i", "var_CD3_stroma.i", "var_CD8_stroma.i", "var_CD3_CD8_stroma.i",
+                        "var_FoxP3_stroma.i", "var_CD3_FoxP3_stroma.i", "var_CD11b_stroma.i", "var_CD15_stroma.i",
+                        "var_CD11b_CD15_stroma.i", "var_CD3_total.i", "var_CD8_total.i", "var_CD3_CD8_total.i",
+                        "var_FoxP3_total.i")],
       use = "pairwise.complete.obs")
 corrplot.mixed(mat)
 
 # jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Correlation .jpg"),
 #      width = 1300, height = 800, quality = 100)
 ggcorrplot(mat, hc.order = FALSE, method = "square", 
-           # outline.col = "darkblue", # the outline of the circle or sqare
-           # hc.method = "complete",
            type = "upper", # show the top half panel
            lab = TRUE, lab_col = "darkblue", lab_size = 2.5, # add correlation nbr, col and size of the correlation nbr
            title = "Immune markers correlation in TMA vs Intratumoral ROI",
            show.legend = TRUE, legend.title = "Correlation", show.diag = TRUE,
-           # colors = viridis::inferno(n=3),
-           # p.mat = pmat, # Add correlation significance
            sig.level = 0.05, insig = c("pch", "blank"), pch = 4, pch.col = "black", pch.cex = 10, 
            tl.cex = 10, tl.col = "red", tl.srt = 40,
            digits = 2
