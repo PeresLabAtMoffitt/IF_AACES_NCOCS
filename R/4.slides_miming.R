@@ -114,6 +114,7 @@ df.tertile <- data.frame(
   stroma_tert.i = ntile(markers_28$mean_stroma.i, 4),
   tert_CD3_tumor.i = ntile(markers_28$percent_CD3_tumor.i, 4),
   tert_CD8_tumor.i = ntile(markers_28$percent_CD8_tumor.i, 4),
+  tert_CD3_CD8_tumor.i = ntile(markers_28$percent_CD3_CD8_tumor.i, 4),
   tert_FoxP3_tumor.i = ntile(markers_28$percent_FoxP3_tumor.i, 4),
   tert_CD3_FoxP3_tumor.i = ntile(markers_28$percent_CD3_FoxP3_tumor.i, 4),
   tert_CD11b_tumor.i = ntile(markers_28$percent_CD11b_tumor.i, 4),
@@ -132,8 +133,56 @@ df.tertile <- data.frame(
   tert_CD3_CD8_total.i = ntile(markers_28$percent_CD3_CD8_total.i, 4),
   tert_FoxP3_total.i = ntile(markers_28$percent_FoxP3_total.i, 4))
 
-xtabs(tert_CD3_tumor_tma ~ tert_CD3_tumor.i, df.tertile)
-xtabs(suid ~ tert_CD3_tumor_tma + tert_CD3_tumor.i, df.tertile)
+xtab <- table(df.tertile$tumor_tert_tma, df.tertile$tumor_tert.i)
+diagonal.counts <- diag(xtab)
+N <- sum(xtab)
+row.marginal.props <- rowSums(xtab)/N
+col.marginal.props <- colSums(xtab)/N
+Po <- sum(diagonal.counts)/N
+Pe <- sum(row.marginal.props*col.marginal.props)
+kappa <- (Po - Pe)/(1 - Pe)
+kappa # 0.2595978
+
+library(irr)
+# If the data is ordinal, then it may be appropriate to use a weighted Kappa. 
+# For example, if the possible values are low, medium, and high, then if a case were rated 
+# medium and high by the two coders, they would be in better agreement than if the ratings were low and high.
+#   VALUE OF K	    STRENGTH OF AGREEMENT
+#   < 0	            Poor
+#   0.01 - 0.20	    Slight
+#   0.21-0.40	      Fair
+#   0.41-0.60	      Moderate
+#   0.61-0.80	      Substantial
+#   0.81 - 1.00	    Almost perfect
+kappa2(df.tertile[,c("tumor_tert_tma","tumor_tert.i")], "unweighted") # Higher with unweighted, probably bc 1 can be 4
+
+kappa2(df.tertile[,c("tumor_tert_tma","tumor_tert.i")], "unweighted")$value
+
+df.tertile_kappa <- data.frame(
+  tumor_tert = kappa2(df.tertile[,c("tumor_tert_tma","tumor_tert.i")], "unweighted")$value,
+  stroma_tert = kappa2(df.tertile[,c("stroma_tert_tma","stroma_tert.i")], "unweighted")$value,
+  tert_CD3_tumor = kappa2(df.tertile[,c("tert_CD3_tumor_tma","tert_CD3_tumor.i")], "unweighted")$value,
+  tert_CD8_tumor = kappa2(df.tertile[,c("tert_CD8_tumor_tma","tert_CD8_tumor.i")], "unweighted")$value,
+  tert_CD3_CD8_tumor = kappa2(df.tertile[,c("tert_CD3_CD8_tumor_tma","tert_CD3_CD8_tumor.i")], "unweighted")$value,
+  tert_FoxP3_tumor = kappa2(df.tertile[,c("tert_FoxP3_tumor_tma","tert_FoxP3_tumor.i")], "unweighted")$value,
+  tert_CD3_FoxP3_tumor = kappa2(df.tertile[,c("tert_CD3_FoxP3_tumor_tma","tert_CD3_FoxP3_tumor.i")], "unweighted")$value,
+  tert_CD11b_tumor = kappa2(df.tertile[,c("tert_CD11b_tumor_tma","tert_CD11b_tumor.i")], "unweighted")$value,
+  tert_CD15_tumor = kappa2(df.tertile[,c("tert_CD15_tumor_tma","tert_CD15_tumor.i")], "unweighted")$value,
+  tert_CD11b_CD15_tumor = kappa2(df.tertile[,c("tert_CD11b_CD15_tumor_tma","tert_CD11b_CD15_tumor.i")], "unweighted")$value,
+  tert_CD3_stroma = kappa2(df.tertile[,c("tert_CD3_stroma_tma","tert_CD3_stroma.i")], "unweighted")$value,
+  tert_CD8_stroma = kappa2(df.tertile[,c("tert_CD8_stroma_tma","tert_CD8_stroma.i")], "unweighted")$value,
+  tert_CD3_CD8_stroma = kappa2(df.tertile[,c("tert_CD3_CD8_stroma_tma","tert_CD3_CD8_stroma.i")], "unweighted")$value,
+  tert_FoxP3_stroma = kappa2(df.tertile[,c("tert_FoxP3_stroma_tma","tert_FoxP3_stroma.i")], "unweighted")$value,
+  tert_CD3_FoxP3_stroma = kappa2(df.tertile[,c("tert_CD3_FoxP3_stroma_tma","tert_CD3_FoxP3_stroma.i")], "unweighted")$value,
+  tert_CD11b_stroma = kappa2(df.tertile[,c("tert_CD11b_stroma_tma","tert_CD11b_stroma.i")], "unweighted")$value,
+  tert_CD15_stroma = kappa2(df.tertile[,c("tert_CD15_stroma_tma","tert_CD15_stroma.i")], "unweighted")$value,
+  tert_CD11b_CD15_stroma = kappa2(df.tertile[,c("tert_CD11b_CD15_stroma_tma","tert_CD11b_CD15_stroma.i")], "unweighted")$value,
+  tert_CD3_total = kappa2(df.tertile[,c("tert_CD3_total_tma","tert_CD3_total.i")], "unweighted")$value,
+  tert_CD8_total = kappa2(df.tertile[,c("tert_CD8_total_tma","tert_CD8_total.i")], "unweighted")$value,
+  tert_CD3_CD8_total = kappa2(df.tertile[,c("tert_CD3_CD8_total_tma","tert_CD3_CD8_total.i")], "unweighted")$value,
+  tert_FoxP3_total = kappa2(df.tertile[,c("tert_FoxP3_total_tma","tert_FoxP3_total.i")], "unweighted")$value
+) %>% 
+  t(.) %>% as.data.frame(.)
 
 
 
