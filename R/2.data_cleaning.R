@@ -762,7 +762,8 @@ markers_28 <- markers[(grepl(uid, markers$suid)),]
 markers_match <-  markers %>% drop_na(pair_id) %>% 
   group_by(pair_id) %>% filter( n() > 1 )
 
-
+global_28 <- left_join(TMA_global, ROI_global, by = "suid")
+global_28 <- global_28[(grepl(uid, global_28$suid)),]
 ######################################################################################## VII ### to look----
 
 # # 3.3.Add case_match and race to ROI data
