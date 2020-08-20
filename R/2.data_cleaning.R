@@ -6,13 +6,13 @@ clinical_data <- clinical_data %>%
     casecon == 2                                       ~ "Control"
   )) %>% 
   mutate(vitalstatus = case_when(
-    vitalstatus == 1                                   ~ "Alive",
-    vitalstatus == 2                                   ~ "Deceased",
+    vitalstatus_new == 1                                   ~ "Alive",
+    vitalstatus_new == 2                                   ~ "Deceased",
     TRUE                                               ~ NA_character_
   )) %>% 
   mutate(surv_vital = case_when(
-    vitalstatus == "Alive"                             ~ 0,
-    vitalstatus == "Deceased"                          ~ 1,
+    vitalstatus_new == "Alive"                             ~ 0,
+    vitalstatus_new == "Deceased"                          ~ 1,
     TRUE                                               ~ NA_real_
   )) %>% 
   mutate(cancersite = case_when(
@@ -23,7 +23,7 @@ clinical_data <- clinical_data %>%
     cancersite == 5                                    ~ "Ovarian, tubal or peritoneal, can't distinguish",
     TRUE                                               ~ NA_character_
   )) %>% 
-  mutate_at(c("timelastfu", "morphology", "hysteryear", "oophoryear", "tubeligyear",
+  mutate_at(c("timelastfu_new", "morphology", "hysteryear", "oophoryear", "tubeligyear",
               "anyfhdur", "eonlydur", "epdur"), 
             ~ case_when(
               . %in% c("8888","9998", "9999")          ~ NA_real_,

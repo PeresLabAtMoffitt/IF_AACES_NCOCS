@@ -8,7 +8,7 @@ fct_name_repair <- function(colnms) {
 }
 data_import <- function(data_path){
   read_csv(paste0(data_path,
-              "/K99_R00/Image analysis data/AACES and NCOCS data/aaces_ncocs_03042020.csv"))
+              "/K99_R00/Image analysis data/AACES and NCOCS data/aaces_ncocs_08142020.csv"))
 }
 #-----------------------------------------------------------------------------------------------------------------
 roit_import <- function(path){

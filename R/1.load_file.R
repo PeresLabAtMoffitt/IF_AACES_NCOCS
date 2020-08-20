@@ -13,7 +13,7 @@ fct_name_repair <- function(colnms) {
 #-----------------------------------------------------------------------------------------------------------------
 clinical_data <-
   read_csv(paste0(path,
-      "/K99_R00/Image analysis data/AACES and NCOCS data/aaces_ncocs_03042020.csv"
+      "/K99_R00/Image analysis data/AACES and NCOCS data/aaces_ncocs_08142020.csv"
     ))
 #-----------------------------------------------------------------------------------------------------------------
 ROI_tumor <-

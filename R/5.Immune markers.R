@@ -233,7 +233,7 @@ markers <- markers %>%
   ))
 # Survival
 clin_surv <- markers
-mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 myplot <- survfit(mysurv~clin_surv$immunoscore_)
 myplot
 ggsurvplot(myplot, data = clin_surv,
@@ -817,7 +817,7 @@ clin_surv <- left_join(markers,
                                          "clusters_excluded", "clusters_immsuppr", "clusters_FoxP3",
                                          "special_cluster", "special_cluster2", "special_cluster3", 
                                          "special_cluster4", "special_cluster5")], by="suid")
-mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 # 2.1.Does Intratumoral tumor+stroma markers are predictive?----
 # clusters_Brooke
 myplot <- survfit(mysurv~clin_surv$clusters_Brooke)
@@ -1143,7 +1143,7 @@ clust_markers <- clust_markers %>%
 # Survivals----
 clin_surv <- left_join(markers, 
                        clust_markers[, c("suid", "clusters_CD3CD8", "dbl_pos", "special_cluster")], by="suid")
-mysurv <- Surv(time = clin_surv$timelastfu, event = clin_surv$surv_vital)
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 
 # cluster 1
 myplot <- survfit(mysurv~clin_surv$clusters_CD3CD8)

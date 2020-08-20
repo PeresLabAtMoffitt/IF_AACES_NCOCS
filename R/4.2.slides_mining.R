@@ -474,8 +474,8 @@ gridExtra::grid.arrange(p1,p2,p3,p4,p5,  nrow = 2,
 # Survival Tumor, Stroma, overall
 clin_surv <- markers %>% 
   gather(key = "location", value = "value", c("sqrt_CD3_tumor.i", "sqrt_CD3_stroma.i", "sqrt_CD3_total.i")) %>% 
-  select(c("suid", "location", "value", "timelastfu", "surv_vital"))
-myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
+  select(c("suid", "location", "value", "timelastfu_new", "surv_vital"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~location, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on overall population \nseparated by CD3+ lymphocyte location",
            font.main = c(16, "bold", "black"),
@@ -491,8 +491,8 @@ ggsurvplot(myplot, data = clin_surv,
 
 clin_surv <- markers %>% 
   gather(key = "location", value = "value", c("sqrt_CD3_CD8_tumor.i", "sqrt_CD3_CD8_stroma.i", "sqrt_CD3_CD8_total.i")) %>% 
-  select(c("suid", "location", "value", "timelastfu", "surv_vital"))
-myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
+  select(c("suid", "location", "value", "timelastfu_new", "surv_vital"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~location, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on overall population \nseparated by CD3+CD8+ lymphocyte location",
            font.main = c(16, "bold", "black"),
@@ -507,8 +507,8 @@ ggsurvplot(myplot, data = clin_surv,
 
 clin_surv <- markers %>% 
   gather(key = "location", value = "value", c("sqrt_CD3_FoxP3_tumor.i", "sqrt_CD3_FoxP3_stroma.i", "sqrt_CD3_FoxP3_total.i")) %>% 
-  select(c("suid", "location", "value", "timelastfu", "surv_vital"))
-myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
+  select(c("suid", "location", "value", "timelastfu_new", "surv_vital"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~location, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on overall population \nseparated by CD3+FoxP3+ lymphocyte location",
            font.main = c(16, "bold", "black"),
@@ -523,8 +523,8 @@ ggsurvplot(myplot, data = clin_surv,
 
 clin_surv <- markers %>% 
   gather(key = "location", value = "value", c("sqrt_CD11b_tumor.i", "sqrt_CD11b_stroma.i", "sqrt_CD11b_total.i")) %>% 
-  select(c("suid", "location", "value", "timelastfu", "surv_vital"))
-myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
+  select(c("suid", "location", "value", "timelastfu_new", "surv_vital"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~location, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on overall population \nseparated by CD11b+ lymphocyte location",
            font.main = c(16, "bold", "black"),
@@ -539,8 +539,8 @@ ggsurvplot(myplot, data = clin_surv,
 
 clin_surv <- markers %>% 
   gather(key = "location", value = "value", c("sqrt_CD11b_CD15_tumor.i", "sqrt_CD11b_CD15_stroma.i", "sqrt_CD11b_CD15_total.i")) %>% 
-  select(c("suid", "location", "value", "timelastfu", "surv_vital"))
-myplot <- survfit(Surv(time = timelastfu, event = surv_vital)~location, data = clin_surv) 
+  select(c("suid", "location", "value", "timelastfu_new", "surv_vital"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~location, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on overall population \nseparated by CD11b+CD15 lymphocyte location",
            font.main = c(16, "bold", "black"),
