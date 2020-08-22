@@ -223,7 +223,9 @@ markers <- markers %>%
   mutate(percentile_score_CD3_p = ntile(percent_CD3_total.p, 100) ) %>% 
   mutate(percentile_score_CD8_i = ntile(percent_CD8_total.i, 100) ) %>% 
   mutate(percentile_score_CD8_p = ntile(percent_CD8_total.p, 100) ) %>%
-  mutate(percentile_score_mean = rowMeans(markers[c("percentile_score_CD3_i", "percentile_score_CD3_p", "percentile_score_CD8_i", "percentile_score_CD8_p")])) %>% 
+  mutate(percentile_score_mean = 
+           rowMeans(markers[c("percentile_score_CD3_i", "percentile_score_CD3_p", 
+                              "percentile_score_CD8_i", "percentile_score_CD8_p")])) %>% 
   mutate(immunoscore_ = case_when(
     percentile_score_mean <= 10 ~ 0,
     percentile_score_mean <= 25 ~ 1,
@@ -247,7 +249,7 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf.int = FALSE
 )
-survdiff(mysurv~clin_surv$race+clin_surv$clusters_Brooke)
+survdiff(mysurv~clin_surv$race+clin_surv$immunoscore_)
 
 
 # 2.1.Exclusion: Immune markers difference between periph and intra.----
@@ -258,54 +260,64 @@ survdiff(mysurv~clin_surv$race+clin_surv$clusters_Brooke)
 # That could be logical when looking at CD11b-CD15 are same intra and periph
 # May even need to go 1.5 times nut lets see.
 
-p1 <- ggplot(markers_ROI, aes(x=percent_CD3_tumor.p, y=percent_CD3_tumor.i))+
+p1 <- ggplot(markers, aes(x=percent_CD3_tumor.p, y=percent_CD3_tumor.i))+
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
   stat_cor(label.y = 15)+
   stat_cor(label.y = 17, 
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
-  stat_regline_equation(label.y.npc = 1)
-p2 <- ggplot(markers_ROI, aes(x=percent_CD8_tumor.p, y=percent_CD8_tumor.i))+
+  xlim(0,30) + ylim(0,30) +
+stat_regline_equation(label.y.npc = 1)
+p2 <- ggplot(markers, aes(x=percent_CD8_tumor.p, y=percent_CD8_tumor.i))+
   geom_point() +
   geom_smooth(method = "lm", se = FALSE)+
   stat_cor(label.y = 12.5, 
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
-  stat_regline_equation(label.y.npc = 1)
-p3 <- ggplot(markers_ROI, aes(x=percent_FoxP3_tumor.p, y=percent_FoxP3_tumor.i))+
+  xlim(0,15.5) + ylim(0,15.5) +
+stat_regline_equation(label.y.npc = 1)
+p3 <- ggplot(markers, aes(x=percent_FoxP3_tumor.p, y=percent_FoxP3_tumor.i))+
   geom_point() +
   geom_smooth(method = "lm", se = FALSE)+
-  stat_cor(label.y = 3.5, 
+  stat_cor(label.y = 10, 
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
-  stat_regline_equation(label.y.npc = 1)
-p4 <- ggplot(markers_ROI, aes(x=percent_CD11b_tumor.p, y=percent_CD11b_tumor.i))+
+  xlim(-0.05,12.5) + ylim(-0.05,12.5) +
+  stat_regline_equation(label.y.npc = 1) +
+  geom_rect(mapping=aes(xmin=-0.05, xmax=.5, ymin=-0.05, ymax=0.3, fill="red"), color="red", alpha=0.01)+
+  theme(legend.position = "none")
+p4 <- ggplot(markers, aes(x=percent_CD11b_tumor.p, y=percent_CD11b_tumor.i))+
   geom_point() +
   geom_smooth(method = "lm", se = FALSE)+
   stat_cor(label.y = 5, 
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
-  stat_regline_equation(label.y.npc = 1)
-p5 <- ggplot(markers_ROI, aes(x=percent_CD15_tumor.p, y=percent_CD15_tumor.i))+
+  xlim(0,11) + ylim(0,11) +
+stat_regline_equation(label.y.npc = 1)
+p5 <- ggplot(markers, aes(x=percent_CD15_tumor.p, y=percent_CD15_tumor.i))+
   geom_point() +
   geom_smooth(method = "lm", se = FALSE)+
   stat_cor(label.y = 4, 
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
-  stat_regline_equation(label.y.npc = 1)
-p6 <- ggplot(markers_ROI, aes(x=percent_CD3_CD8_tumor.p, y=percent_CD3_CD8_tumor.i))+
+  xlim(0,4) + ylim(0,4) +
+stat_regline_equation(label.y.npc = 1)
+p6 <- ggplot(markers, aes(x=percent_CD3_CD8_tumor.p, y=percent_CD3_CD8_tumor.i))+
   geom_point() +
   geom_smooth(method = "lm", se = FALSE)+
   stat_cor(label.y = 11, 
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
-  stat_regline_equation(label.y.npc = 1)
-p7 <- ggplot(markers_ROI, aes(x=percent_CD3_FoxP3_tumor.p, y=percent_CD3_FoxP3_tumor.i))+
+  xlim(0,15) + ylim(0,15) +
+stat_regline_equation(label.y.npc = 1)
+p7 <- ggplot(markers, aes(x=percent_CD3_FoxP3_tumor.p, y=percent_CD3_FoxP3_tumor.i))+
   geom_point() +
   geom_smooth(method = "lm", se = FALSE)+
   stat_cor(label.y = 3, 
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  xlim(0,4) + ylim(0,4) +
   stat_regline_equation(label.y.npc = 1)
-p8 <- ggplot(markers_ROI, aes(x=percent_CD11b_CD15_tumor.p, y=percent_CD11b_CD15_tumor.i))+
+p8 <- ggplot(markers, aes(x=percent_CD11b_CD15_tumor.p, y=percent_CD11b_CD15_tumor.i))+
   geom_point() +
   geom_smooth(method = "lm", se = FALSE)+
   stat_cor(label.y = 1.5, 
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  xlim(0,1.75) +
   stat_regline_equation(label.y.npc = 1)
 gridExtra::grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, ncol = 5)
 
@@ -314,7 +326,72 @@ gridExtra::grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, ncol = 5)
 # More++ CD3-FoxP outside the tumor = 4 L out for 2.2 L in
 # Same CD11b-CD15 outside the tumor = 1.1 L out for 1 L in
 
+# 2.1.Exclusion: Immune markers difference between tumor and stroma----
+p1 <- ggplot(markers, aes(x=percent_CD3_stroma.i, y=percent_CD3_tumor.i))+
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  stat_cor(label.y = 15)+
+  stat_cor(label.y = 17, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  xlim(0,50) + ylim(0,50) +
+  stat_regline_equation(label.y.npc = 1)
+p2 <- ggplot(markers, aes(x=percent_CD8_stroma.i, y=percent_CD8_tumor.i))+
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 12.5, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  xlim(0,45) + ylim(0,45) +
+  stat_regline_equation(label.y.npc = 1)
+p3 <- ggplot(markers, aes(x=percent_FoxP3_stroma.i, y=percent_FoxP3_tumor.i))+
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 10, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  xlim(-0.05,12.5) + ylim(-0.05,12.5) +
+  stat_regline_equation(label.y.npc = 1) +
+  geom_rect(mapping=aes(xmin=-0.05, xmax=.5, ymin=-0.05, ymax=0.3, fill="red"), color="red", alpha=0.01)+
+  theme(legend.position = "none")
+p4 <- ggplot(markers, aes(x=percent_CD11b_stroma.i, y=percent_CD11b_tumor.i))+
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 5, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  xlim(0,25) + ylim(0,25) +
+  stat_regline_equation(label.y.npc = 1)
+p5 <- ggplot(markers, aes(x=percent_CD15_stroma.i, y=percent_CD15_tumor.i))+
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 4, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  xlim(0,11) + ylim(0,11) +
+  stat_regline_equation(label.y.npc = 1)
+p6 <- ggplot(markers, aes(x=percent_CD3_CD8_stroma.i, y=percent_CD3_CD8_tumor.i))+
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 11, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  xlim(0,35) + ylim(0,35) +
+  stat_regline_equation(label.y.npc = 1)
+p7 <- ggplot(markers, aes(x=percent_CD3_FoxP3_stroma.i, y=percent_CD3_FoxP3_tumor.i))+
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 3, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  xlim(0,12) + ylim(0,12) +
+  stat_regline_equation(label.y.npc = 1)
+p8 <- ggplot(markers, aes(x=percent_CD11b_CD15_stroma.i, y=percent_CD11b_CD15_tumor.i))+
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)+
+  stat_cor(label.y = 1.5, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))+
+  xlim(0,11) + ylim(0,11) +
+  stat_regline_equation(label.y.npc = 1)
+gridExtra::grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, ncol = 5)
+
+
 # +
+
+
 
 # FoxP3 alone - CD3-FoxP3
 # Look at survival
@@ -327,7 +404,7 @@ gridExtra::grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, ncol = 5)
 
 
 
-# 2.2.Ratio:Immune cells vs tumor cell----
+# 2.2.Ratio:Immune cells vs tumor cell---- Doesn't seem as important
 ggplot(markers_ROI, aes(x=mean_tumor.i, y=percent_CD3_tumor.i))+
   geom_point()+ scale_y_continuous(trans = "log10")+
   annotation_logticks(sides="l")
@@ -400,20 +477,20 @@ colour=percent_CD3_FoxP3_tumor.i<1
 # 2.3.Clustering----
 # Need to remove NAs
 clust_markers <- markers %>% filter(!is.na(markers$sqrt_CD3_CD8_tumor.i ))
-# Do not take CD3 alone for clustering beacuse contain effector, regulator, helper, gamma delta
+# Idea:
+# Do not take CD3 alone for clustering because contain effector, regulator, helper, gamma delta
 # Do not take FoxP3 alone because tumor cells can express FoxP3
 # Do not take CD11b alone because CD3CD11b can be NK cells
 # CD11bCD15 are myeloid cells prevent other immune cells to traffic into the tumor
 
 
 # 2.3.0.clusters 1_by_Brooke # She took only intratumoral but all markers simple and doubled staining
-clust <- Mclust(clust_markers[,c(116:123)], G = 5)
+clust <- Mclust(clust_markers[c(116:139)], G = 5)
 summary(clust)
 clust_markers$clusters_Brooke <- clust$classification
 clust_markers$clusters_Brooke <- factor(clust_markers$clusters_Brooke, 
                                         levels = c(4, 2, 3, 5, 1),
                                         labels = c("mid-high", "mid-low", "high", "low", "mid"))
-# clust_markers <- left_join(clust_markers, clust[, c("suid", "clusters_Brooke")], by= "suid")
 
 clust_markers %>% 
   gather(key = "markers_cat", value = "value", c(116:123)) %>% 
@@ -558,7 +635,7 @@ p3 <- clust_markers %>% filter(!is.na(race)) %>%
 gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 
-# 2.3.3.clusters_special
+# 2.3.3.clusters_special----
 ### 2.3.3.1_CD3-CD8 first
 # clust_markers <- markers %>% filter(!is.na( sqrt_CD3_CD8_tumor.i ))
 clust <- Mclust(clust_markers$sqrt_CD3_CD8_tumor.i, G = 2)
@@ -598,18 +675,35 @@ gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 ### 2.3.3.2_ Cluster low into cold or excluded----
 b <- clust_markers %>% filter(clusters_CD38 == "low")
-b <- b %>% mutate(ratio_IP = percent_CD3_CD8_tumor.p / percent_CD3_CD8_tumor.i) %>%
+b <- b %>% mutate(ratio_IP = percent_CD3_CD8_tumor.p / percent_CD3_CD8_tumor.i) %>% 
+  mutate(ratio_IP = case_when(
+    ratio_IP ==  "NaN" ~ 0,
+    TRUE ~ ratio_IP
+  )) %>% 
   mutate(excluded_cluster = case_when(
-    ratio_IP < 2 ~ "cold",
-    ratio_IP >=2 ~ "excluded"
-  ))
+    ratio_IP < 2 | ratio_IP == "NaN"     ~ "cold",
+    ratio_IP >=2 | is.infinite(ratio_IP) ~ "excluded"
+  )) %>% mutate(ratio_ST = percent_CD3_CD8_stroma.i / percent_CD3_CD8_tumor.i) %>% 
+  mutate(ratio_ST = case_when(
+    ratio_ST ==  "NaN" ~ 0,
+    TRUE ~ ratio_ST
+  )) %>% 
+  mutate(excluded_cluster2 = case_when(
+    ratio_ST < 2 | ratio_ST == "NaN"     ~ "c",
+    ratio_ST >=2 | is.infinite(ratio_ST) ~ "excluded"))
+clust_markers <- left_join(clust_markers, b[, c("suid", "excluded_cluster", "excluded_cluster2")], by= "suid")
+
 
 b %>% 
   gather(key = "markers_cat", value = "value", ratio_IP) %>% 
   select(suid, excluded_cluster, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=excluded_cluster, color=excluded_cluster))+ # Take home: bad separation, MORE outliers
-  geom_boxplot()+
-  facet_grid(.~ markers_cat)
+  geom_boxplot()
+b %>% 
+  gather(key = "markers_cat", value = "value", ratio_ST) %>% 
+  select(suid, excluded_cluster2, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=excluded_cluster2, color=excluded_cluster2))+ # Take home: bad separation, MORE outliers
+  geom_boxplot()
 
 # Try another by clustering ######################################### Need to compare ratio separation or ratio cluster
 c <- b %>% filter(is.finite(ratio_IP))
@@ -619,7 +713,17 @@ c$clusters_excluded <- clust$classification
 c$clusters_excluded <- factor(c$clusters_excluded, 
                               levels = c(1, 2),
                               labels = c("cold", "excluded"))
-clust_markers <- left_join(clust_markers, c[, c("suid", "excluded_cluster", "clusters_excluded")], by= "suid")
+clust_markers <- left_join(clust_markers, c[, c("suid", "clusters_excluded")], by= "suid")
+
+d <- b %>% filter(is.finite(ratio_ST))
+clust <- Mclust(d$ratio_ST, G = 2)
+summary(clust)
+d$clusters_excluded2 <- clust$classification
+d$clusters_excluded2 <- factor(d$clusters_excluded2, 
+                              levels = c(1, 2),
+                              labels = c("cold", "excluded"))
+clust_markers <- left_join(clust_markers, d[, c("suid", "clusters_excluded2")], by= "suid")
+
 
 c %>% 
   gather(key = "markers_cat", value = "value", ratio_IP) %>% 
@@ -627,12 +731,88 @@ c %>%
   ggplot(aes(x=suid, y=value, group=clusters_excluded, color=clusters_excluded))+
   geom_boxplot()
 
+d %>% 
+  gather(key = "markers_cat", value = "value", ratio_ST) %>% 
+  select(suid, clusters_excluded2, excluded_cluster2, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_excluded2, color=clusters_excluded2))+
+  geom_boxplot()
+
+clin_surv <- left_join(markers, 
+                       clust_markers[, c("suid", "excluded_cluster", "excluded_cluster2",
+                                         "clusters_excluded", "clusters_excluded2")], by="suid")
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
+
+myplot <- survfit(mysurv~clin_surv$excluded_cluster)
+myplot
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by excluded_cluster",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+myplot <- survfit(mysurv~clin_surv$excluded_cluster2)
+myplot
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by excluded_cluster2",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+myplot <- survfit(mysurv~clin_surv$clusters_excluded)
+myplot
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by clusters_excluded",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+myplot <- survfit(mysurv~clin_surv$clusters_excluded2)
+myplot
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by clusters_excluded",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+
+clust_markers %>% 
+  gather(key = "markers_cat", value = "value", c(percent_CD11b_stroma.i, percent_CD11b_tumor.i,
+                                                 percent_CD15_stroma.i, percent_CD15_tumor.i)) %>% 
+  select(suid, clusters_excluded2, markers_cat, value) %>% 
+  ggplot(aes(x=clusters_excluded2, y=value, color=markers_cat))+ 
+  geom_boxplot()+
+  ylim(0,.5)
+# Take home: CD11b (myeloid which can prevent T cell trafficing) has same repartition in cold or excluded
+# So may not play a role or level is too low anyway
 
 
 
 
-
-### 2.3.3.3_ then immunosuppressed
+### 2.3.3.3_ then immunosuppressed----
 
 # https://www.nature.com/articles/s41573-018-0007-y.pdf
 # Following neoadjuvant
@@ -725,7 +905,7 @@ a %>%
 
 
 # clustering
-# a <- clust_markers %>% filter(clusters_CD38 == "high") # 2 is high in CD38
+a <- clust_markers %>% filter(clusters_CD38 == "high") # 2 is high in CD38
 clust <- Mclust(a$percent_CD3_FoxP3_tumor.i, G = 2) # clust on CD3-FoxP3
 summary(clust)
 a$clusters_FoxP3 <- clust$classification
@@ -759,6 +939,27 @@ p3 <- clust_markers %>% filter(!is.na(race)) %>%
   facet_grid(.~ clusters_FoxP3)+
   stat_compare_means(label = "p.format")  
 gridExtra::grid.arrange(p1, p2, p3, ncol=3)############################ Need compare ration 8/fox and fox high lox cluster----
+
+# Other cluster on FoxP3 alone (total) and check if we should add it up to ration or cd3foxp3 cluster
+clust <- Mclust(a$percent_FoxP3_total.i, G = 2) # clust on FoxP3
+summary(clust)
+a$clusters_FoxP3_ <- clust$classification
+a$clusters_FoxP3_ <- factor(a$clusters_FoxP3_, 
+                           levels = c(1, 2),
+                           labels = c("hot", "immunosuppressed"))
+clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_FoxP3_")], by= "suid")
+
+clust_markers %>% 
+  gather(key = "markers_cat", value = "value", c(percent_FoxP3_total.i, percent_CD3_FoxP3_total.i,
+                                                 percent_CD3_CD8_tumor.i)) %>% 
+  select(suid, markers_cat, clusters_FoxP3_, value) %>% 
+  ggplot(aes(x=clusters_FoxP3_, y=value, color=markers_cat))+
+  geom_boxplot()
+
+
+
+
+
 
 # Combine all special cluster CD38 and cluster FoxP3
 clust_markers <- clust_markers %>% 
