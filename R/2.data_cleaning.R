@@ -779,7 +779,7 @@ cases_match1 <- dcast(setDT(cases_match), pair_id ~ rowid(pair_id),
 # Cleaning
 rm(uid, TMAcases_remove, TMA_tumor, TMA_stroma, TMA_total,
    ROI_tumor, ROI_stroma, ROI_total,
-   common_ROITMA_IDs, cases_match1, sqrt.markers, markers_ROIi, markers_ROIp,
+   cases_match1, sqrt.markers, markers_ROIi, markers_ROIp,
    cases_match)
 
 

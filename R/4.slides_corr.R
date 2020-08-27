@@ -85,54 +85,66 @@ rm(ICC_TMA, ICC_ROIi, ICC_ROIp, ICC_d_ROIi, ICC_p_ROIi)
 # Kappa stat----
 # https://www.datanovia.com/en/lessons/cohens-kappa-in-r-for-two-categorical-variables/#:~:text=Cohen's%20Kappa%20in%20R%3A%20For%20Two%20Categorical%20Variables,-20%20mins&text=Cohen's%20kappa%20(Jacob%20Cohen%201960,methods%20rating%20on%20categorical%20scales.&text=The%20Cohen's%20kappa%20is%20a,that%20removes%20this%20chance%20agreement.
 
-# To get categorical var, create tertile
+# To get categorical var, create tertile on whole population
 df.tertile <- data.frame(
-  suid = markers_28$suid,
-  tumor_tert_tma = ntile(markers_28$mean_tumor_tma, 4),
-  stroma_tert_tma = ntile(markers_28$mean_stroma_tma, 4),
-  tert_CD3_tumor_tma = ntile(markers_28$percent_CD3_tumor_tma, 4),
-  tert_CD8_tumor_tma = ntile(markers_28$percent_CD8_tumor_tma, 4),
-  tert_CD3_CD8_tumor_tma = ntile(markers_28$percent_CD3_CD8_tumor_tma, 4),
-  tert_FoxP3_tumor_tma = ntile(markers_28$percent_FoxP3_tumor_tma, 4),
-  tert_CD3_FoxP3_tumor_tma = ntile(markers_28$percent_CD3_FoxP3_tumor_tma, 4),
-  tert_CD11b_tumor_tma = ntile(markers_28$percent_CD11b_tumor_tma, 4),
-  tert_CD15_tumor_tma = ntile(markers_28$percent_CD15_tumor_tma, 4),
-  tert_CD11b_CD15_tumor_tma = ntile(markers_28$percent_CD11b_CD15_tumor_tma, 4),
-  tert_CD3_stroma_tma = ntile(markers_28$percent_CD3_stroma_tma, 4),
-  tert_CD8_stroma_tma = ntile(markers_28$percent_CD8_stroma_tma, 4),
-  tert_CD3_CD8_stroma_tma = ntile(markers_28$percent_CD3_CD8_stroma_tma, 4),
-  tert_FoxP3_stroma_tma = ntile(markers_28$percent_FoxP3_stroma_tma, 4),
-  tert_CD3_FoxP3_stroma_tma = ntile(markers_28$percent_CD3_FoxP3_stroma_tma, 4),
-  tert_CD11b_stroma_tma = ntile(markers_28$percent_CD11b_stroma_tma, 4),
-  tert_CD15_stroma_tma = ntile(markers_28$percent_CD15_stroma_tma, 4),
-  tert_CD11b_CD15_stroma_tma = ntile(markers_28$percent_CD11b_CD15_stroma_tma, 4),
-  tert_CD3_total_tma = ntile(markers_28$percent_CD3_total_tma, 4),
-  tert_CD8_total_tma = ntile(markers_28$percent_CD8_total_tma, 4),
-  tert_CD3_CD8_total_tma = ntile(markers_28$percent_CD3_CD8_total_tma, 4),
-  tert_FoxP3_total_tma = ntile(markers_28$percent_FoxP3_total_tma, 4),
+  suid = markers$suid,
+  tumor_tert_tma = ntile(markers$mean_tumor_tma, 4),
+  stroma_tert_tma = ntile(markers$mean_stroma_tma, 4),
+  tert_CD3_tumor_tma = ntile(markers$percent_CD3_tumor_tma, 4),
+  tert_CD8_tumor_tma = ntile(markers$percent_CD8_tumor_tma, 4),
+  tert_CD3_CD8_tumor_tma = ntile(markers$percent_CD3_CD8_tumor_tma, 4),
+  tert_FoxP3_tumor_tma = ntile(markers$percent_FoxP3_tumor_tma, 4),
+  tert_CD3_FoxP3_tumor_tma = ntile(markers$percent_CD3_FoxP3_tumor_tma, 4),
+  tert_CD11b_tumor_tma = ntile(markers$percent_CD11b_tumor_tma, 4),
+  tert_CD15_tumor_tma = ntile(markers$percent_CD15_tumor_tma, 4),
+  tert_CD11b_CD15_tumor_tma = ntile(markers$percent_CD11b_CD15_tumor_tma, 4),
+  tert_CD3_stroma_tma = ntile(markers$percent_CD3_stroma_tma, 4),
+  tert_CD8_stroma_tma = ntile(markers$percent_CD8_stroma_tma, 4),
+  tert_CD3_CD8_stroma_tma = ntile(markers$percent_CD3_CD8_stroma_tma, 4),
+  tert_FoxP3_stroma_tma = ntile(markers$percent_FoxP3_stroma_tma, 4),
+  tert_CD3_FoxP3_stroma_tma = ntile(markers$percent_CD3_FoxP3_stroma_tma, 4),
+  tert_CD11b_stroma_tma = ntile(markers$percent_CD11b_stroma_tma, 4),
+  tert_CD15_stroma_tma = ntile(markers$percent_CD15_stroma_tma, 4),
+  tert_CD11b_CD15_stroma_tma = ntile(markers$percent_CD11b_CD15_stroma_tma, 4),
+  tert_CD3_total_tma = ntile(markers$percent_CD3_total_tma, 4),
+  tert_CD8_total_tma = ntile(markers$percent_CD8_total_tma, 4),
+  tert_CD3_CD8_total_tma = ntile(markers$percent_CD3_CD8_total_tma, 4),
+  tert_FoxP3_total_tma = ntile(markers$percent_FoxP3_total_tma, 4),
   
-  tumor_tert.i = ntile(markers_28$mean_tumor.i, 4),
-  stroma_tert.i = ntile(markers_28$mean_stroma.i, 4),
-  tert_CD3_tumor.i = ntile(markers_28$percent_CD3_tumor.i, 4),
-  tert_CD8_tumor.i = ntile(markers_28$percent_CD8_tumor.i, 4),
-  tert_CD3_CD8_tumor.i = ntile(markers_28$percent_CD3_CD8_tumor.i, 4),
-  tert_FoxP3_tumor.i = ntile(markers_28$percent_FoxP3_tumor.i, 4),
-  tert_CD3_FoxP3_tumor.i = ntile(markers_28$percent_CD3_FoxP3_tumor.i, 4),
-  tert_CD11b_tumor.i = ntile(markers_28$percent_CD11b_tumor.i, 4),
-  tert_CD15_tumor.i = ntile(markers_28$percent_CD15_tumor.i, 4),
-  tert_CD11b_CD15_tumor.i = ntile(markers_28$percent_CD11b_CD15_tumor.i, 4),
-  tert_CD3_stroma.i = ntile(markers_28$percent_CD3_stroma.i, 4),
-  tert_CD8_stroma.i = ntile(markers_28$percent_CD8_stroma.i, 4),
-  tert_CD3_CD8_stroma.i = ntile(markers_28$percent_CD3_CD8_stroma.i, 4),
-  tert_FoxP3_stroma.i = ntile(markers_28$percent_FoxP3_stroma.i, 4),
-  tert_CD3_FoxP3_stroma.i = ntile(markers_28$percent_CD3_FoxP3_stroma.i, 4),
-  tert_CD11b_stroma.i = ntile(markers_28$percent_CD11b_stroma.i, 4),
-  tert_CD15_stroma.i = ntile(markers_28$percent_CD15_stroma.i, 4),
-  tert_CD11b_CD15_stroma.i = ntile(markers_28$percent_CD11b_CD15_stroma.i, 4),
-  tert_CD3_total.i = ntile(markers_28$percent_CD3_total.i, 4),
-  tert_CD8_total.i = ntile(markers_28$percent_CD8_total.i, 4),
-  tert_CD3_CD8_total.i = ntile(markers_28$percent_CD3_CD8_total.i, 4),
-  tert_FoxP3_total.i = ntile(markers_28$percent_FoxP3_total.i, 4))
+  tumor_tert.i = ntile(markers$mean_tumor.i, 4),
+  stroma_tert.i = ntile(markers$mean_stroma.i, 4),
+  tert_CD3_tumor.i = ntile(markers$percent_CD3_tumor.i, 4),
+  tert_CD8_tumor.i = ntile(markers$percent_CD8_tumor.i, 4),
+  tert_CD3_CD8_tumor.i = ntile(markers$percent_CD3_CD8_tumor.i, 4),
+  tert_FoxP3_tumor.i = ntile(markers$percent_FoxP3_tumor.i, 4),
+  tert_CD3_FoxP3_tumor.i = ntile(markers$percent_CD3_FoxP3_tumor.i, 4),
+  tert_CD11b_tumor.i = ntile(markers$percent_CD11b_tumor.i, 4),
+  tert_CD15_tumor.i = ntile(markers$percent_CD15_tumor.i, 4),
+  tert_CD11b_CD15_tumor.i = ntile(markers$percent_CD11b_CD15_tumor.i, 4),
+  tert_CD3_stroma.i = ntile(markers$percent_CD3_stroma.i, 4),
+  tert_CD8_stroma.i = ntile(markers$percent_CD8_stroma.i, 4),
+  tert_CD3_CD8_stroma.i = ntile(markers$percent_CD3_CD8_stroma.i, 4),
+  tert_FoxP3_stroma.i = ntile(markers$percent_FoxP3_stroma.i, 4),
+  tert_CD3_FoxP3_stroma.i = ntile(markers$percent_CD3_FoxP3_stroma.i, 4),
+  tert_CD11b_stroma.i = ntile(markers$percent_CD11b_stroma.i, 4),
+  tert_CD15_stroma.i = ntile(markers$percent_CD15_stroma.i, 4),
+  tert_CD11b_CD15_stroma.i = ntile(markers$percent_CD11b_CD15_stroma.i, 4),
+  tert_CD3_total.i = ntile(markers$percent_CD3_total.i, 4),
+  tert_CD8_total.i = ntile(markers$percent_CD8_total.i, 4),
+  tert_CD3_CD8_total.i = ntile(markers$percent_CD3_CD8_total.i, 4),
+  tert_FoxP3_total.i = ntile(markers$percent_FoxP3_total.i, 4))
+
+uid <- paste(unique(common_ROITMA_IDs$Subject_IDs), collapse = '|') # Restrict to the 28 patients
+df.tertile <- df.tertile[(grepl(uid, df.tertile$suid)),]
+
+table(df.tertile$tert_CD3_tumor_tma, df.tertile$tert_CD3_tumor.i)
+table(df.tertile$tert_CD3_CD8_tumor_tma, df.tertile$tert_CD3_CD8_tumor.i)
+table(df.tertile$tert_CD3_FoxP3_tumor_tma, df.tertile$tert_CD3_FoxP3_tumor.i)
+table(df.tertile$tert_CD3_stroma_tma, df.tertile$tert_CD3_stroma.i)
+table(df.tertile$tert_CD3_CD8_stroma_tma, df.tertile$tert_CD3_CD8_stroma.i)
+table(df.tertile$tert_CD3_FoxP3_stroma_tma, df.tertile$tert_CD3_FoxP3_stroma.i)
+
+
 
 xtab <- table(df.tertile$tumor_tert_tma, df.tertile$tumor_tert.i)
 diagonal.counts <- diag(xtab)
@@ -160,6 +172,7 @@ kappa2(df.tertile[,c("tumor_tert_tma","tumor_tert.i")], "unweighted") # Higher w
 kappa2(df.tertile[,c("tumor_tert_tma","tumor_tert.i")], "unweighted")$value
 
 df.tertile_kappa <- data.frame(
+  type = "kappa",
   tumor_tert = kappa2(df.tertile[,c("tumor_tert_tma","tumor_tert.i")], "unweighted")$value,
   stroma_tert = kappa2(df.tertile[,c("stroma_tert_tma","stroma_tert.i")], "unweighted")$value,
   tert_CD3_tumor = kappa2(df.tertile[,c("tert_CD3_tumor_tma","tert_CD3_tumor.i")], "unweighted")$value,
