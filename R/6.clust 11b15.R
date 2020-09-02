@@ -1,6 +1,6 @@
 # ratio /CD11CD15 tumor
 a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
-  mutate(ratio_eff_suppr = sqrt_CD3_CD8_tumor.i / sqrt_CD11b_CD15_tumor.i) %>% 
+  mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD11b_CD15_tumor.i) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2) 
 summary(clust)
@@ -16,9 +16,9 @@ a %>%
   ggplot(aes(x=suid, y=value, group=clusters_R_CD11bCD15_tum, color=clusters_R_CD11bCD15_tum))+
   geom_boxplot()
 
-# ratio /CD3FoxP3 total
+# ratio /CD11CD15 total
 a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
-  mutate(ratio_eff_suppr = sqrt_CD3_CD8_tumor.i / sqrt_CD11b_CD15_total.i) %>% 
+  mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD11b_CD15_total.i) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2) 
 summary(clust)
@@ -33,9 +33,9 @@ a %>%
   select(suid, clusters_R_CD11bCD15_tot, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_R_CD11bCD15_tot, color=clusters_R_CD11bCD15_tot))+
   geom_boxplot()
-# ratio /CD3FoxP3 stroma
+# ratio /CD11CD15 stroma
 a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
-  mutate(ratio_eff_suppr = sqrt_CD3_CD8_tumor.i / sqrt_CD11b_CD15_stroma.i) %>% 
+  mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD11b_CD15_stroma.i) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2) 
 summary(clust)
@@ -57,7 +57,6 @@ clin_surv <- left_join(markers,
                                          "clusters_R_CD11bCD15_str")], by="suid")
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 myplot <- survfit(mysurv~clin_surv$clusters_R_CD11bCD15_tum)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
@@ -71,7 +70,6 @@ ggsurvplot(myplot, data = clin_surv,
            conf.int = FALSE
 )
 myplot <- survfit(mysurv~clin_surv$clusters_R_CD11bCD15_tot)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
@@ -85,7 +83,6 @@ ggsurvplot(myplot, data = clin_surv,
            conf.int = FALSE
 )
 myplot <- survfit(mysurv~clin_surv$clusters_R_CD11bCD15_str)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
@@ -103,7 +100,7 @@ ggsurvplot(myplot, data = clin_surv,
 
 ############################################################################################# With no ratio----
 a <- clust_markers %>% filter(clusters_CD38 == "high") 
-clust <- Mclust(a$sqrt_CD11b_CD15_tumor.i, G = 2) 
+clust <- Mclust(a$percent_CD11b_CD15_tumor.i, G = 2) 
 summary(clust)
 a$clusters_CD11bCD15_tum <- clust$classification
 a$clusters_CD11bCD15_tum <- factor(a$clusters_CD11bCD15_tum, 
@@ -118,7 +115,7 @@ clust_markers %>%
   geom_boxplot()
 
 a <- clust_markers %>% filter(clusters_CD38 == "high") 
-clust <- Mclust(a$sqrt_CD11b_CD15_total.i, G = 2) 
+clust <- Mclust(a$percent_CD11b_CD15_total.i, G = 2) 
 summary(clust)
 a$clusters_CD11bCD15_tot <- clust$classification
 a$clusters_CD11bCD15_tot <- factor(a$clusters_CD11bCD15_tot, 
@@ -133,7 +130,7 @@ clust_markers %>%
   geom_boxplot()
 
 a <- clust_markers %>% filter(clusters_CD38 == "high") 
-clust <- Mclust(a$sqrt_CD11b_CD15_stroma.i, G = 2) 
+clust <- Mclust(a$percent_CD11b_CD15_stroma.i, G = 2) 
 summary(clust)
 a$clusters_CD11bCD15_str <- clust$classification
 a$clusters_CD11bCD15_str <- factor(a$clusters_CD11bCD15_str, 
@@ -153,7 +150,6 @@ clin_surv <- left_join(markers,
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 
 myplot <- survfit(mysurv~clin_surv$clusters_CD11bCD15_tum)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
@@ -167,7 +163,6 @@ ggsurvplot(myplot, data = clin_surv,
            conf.int = FALSE
 )
 myplot <- survfit(mysurv~clin_surv$clusters_CD11bCD15_tot)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
@@ -181,7 +176,6 @@ ggsurvplot(myplot, data = clin_surv,
            conf.int = FALSE
 )
 myplot <- survfit(mysurv~clin_surv$clusters_CD11bCD15_str)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
@@ -201,7 +195,7 @@ ggsurvplot(myplot, data = clin_surv,
 
 # ratio /CD11CD15 tumor
 a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
-  mutate(ratio_eff_suppr = sqrt_CD3_CD8_tumor.p / sqrt_CD11b_CD15_tumor.p) %>% 
+  mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.p / percent_CD11b_CD15_tumor.p) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2) 
 summary(clust)
@@ -217,9 +211,9 @@ a %>%
   ggplot(aes(x=suid, y=value, group=clusters_R_CD11bCD15_tum.p, color=clusters_R_CD11bCD15_tum.p))+
   geom_boxplot()
 
-# ratio /CD3FoxP3 total
+# ratio /CD11CD15 total
 a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
-  mutate(ratio_eff_suppr = sqrt_CD3_CD8_tumor.p / sqrt_CD11b_CD15_total.p) %>% 
+  mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.p / percent_CD11b_CD15_total.p) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2) 
 summary(clust)
@@ -234,9 +228,9 @@ a %>%
   select(suid, clusters_R_CD11bCD15_tot.p, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_R_CD11bCD15_tot.p, color=clusters_R_CD11bCD15_tot.p))+
   geom_boxplot()
-# ratio /CD3FoxP3 stroma
+# ratio /CD11CD15 stroma
 a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
-  mutate(ratio_eff_suppr = sqrt_CD3_CD8_tumor.p / sqrt_CD11b_CD15_stroma.p) %>% 
+  mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.p / percent_CD11b_CD15_stroma.p) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2) 
 summary(clust)
@@ -258,7 +252,6 @@ clin_surv <- left_join(markers,
                                          "clusters_R_CD11bCD15_str.p")], by="suid")
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 myplot <- survfit(mysurv~clin_surv$clusters_R_CD11bCD15_tum.p)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
@@ -272,7 +265,6 @@ ggsurvplot(myplot, data = clin_surv,
            conf.pnt = FALSE
 )
 myplot <- survfit(mysurv~clin_surv$clusters_R_CD11bCD15_tot.p)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
@@ -303,8 +295,8 @@ ggsurvplot(myplot, data = clin_surv,
 
 
 ############################################################################################# With no ratio----
-a <- clust_markers %>% filter(clusters_CD38 == "high") 
-clust <- Mclust(a$sqrt_CD11b_CD15_tumor.p, G = 2) 
+a <- clust_markers %>% filter(clusters_CD38 == "high", !is.na(percent_CD11b_CD15_tumor.p)) 
+clust <- Mclust(a$percent_CD11b_CD15_tumor.p, G = 2) 
 summary(clust)
 a$clusters_CD11bCD15_tum.p <- clust$classification
 a$clusters_CD11bCD15_tum.p <- factor(a$clusters_CD11bCD15_tum.p, 
@@ -318,8 +310,8 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_CD11bCD15_tum.p, color=clusters_CD11bCD15_tum.p))+
   geom_boxplot()
 
-a <- clust_markers %>% filter(clusters_CD38 == "high") 
-clust <- Mclust(a$sqrt_CD11b_CD15_total.p, G = 2) 
+# a <- clust_markers %>% filter(clusters_CD38 == "high") 
+clust <- Mclust(a$percent_CD11b_CD15_total.p, G = 2) 
 summary(clust)
 a$clusters_CD11bCD15_tot.p <- clust$classification
 a$clusters_CD11bCD15_tot.p <- factor(a$clusters_CD11bCD15_tot.p, 
@@ -333,8 +325,8 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_CD11bCD15_tot.p, color=clusters_CD11bCD15_tot.p))+
   geom_boxplot()
 
-a <- clust_markers %>% filter(clusters_CD38 == "high") 
-clust <- Mclust(a$sqrt_CD11b_CD15_stroma.p, G = 2) 
+# a <- clust_markers %>% filter(clusters_CD38 == "high") 
+clust <- Mclust(a$percent_CD11b_CD15_stroma.p, G = 2) 
 summary(clust)
 a$clusters_CD11bCD15_str.p <- clust$classification
 a$clusters_CD11bCD15_str.p <- factor(a$clusters_CD11bCD15_str.p, 
@@ -354,7 +346,6 @@ clin_surv <- left_join(markers,
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 
 myplot <- survfit(mysurv~clin_surv$clusters_CD11bCD15_tum.p)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
@@ -368,7 +359,6 @@ ggsurvplot(myplot, data = clin_surv,
            conf.pnt = FALSE
 )
 myplot <- survfit(mysurv~clin_surv$clusters_CD11bCD15_tot.p)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
@@ -382,7 +372,6 @@ ggsurvplot(myplot, data = clin_surv,
            conf.pnt = FALSE
 )
 myplot <- survfit(mysurv~clin_surv$clusters_CD11bCD15_str.p)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),

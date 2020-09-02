@@ -1,7 +1,7 @@
 # 2.3.Clustering----
 set.seed(1234)
 # Need to remove NAs
-clust_markers <- markers %>% filter(!is.na(markers$sqrt_CD3_CD8_tumor.i ))
+clust_markers <- markers %>% filter(!is.na(markers$percent_CD3_CD8_tumor.i ))
 # Idea:
 # Do not take CD3 alone for clustering because contain effector, regulator, helper, gamma delta
 # Do not take FoxP3 alone because tumor cells can express FoxP3
@@ -49,13 +49,13 @@ clust_markers %>%
 
 # Cluster for tumor+stroma/intra+periph
 # 2.3.1.clusters 1_tumor+stroma/intra+periph
-clust_markers <- markers %>% filter( !is.na(markers[,c(116:131)]), !is.na(markers[,c(140:155)])  )
+clust_markers <- markers %>% filter( !is.na(markers$percent_CD3_tumor.i), !is.na(markers$percent_CD3_tumor.p)  )
 
-clust <- Mclust(clust_markers[,c(116:131,140:155)], G = 5)
+clust <- Mclust(clust_markers[,c(59:74,89:104)], G = 5)
 summary(clust)
 clust_markers$clusters_all_IandP <- clust$classification
 clust_markers$clusters_all_IandP <- factor(clust_markers$clusters_all_IandP, 
-                                           levels = c(5, 2, 1, 4, 3),
+                                           levels = c(5, 4, 2, 3, 1),
                                            labels = c("low", "mid-low", "mid", "mid-high", "high"))
 
 clust_markers %>% 
@@ -87,8 +87,8 @@ clust_markers %>%
 
 # Cluster for tumor
 # 2.3.1.clusters 1_by_CD3-CD8
-clust_markers <- markers %>% filter( !is.na(markers[,c(116:131)]), !is.na(markers[,c(140:155)])  )
-clust <- Mclust(clust_markers$sqrt_CD3_CD8_tumor.i, G = 5)
+clust_markers <- markers %>% filter( !is.na(markers$percent_CD3_CD8_tumor.i) )
+clust <- Mclust(clust_markers$percent_CD3_CD8_tumor.i, G = 5)
 summary(clust)
 clust_markers$clusters_CD3CD8 <- clust$classification
 clust_markers$clusters_CD3CD8 <- factor(clust_markers$clusters_CD3CD8, 
@@ -96,12 +96,28 @@ clust_markers$clusters_CD3CD8 <- factor(clust_markers$clusters_CD3CD8,
                                         labels = c("low", "mid-low", "mid", "mid-high", "high"))
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c(116:123)) %>% 
+  gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>% 
   select(suid, clusters_CD3CD8, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=markers_cat, color=markers_cat))+
   geom_boxplot()+
   facet_grid(.~ clusters_CD3CD8)
 
+clin_surv <- left_join(markers, 
+                       clust_markers[, c("suid", "clusters_CD3CD8")], by="suid")
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
+myplot <- survfit(mysurv~clin_surv$clusters_CD3CD8)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters_CD3CD8",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.pnt = FALSE
+)
 # p1 <- clust_markers %>% filter(!is.na(race)) %>% 
 #   ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor.i, color=clusters_CD3CD8))+
 #   geom_boxplot()+
@@ -123,20 +139,36 @@ clust_markers %>%
 # gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 # 2.3.2.clusters 2_by_all double positive
-clust <- Mclust(clust_markers[,c("sqrt_CD3_CD8_tumor.i", "sqrt_CD3_FoxP3_tumor.i", "sqrt_CD11b_CD15_tumor.i")], G = 5)
+clust <- Mclust(clust_markers[,c("percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", "percent_CD11b_CD15_tumor.i")], G = 5)
 summary(clust)
 clust_markers$dbl_pos <- clust$classification
 clust_markers$dbl_pos <- factor(clust_markers$dbl_pos, 
-                                levels = c(4, 5, 1, 2, 3),
+                                levels = c(2, 4, 3, 5, 1),
                                 labels = c("low", "mid-low", "mid", "mid-high", "high"))
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c(116:123)) %>% 
+  gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>% 
   select(suid, dbl_pos, markers_cat, value) %>% 
   ggplot(aes(x=suid, group=markers_cat, color=markers_cat))+
   geom_boxplot(aes(y=value))+
   facet_grid(.~ dbl_pos)
 
+clin_surv <- left_join(markers, 
+                       clust_markers[, c("suid", "dbl_pos")], by="suid")
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
+myplot <- survfit(mysurv~clin_surv$dbl_pos)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "dbl_pos",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.pnt = FALSE
+)
 # clust_markers %>% 
 #   gather(key = "markers_cat", value = "value", c(106, 108:111)) %>% 
 #   select(suid, dbl_pos, markers_cat, value) %>% 
@@ -166,9 +198,9 @@ gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 # 2.3.3.clusters_special----
 ### 2.3.3.1_CD3-CD8 first
-# clust_markers <- markers %>% filter(!is.na( sqrt_CD3_CD8_tumor.i ))
-clust_markers <- markers %>% filter( !is.na(markers[,c(116:131)]), !is.na(markers[,c(140:155)])  )
-clust <- Mclust(clust_markers$sqrt_CD3_CD8_tumor.i, G = 2)
+clust_markers <- markers %>% filter(!is.na( percent_CD3_CD8_tumor.i ))
+# clust_markers <- markers %>% filter( !is.na(markers[,c(116:131)]), !is.na(markers[,c(140:155)])  )
+clust <- Mclust(clust_markers$percent_CD3_CD8_tumor.i, G = 2)
 summary(clust)
 clust_markers$clusters_CD38 <- clust$classification
 clust_markers$clusters_CD38 <- factor(clust_markers$clusters_CD38, 
@@ -176,7 +208,7 @@ clust_markers$clusters_CD38 <- factor(clust_markers$clusters_CD38,
                                       labels = c("low", "high"))
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", sqrt_CD3_total.i:sqrt_CD11b_CD15_total.i) %>%
+  gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>%
   select(suid, clusters_CD38, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=markers_cat, color=markers_cat))+
   geom_boxplot()+
@@ -433,7 +465,7 @@ clust_markers %>%
 
 # cluster ratio CD3CD8/CD3Foxp3 tumor
 a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
-  mutate(ratio_eff_suppr = sqrt_CD3_CD8_tumor.i / sqrt_CD3_FoxP3_tumor.i) %>% 
+  mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD3_FoxP3_tumor.i) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2) # clust on ratio
 summary(clust)
@@ -449,10 +481,28 @@ a %>%
   ggplot(aes(x=suid, y=value, group=clusters_immsuppr, color=clusters_immsuppr))+
   geom_boxplot()
 
+clin_surv <- left_join(markers, 
+                       clust_markers[, c("suid", "clusters_immsuppr")], by="suid")
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
+
+myplot <- survfit(mysurv~clin_surv$clusters_immsuppr)
+myplot
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters_immsuppr",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.pnt = FALSE
+)
 
 # clustering
 a <- clust_markers %>% filter(clusters_CD38 == "high") # 2 is high in CD38
-clust <- Mclust(a$sqrt_CD3_FoxP3_tumor.i, G = 2) # clust on CD3-FoxP3
+clust <- Mclust(a$percent_CD3_FoxP3_tumor.i, G = 2) # clust on CD3-FoxP3
 summary(clust)
 a$clusters_FoxP3 <- clust$classification
 a$clusters_FoxP3 <- factor(a$clusters_FoxP3, 
@@ -466,6 +516,24 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_FoxP3, color=clusters_FoxP3))+
   geom_boxplot()
 
+clin_surv <- left_join(markers, 
+                       clust_markers[, c("suid", "clusters_FoxP3")], by="suid")
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
+
+myplot <- survfit(mysurv~clin_surv$clusters_FoxP3)
+myplot
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters_FoxP3",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.pnt = FALSE
+)
 # p1 <- clust_markers %>% filter(!is.na(race)) %>% 
 #   ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor.i, color=clusters_FoxP3))+
 #   geom_boxplot()+
@@ -487,7 +555,7 @@ clust_markers %>%
 # gridExtra::grid.arrange(p1, p2, p3, ncol=3)############################ Need compare ration 8/fox and fox high lox cluster----
 
 # Other cluster on FoxP3 alone (total) and check if we should add it up to ration or cd3foxp3 cluster
-clust <- Mclust(a$sqrt_FoxP3_total.i, G = 2) # clust on FoxP3
+clust <- Mclust(a$percent_FoxP3_total.i, G = 2) # clust on FoxP3
 summary(clust)
 a$clusters_FoxP3_ <- clust$classification
 a$clusters_FoxP3_ <- factor(a$clusters_FoxP3_, 
@@ -504,25 +572,9 @@ clust_markers %>%
 
 
 clin_surv <- left_join(markers, 
-                       clust_markers[, c("suid", "clusters_FoxP3", "clusters_FoxP3_")], by="suid")
+                       clust_markers[, c("suid", "clusters_FoxP3_")], by="suid")
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
-
-myplot <- survfit(mysurv~clin_surv$clusters_FoxP3)
-myplot
-ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on whole population",
-           font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "clustered by clusters_FoxP3",
-           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
-           surv.median.line = c("hv"),
-           risk.table = TRUE,
-           tables.height = 0.2,
-           risk.table.title = "Risk table",
-           conf.int = FALSE
-)
 myplot <- survfit(mysurv~clin_surv$clusters_FoxP3_)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
@@ -590,8 +642,8 @@ clust_markers <- clust_markers %>%
 
 ######################################################################################## II ### Survival by cluster---
 clin_surv <- left_join(markers, 
-                       clust_markers[, c("suid", "clusters_Brooke", "clusters_all_IandP", "clusters_CD3CD8", "dbl_pos",
-                                         "clusters_CD38", 
+                       clust_markers[, c("suid",#  "clusters_Brooke", "clusters_all_IandP", "clusters_CD3CD8", "dbl_pos",
+                                         # "clusters_CD38", 
                                          # "excluded_double_ratioIP",
                                          # "clusters_excluded_IP", "clusters_immsuppr", "clusters_FoxP3",
                                          "special_cluster", "special_cluster2", "special_cluster3", 
