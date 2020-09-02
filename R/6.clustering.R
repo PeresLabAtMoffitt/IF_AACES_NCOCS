@@ -87,6 +87,7 @@ clust_markers %>%
 
 # Cluster for tumor
 # 2.3.1.clusters 1_by_CD3-CD8
+clust_markers <- markers %>% filter( !is.na(markers[,c(116:131)]), !is.na(markers[,c(140:155)])  )
 clust <- Mclust(clust_markers$sqrt_CD3_CD8_tumor.i, G = 5)
 summary(clust)
 clust_markers$clusters_CD3CD8 <- clust$classification
@@ -166,6 +167,7 @@ gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 # 2.3.3.clusters_special----
 ### 2.3.3.1_CD3-CD8 first
 # clust_markers <- markers %>% filter(!is.na( sqrt_CD3_CD8_tumor.i ))
+clust_markers <- markers %>% filter( !is.na(markers[,c(116:131)]), !is.na(markers[,c(140:155)])  )
 clust <- Mclust(clust_markers$sqrt_CD3_CD8_tumor.i, G = 2)
 summary(clust)
 clust_markers$clusters_CD38 <- clust$classification
@@ -180,6 +182,22 @@ clust_markers %>%
   geom_boxplot()+
   facet_grid(.~ clusters_CD38)
 
+clin_surv <- left_join(markers, 
+                       clust_markers[, c("suid", "clusters_CD38")], by="suid")
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
+myplot <- survfit(mysurv~clin_surv$clusters_CD38)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters_CD38",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
 # p1 <- clust_markers %>% filter(!is.na(race)) %>% 
 #   ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor.i, color=clusters_CD38))+
 #   geom_boxplot()+
@@ -203,79 +221,79 @@ clust_markers %>%
 
 ### 2.3.3.2_ Cluster low into cold or excluded----
 b <- clust_markers %>% filter(clusters_CD38 == "low")
-b <- b %>% mutate(ratio_IP = sqrt_CD3_CD8_tumor.p / sqrt_CD3_CD8_tumor.i) %>% 
+b <- b %>% mutate(ratio_IP = percent_CD3_CD8_tumor.p / percent_CD3_CD8_tumor.i) %>% 
   mutate(ratio_IP = case_when(
     ratio_IP ==  "NaN" ~ 0,
     TRUE ~ ratio_IP
   )) %>% 
-  mutate(excluded_cluster = case_when(
+  mutate(excluded_double_ratioIP = case_when(
     ratio_IP < 2 | ratio_IP == "NaN"     ~ "cold",
     ratio_IP >=2 | is.infinite(ratio_IP) ~ "excluded"
-  )) %>% mutate(ratio_ST = sqrt_CD3_CD8_stroma.i / sqrt_CD3_CD8_tumor.i) %>% 
+  )) %>% mutate(ratio_ST = percent_CD3_CD8_stroma.i / percent_CD3_CD8_tumor.i) %>% 
   mutate(ratio_ST = case_when(
     ratio_ST ==  "NaN" ~ 0,
     TRUE ~ ratio_ST
   )) %>% 
-  mutate(excluded_cluster2 = case_when(
-    ratio_ST < 2 | ratio_ST == "NaN"     ~ "c",
+  mutate(excluded_double_ratioST = case_when(
+    ratio_ST < 2 | ratio_ST == "NaN"     ~ "cold",
     ratio_ST >=2 | is.infinite(ratio_ST) ~ "excluded"))
-clust_markers <- left_join(clust_markers, b[, c("suid", "excluded_cluster", "excluded_cluster2")], by= "suid")
+clust_markers <- left_join(clust_markers, b[, c("suid", "excluded_double_ratioIP", "excluded_double_ratioST")], by= "suid")
 
 
 b %>% 
   gather(key = "markers_cat", value = "value", ratio_IP) %>% 
-  select(suid, excluded_cluster, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=excluded_cluster, color=excluded_cluster))+ # Take home: bad separation, MORE outliers
+  select(suid, excluded_double_ratioIP, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=excluded_double_ratioIP, color=excluded_double_ratioIP))+ # Take home: bad separation, MORE outliers
   geom_boxplot()
 b %>% 
   gather(key = "markers_cat", value = "value", ratio_ST) %>% 
-  select(suid, excluded_cluster2, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=excluded_cluster2, color=excluded_cluster2))+ # Take home: bad separation, MORE outliers
+  select(suid, excluded_double_ratioST, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=excluded_double_ratioST, color=excluded_double_ratioST))+ # Take home: bad separation, MORE outliers
   geom_boxplot()
 
 # Try another by clustering ######################################### Need to compare ratio separation or ratio cluster
 c <- b %>% filter(is.finite(ratio_IP))
 clust <- Mclust(c$ratio_IP, G = 2)
 summary(clust)
-c$clusters_excluded <- clust$classification
-c$clusters_excluded <- factor(c$clusters_excluded, 
+c$clusters_excluded_IP <- clust$classification
+c$clusters_excluded_IP <- factor(c$clusters_excluded_IP, 
                               levels = c(1, 2),
                               labels = c("cold", "excluded"))
-clust_markers <- left_join(clust_markers, c[, c("suid", "clusters_excluded")], by= "suid")
+clust_markers <- left_join(clust_markers, c[, c("suid", "clusters_excluded_IP")], by= "suid")
 
 d <- b %>% filter(is.finite(ratio_ST))
 clust <- Mclust(d$ratio_ST, G = 2)
 summary(clust)
-d$clusters_excluded2 <- clust$classification
-d$clusters_excluded2 <- factor(d$clusters_excluded2, 
+d$clusters_excluded_ST <- clust$classification
+d$clusters_excluded_ST <- factor(d$clusters_excluded_ST, 
                                levels = c(1, 2),
                                labels = c("cold", "excluded"))
-clust_markers <- left_join(clust_markers, d[, c("suid", "clusters_excluded2")], by= "suid")
+clust_markers <- left_join(clust_markers, d[, c("suid", "clusters_excluded_ST")], by= "suid")
 
 
 c %>% 
   gather(key = "markers_cat", value = "value", ratio_IP) %>% 
-  select(suid, clusters_excluded, excluded_cluster, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=clusters_excluded, color=clusters_excluded))+
+  select(suid, clusters_excluded_IP, excluded_double_ratioIP, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_excluded_IP, color=clusters_excluded_IP))+
   geom_boxplot()
 
 d %>% 
   gather(key = "markers_cat", value = "value", ratio_ST) %>% 
-  select(suid, clusters_excluded2, excluded_cluster2, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=clusters_excluded2, color=clusters_excluded2))+
+  select(suid, clusters_excluded_ST, excluded_double_ratioST, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_excluded_ST, color=clusters_excluded_ST))+
   geom_boxplot()
 
 clin_surv <- left_join(markers, 
-                       clust_markers[, c("suid", "excluded_cluster", "excluded_cluster2",
-                                         "clusters_excluded", "clusters_excluded2")], by="suid")
+                       clust_markers[, c("suid", "excluded_double_ratioIP", "excluded_double_ratioST",
+                                         "clusters_excluded_IP", "clusters_excluded_ST")], by="suid")
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 
-myplot <- survfit(mysurv~clin_surv$excluded_cluster)
+myplot <- survfit(mysurv~clin_surv$excluded_double_ratioIP)
 myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "clustered by excluded_cluster",
+           xlab = "Time (days)", legend.title = "clustered by excluded_double_ratioIP",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
            pval = TRUE, # pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
@@ -284,12 +302,12 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf.int = FALSE
 )
-myplot <- survfit(mysurv~clin_surv$excluded_cluster2)
+myplot <- survfit(mysurv~clin_surv$excluded_double_ratioST)
 myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "clustered by excluded_cluster2",
+           xlab = "Time (days)", legend.title = "clustered by excluded_double_ratioST",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
            pval = TRUE, # pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
@@ -298,12 +316,12 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf.int = FALSE
 )
-myplot <- survfit(mysurv~clin_surv$clusters_excluded)
+myplot <- survfit(mysurv~clin_surv$clusters_excluded_IP)
 myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "clustered by clusters_excluded",
+           xlab = "Time (days)", legend.title = "clustered by clusters_excluded_IP",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
            pval = TRUE, # pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
@@ -312,12 +330,12 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf.int = FALSE
 )
-myplot <- survfit(mysurv~clin_surv$clusters_excluded2)
+myplot <- survfit(mysurv~clin_surv$clusters_excluded_ST)
 myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "clustered by clusters_excluded",
+           xlab = "Time (days)", legend.title = "clustered by clusters_excluded_ST",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
            pval = TRUE, # pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
@@ -330,8 +348,8 @@ ggsurvplot(myplot, data = clin_surv,
 clust_markers %>% 
   gather(key = "markers_cat", value = "value", c(percent_CD11b_stroma.i, percent_CD11b_tumor.i,
                                                  percent_CD15_stroma.i, percent_CD15_tumor.i)) %>% 
-  select(suid, clusters_excluded2, markers_cat, value) %>% 
-  ggplot(aes(x=clusters_excluded2, y=value, color=markers_cat))+ 
+  select(suid, clusters_excluded_ST, markers_cat, value) %>% 
+  ggplot(aes(x=clusters_excluded_ST, y=value, color=markers_cat))+ 
   geom_boxplot()+
   ylim(0,.5)
 # Take home: CD11b (myeloid which can prevent T cell trafficing) has same repartition in cold or excluded
@@ -529,9 +547,9 @@ clust_markers <- clust_markers %>%
   )) %>% 
   mutate(special_cluster2 = case_when(
     clusters_CD38 == "low" &
-      clusters_excluded == "cold" ~ "cold",
+      clusters_excluded_IP == "cold" ~ "cold",
     clusters_CD38 == "low" &
-      clusters_excluded == "excluded" ~ "excluded",
+      clusters_excluded_IP == "excluded" ~ "excluded",
     clusters_CD38 == "high" &
       clusters_immsuppr == "immunosupressed" ~ "immunosupressed",
     clusters_CD38 == "high" &
@@ -539,9 +557,9 @@ clust_markers <- clust_markers %>%
   )) %>% 
   mutate(special_cluster3 = case_when(
     clusters_CD38 == "low" &
-      excluded_cluster == "cold" ~ "cold",
+      excluded_double_ratioIP == "cold" ~ "cold",
     clusters_CD38 == "low" &
-      excluded_cluster == "excluded" ~ "excluded",
+      excluded_double_ratioIP == "excluded" ~ "excluded",
     clusters_CD38 == "high" &
       clusters_immsuppr == "immunosupressed" ~ "immunosupressed",
     clusters_CD38 == "high" &
@@ -549,9 +567,9 @@ clust_markers <- clust_markers %>%
   )) %>% 
   mutate(special_cluster4 = case_when(
     clusters_CD38 == "low" &
-      clusters_excluded == "cold" ~ "cold",
+      clusters_excluded_IP == "cold" ~ "cold",
     clusters_CD38 == "low" &
-      clusters_excluded == "excluded" ~ "excluded",
+      clusters_excluded_IP == "excluded" ~ "excluded",
     clusters_CD38 == "high" &
       clusters_FoxP3 == "hot" ~ "hot",
     clusters_CD38 == "high" &
@@ -559,9 +577,9 @@ clust_markers <- clust_markers %>%
   )) %>% 
   mutate(special_cluster5 = case_when(
     clusters_CD38 == "low" &
-      excluded_cluster == "cold" ~ "cold",
+      excluded_double_ratioIP == "cold" ~ "cold",
     clusters_CD38 == "low" &
-      excluded_cluster == "excluded" ~ "excluded",
+      excluded_double_ratioIP == "excluded" ~ "excluded",
     clusters_CD38 == "high" &
       clusters_FoxP3 == "hot" ~ "hot",
     clusters_CD38 == "high" &
@@ -574,8 +592,8 @@ clust_markers <- clust_markers %>%
 clin_surv <- left_join(markers, 
                        clust_markers[, c("suid", "clusters_Brooke", "clusters_all_IandP", "clusters_CD3CD8", "dbl_pos",
                                          "clusters_CD38", 
-                                         # "excluded_cluster",
-                                         # "clusters_excluded", "clusters_immsuppr", "clusters_FoxP3",
+                                         # "excluded_double_ratioIP",
+                                         # "clusters_excluded_IP", "clusters_immsuppr", "clusters_FoxP3",
                                          "special_cluster", "special_cluster2", "special_cluster3", 
                                          "special_cluster4", "special_cluster5")], by="suid")
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)

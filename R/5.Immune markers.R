@@ -222,10 +222,11 @@ markers <- markers %>%
   mutate(percentile_score_CD3_i = ntile(percent_CD3_total.i, 100) ) %>% 
   mutate(percentile_score_CD3_p = ntile(percent_CD3_total.p, 100) ) %>% 
   mutate(percentile_score_CD8_i = ntile(percent_CD8_total.i, 100) ) %>% 
-  mutate(percentile_score_CD8_p = ntile(percent_CD8_total.p, 100) ) %>%
-  mutate(percentile_score_mean = 
-           rowMeans(markers[c("percentile_score_CD3_i", "percentile_score_CD3_p", 
-                              "percentile_score_CD8_i", "percentile_score_CD8_p")])) %>% 
+  mutate(percentile_score_CD8_p = ntile(percent_CD8_total.p, 100) ) 
+markers <- markers %>%
+  mutate(percentile_score_mean = rowMeans(markers[c("percentile_score_CD3_i", "percentile_score_CD3_p", 
+                              "percentile_score_CD8_i", "percentile_score_CD8_p")])
+         ) %>% 
   mutate(immunoscore_ = case_when(
     percentile_score_mean <= 10 ~ 0,
     percentile_score_mean <= 25 ~ 1,
