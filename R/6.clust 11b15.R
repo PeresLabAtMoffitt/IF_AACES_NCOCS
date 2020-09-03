@@ -7,7 +7,7 @@ summary(clust)
 a$clusters_R_CD11bCD15_tum <- clust$classification
 a$clusters_R_CD11bCD15_tum <- factor(a$clusters_R_CD11bCD15_tum, 
                               levels = c(1, 2),
-                              labels = c("immunosuppressed", "hot"))
+                              labels = c("highCD8 highCD11bCD15", "highCD8 lowCD11bCD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_R_CD11bCD15_tum")], by= "suid")
 
 a %>% 
@@ -25,7 +25,7 @@ summary(clust)
 a$clusters_R_CD11bCD15_tot <- clust$classification
 a$clusters_R_CD11bCD15_tot <- factor(a$clusters_R_CD11bCD15_tot, 
                               levels = c(1, 2),
-                              labels = c("immunosuppressed", "hot"))
+                              labels = c("highCD8 highCD11bCD15", "highCD8 lowCD11bCD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_R_CD11bCD15_tot")], by= "suid")
 
 a %>% 
@@ -33,6 +33,7 @@ a %>%
   select(suid, clusters_R_CD11bCD15_tot, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_R_CD11bCD15_tot, color=clusters_R_CD11bCD15_tot))+
   geom_boxplot()
+
 # ratio /CD11CD15 stroma
 a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD11b_CD15_stroma.i) %>% 
@@ -42,7 +43,7 @@ summary(clust)
 a$clusters_R_CD11bCD15_str <- clust$classification
 a$clusters_R_CD11bCD15_str <- factor(a$clusters_R_CD11bCD15_str, 
                                   levels = c(1, 2),
-                                  labels = c("immunosuppressed", "hot"))
+                                  labels = c("highCD8 highCD11bCD15", "highCD8 lowCD11bCD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_R_CD11bCD15_str")], by= "suid")
 
 a %>% 
@@ -99,13 +100,14 @@ ggsurvplot(myplot, data = clin_surv,
 
 
 ############################################################################################# With no ratio----
+# CD11bCD15 tum
 a <- clust_markers %>% filter(clusters_CD38 == "high") 
 clust <- Mclust(a$percent_CD11b_CD15_tumor.i, G = 2) 
 summary(clust)
 a$clusters_CD11bCD15_tum <- clust$classification
 a$clusters_CD11bCD15_tum <- factor(a$clusters_CD11bCD15_tum, 
                            levels = c(1, 2),
-                           labels = c("hot", "immunosuppressed"))
+                           labels = c("lowCD11bCD15", "highCD11bCD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11bCD15_tum")], by= "suid")
 
 clust_markers %>% 
@@ -114,13 +116,14 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_CD11bCD15_tum, color=clusters_CD11bCD15_tum))+
   geom_boxplot()
 
+# CD11bCD15 tot
 a <- clust_markers %>% filter(clusters_CD38 == "high") 
 clust <- Mclust(a$percent_CD11b_CD15_total.i, G = 2) 
 summary(clust)
 a$clusters_CD11bCD15_tot <- clust$classification
 a$clusters_CD11bCD15_tot <- factor(a$clusters_CD11bCD15_tot, 
                            levels = c(1, 2),
-                           labels = c("hot", "immunosuppressed"))
+                           labels = c("lowCD11bCD15", "highCD11bCD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11bCD15_tot")], by= "suid")
 
 clust_markers %>% 
@@ -129,13 +132,14 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_CD11bCD15_tot, color=clusters_CD11bCD15_tot))+
   geom_boxplot()
 
+# CD11bCD15 str
 a <- clust_markers %>% filter(clusters_CD38 == "high") 
 clust <- Mclust(a$percent_CD11b_CD15_stroma.i, G = 2) 
 summary(clust)
 a$clusters_CD11bCD15_str <- clust$classification
 a$clusters_CD11bCD15_str <- factor(a$clusters_CD11bCD15_str, 
                            levels = c(1, 2),
-                           labels = c("hot", "immunosuppressed"))
+                           labels = c("lowCD11bCD15", "highCD11bCD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11bCD15_str")], by= "suid")
 
 clust_markers %>% 
@@ -144,11 +148,11 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_CD11bCD15_str, color=clusters_CD11bCD15_str))+
   geom_boxplot()
 
+# Surv
 clin_surv <- left_join(markers, 
                        clust_markers[, c("suid", "clusters_CD11bCD15_tum", "clusters_CD11bCD15_tot",
                                          "clusters_CD11bCD15_str")], by="suid")
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
-
 myplot <- survfit(mysurv~clin_surv$clusters_CD11bCD15_tum)
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
@@ -191,7 +195,7 @@ ggsurvplot(myplot, data = clin_surv,
 
 
 
-# Peripheral
+# Peripheral----
 
 # ratio /CD11CD15 tumor
 a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
@@ -202,7 +206,7 @@ summary(clust)
 a$clusters_R_CD11bCD15_tum.p <- clust$classification
 a$clusters_R_CD11bCD15_tum.p <- factor(a$clusters_R_CD11bCD15_tum.p, 
                                        levels = c(1, 2),
-                                       labels = c("immunosuppressed", "hot"))
+                                       labels = c("highCD8 highCD11bCD15", "highCD8 lowCD11bCD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_R_CD11bCD15_tum.p")], by= "suid")
 
 a %>% 
@@ -220,7 +224,7 @@ summary(clust)
 a$clusters_R_CD11bCD15_tot.p <- clust$classification
 a$clusters_R_CD11bCD15_tot.p <- factor(a$clusters_R_CD11bCD15_tot.p, 
                                        levels = c(1, 2),
-                                       labels = c("immunosuppressed", "hot"))
+                                       labels = c("highCD8 highCD11bCD15", "highCD8 lowCD11bCD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_R_CD11bCD15_tot.p")], by= "suid")
 
 a %>% 
@@ -237,7 +241,7 @@ summary(clust)
 a$clusters_R_CD11bCD15_str.p <- clust$classification
 a$clusters_R_CD11bCD15_str.p <- factor(a$clusters_R_CD11bCD15_str.p, 
                                        levels = c(1, 2),
-                                       labels = c("immunosuppressed", "hot"))
+                                       labels = c("highCD8 highCD11bCD15", "highCD8 lowCD11bCD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_R_CD11bCD15_str.p")], by= "suid")
 
 a %>% 
@@ -278,7 +282,6 @@ ggsurvplot(myplot, data = clin_surv,
            conf.pnt = FALSE
 )
 myplot <- survfit(mysurv~clin_surv$clusters_R_CD11bCD15_str.p)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
@@ -295,13 +298,14 @@ ggsurvplot(myplot, data = clin_surv,
 
 
 ############################################################################################# With no ratio----
+# CD11bCD15 tum
 a <- clust_markers %>% filter(clusters_CD38 == "high", !is.na(percent_CD11b_CD15_tumor.p)) 
 clust <- Mclust(a$percent_CD11b_CD15_tumor.p, G = 2) 
 summary(clust)
 a$clusters_CD11bCD15_tum.p <- clust$classification
 a$clusters_CD11bCD15_tum.p <- factor(a$clusters_CD11bCD15_tum.p, 
                                      levels = c(1, 2),
-                                     labels = c("hot", "immunosuppressed"))
+                                     labels = c("lowCD11bCD15", "highCD11bCD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11bCD15_tum.p")], by= "suid")
 
 clust_markers %>% 
@@ -310,13 +314,13 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_CD11bCD15_tum.p, color=clusters_CD11bCD15_tum.p))+
   geom_boxplot()
 
-# a <- clust_markers %>% filter(clusters_CD38 == "high") 
+# CD11bCD15 tot
 clust <- Mclust(a$percent_CD11b_CD15_total.p, G = 2) 
 summary(clust)
 a$clusters_CD11bCD15_tot.p <- clust$classification
 a$clusters_CD11bCD15_tot.p <- factor(a$clusters_CD11bCD15_tot.p, 
                                      levels = c(1, 2),
-                                     labels = c("hot", "immunosuppressed"))
+                                     labels = c("lowCD11bCD15", "highCD11bCD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11bCD15_tot.p")], by= "suid")
 
 clust_markers %>% 
@@ -325,13 +329,13 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_CD11bCD15_tot.p, color=clusters_CD11bCD15_tot.p))+
   geom_boxplot()
 
-# a <- clust_markers %>% filter(clusters_CD38 == "high") 
+# CD11bCD15 str
 clust <- Mclust(a$percent_CD11b_CD15_stroma.p, G = 2) 
 summary(clust)
 a$clusters_CD11bCD15_str.p <- clust$classification
 a$clusters_CD11bCD15_str.p <- factor(a$clusters_CD11bCD15_str.p, 
                                      levels = c(1, 2),
-                                     labels = c("hot", "immunosuppressed"))
+                                     labels = c("lowCD11bCD15", "highCD11bCD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11bCD15_str.p")], by= "suid")
 
 clust_markers %>% 
@@ -340,11 +344,11 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_CD11bCD15_str.p, color=clusters_CD11bCD15_str.p))+
   geom_boxplot()
 
+# Surv
 clin_surv <- left_join(markers, 
                        clust_markers[, c("suid", "clusters_CD11bCD15_tum.p", "clusters_CD11bCD15_tot.p",
                                          "clusters_CD11bCD15_str.p")], by="suid")
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
-
 myplot <- survfit(mysurv~clin_surv$clusters_CD11bCD15_tum.p)
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on whole population",
