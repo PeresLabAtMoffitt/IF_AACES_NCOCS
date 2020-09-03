@@ -1,3 +1,4 @@
+# Intratumoral----
 # ratio /CD11CD15 tumor
 a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD11b_CD15_tumor.i) %>% 
@@ -116,7 +117,7 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_CD11bCD15_tum, color=clusters_CD11bCD15_tum))+
   geom_boxplot()
 
-# CD11bCD15 tot
+# CD11bCD15 tot----
 a <- clust_markers %>% filter(clusters_CD38 == "high") 
 clust <- Mclust(a$percent_CD11b_CD15_total.i, G = 2) 
 summary(clust)

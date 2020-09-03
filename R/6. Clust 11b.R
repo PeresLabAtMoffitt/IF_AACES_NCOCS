@@ -101,7 +101,6 @@ ggsurvplot(myplot, data = clin_surv,
 ############################################################################################# With no ratio----
 # CD11b tum
 a <- clust_markers %>% filter(clusters_CD38 == "high")
-
 clust <- Mclust(a$percent_CD11b_tumor.i, G = 2)
 summary(clust)
 a$clusters_CD11b_tum <- clust$classification
@@ -117,7 +116,8 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_CD11b_tum, color=clusters_CD11b_tum))+
   geom_boxplot()
 
-# CD11b tot
+# CD11b tot----
+a <- clust_markers %>% filter(clusters_CD38 == "high")
 clust <- Mclust(a$percent_CD11b_total.i, G = 2)
 summary(clust)
 a$clusters_CD11b_tot <- clust$classification
@@ -134,6 +134,7 @@ clust_markers %>%
   geom_boxplot()
 
 # CD11b str
+a <- clust_markers %>% filter(clusters_CD38 == "high")
 clust <- Mclust(a$percent_CD11b_stroma.i, G = 2)
 summary(clust)
 a$clusters_CD11b_str <- clust$classification
@@ -317,7 +318,8 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_CD11b_tum.p, color=clusters_CD11b_tum.p))+
   geom_boxplot()
 
-# CD11b tot
+# CD11b tot----
+a <- clust_markers %>% filter(clusters_CD38 == "high", !is.na(percent_CD11b_tumor.p))
 clust <- Mclust(a$percent_CD11b_total.p, G = 2)
 summary(clust)
 a$clusters_CD11b_tot.p <- clust$classification
