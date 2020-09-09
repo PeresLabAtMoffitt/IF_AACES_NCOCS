@@ -490,7 +490,7 @@ ggsurvplot(myplot, data = clin_surv,
 )
 
 clin_surv <- markers %>% 
-  gather(key = "location", value = "value", c("sqrt_CD3_CD8_tumor.i", "sqrt_CD3_CD8_stroma.i", "sqrt_CD3_CD8_total.i")) %>% 
+  gather(key = "location", value = "value", c("percent_CD3_CD8_tumor.i", "percent_CD3_CD8_stroma.i", "percent_CD3_CD8_total.i")) %>% 
   select(c("suid", "location", "value", "timelastfu_new", "surv_vital"))
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~location, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,

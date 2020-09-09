@@ -390,17 +390,6 @@ p8 <- ggplot(markers, aes(x=percent_CD11b_CD15_stroma.i, y=percent_CD11b_CD15_tu
 gridExtra::grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, ncol = 5)
 
 
-# +
-
-
-
-# FoxP3 alone - CD3-FoxP3
-# Look at survival
-# Look at CD8 presence
-
-
-
-
 
 
 

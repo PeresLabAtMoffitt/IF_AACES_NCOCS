@@ -1,23 +1,272 @@
-# ########################################################################################## I ### Create ROI Match Cases----
-# 
-# cases_match <- cases_match %>% mutate(suid = as.character(suid))
-# cases_match <- left_join(cases_match, 
-#                           clinical_data %>% select("suid", "race"),
-#                           by= "suid")
-#   
-# 
-# cases_match1 <- dcast(setDT(cases_match), pair_id ~ rowid(pair_id),
-#                       value.var = c("suid", "race")) %>%
-#   drop_na("race_1", "race_2") # We all have the matching
-# 
-# 
-# cases_match <-  left_join(cases_match, # innerjoin for only patient who has a match and ROIs give no white for comparison
-#                      markers_ROIi,
-#                      by= "suid")
-# 
-# # Cleanup both paired ID when one had a missing data----
-# cases_match$suid[is.na(cases_match$percent_CD3_tumor)]
-# cases_match2 <-  cases_match %>% drop_na(.) %>% group_by(pair_id) %>% filter( n() > 1 )
+# ########################################################################################## I ### Survivals----
+# 1.1.Clustering----
+set.seed(1234)
+# Merge markers_match with the cluster previously created
+markers_match <- left_join(markers_match, clust_markers[, c("suid", 
+                                                            "clusters_CD38", 
+                                                            "clusters_excluded_IP", "clusters_excluded_ST",
+                                                            "clusters_R_FoxP3_tum", "clusters_R_FoxP3_tum.p",
+                                                            "clusters_CD11b_tot", "clusters_CD11b_tot.p", 
+                                                            "clusters_CD15_tot", "clusters_CD15_tot.p",
+                                                            "clusters_CD11bCD15_tot", "clusters_CD11bCD15_tot.p"
+                                                            )], by= "suid") %>% 
+  left_join(., markers[, c("suid","immunoscore_")], by = "suid")
+
+# 1.2.Survivals----
+# Immunoscore----
+clin_surv <- markers_match
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
+myplot <- survfit(mysurv~clin_surv$immunoscore_)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on case-matched population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "Immunoscore", # legend.labs = c("mid-high", "mid-low", "high", "low"), # 4253
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+# CD3CD8
+myplot <- survfit(mysurv~clin_surv$clusters_CD38)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on case-matched population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters_CD38",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+# Excluded
+myplot <- survfit(mysurv~clin_surv$clusters_excluded_IP)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on case-matched population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by clusters_excluded_IP",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+myplot <- survfit(mysurv~clin_surv$clusters_excluded_ST)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on case-matched population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clustered by clusters_excluded_ST",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+# Immunosuppressed
+myplot <- survfit(mysurv~clin_surv$clusters_R_FoxP3_tum)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on case-matched population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters ratio CD3CD8/FoxP3 in intratumoral tumor",
+           # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+myplot <- survfit(mysurv~clin_surv$clusters_R_FoxP3_tum.p)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on case-matched population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters ration CD3CD8/FoxP3 in peripheral tumor",
+           # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.pnt = FALSE
+)
+# CD11b
+myplot <- survfit(mysurv~clin_surv$clusters_CD11b_tot)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on case-matched population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters CD11b intratumoral tumor and stroma",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+myplot <- survfit(mysurv~clin_surv$clusters_CD11b_tot.p)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on case-matched population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters CD11b peripheral tumor and stroma",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.pnt = FALSE
+)
+# CD15
+myplot <- survfit(mysurv~clin_surv$clusters_CD15_tot)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on case-matched population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters CD15 intratumoral tumor and stroma",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+myplot <- survfit(mysurv~clin_surv$clusters_CD15_tot.p)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on case-matched population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters CD15 peripheral tumor and stroma",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.pnt = FALSE
+)
+# CD11bCD15
+myplot <- survfit(mysurv~clin_surv$clusters_CD11bCD15_tot)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on case-matched population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters CD11bCD15 intratumoral tumor and stroma",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+myplot <- survfit(mysurv~clin_surv$clusters_CD11bCD15_tot.p)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on case-matched population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters CD11bCD15 peripheral tumor and stroma",
+           #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.pnt = FALSE
+)
+
+
+# 1.3.Survivals Black/White----
+clin_surv <- markers_match
+# Immunoscore----
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_ + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "immunoscore_",
+                 title = "Survival analysis on case-matched population Black vs White",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Immunoscore",
+                 surv.median.line = c("hv"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD38 + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD38",
+                 title = "Survival analysis on case-matched population Black vs White",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "clusters_CD38",
+                 surv.median.line = c("hv"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_IP + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_excluded_IP",
+                 title = "Survival analysis on case-matched population Black vs White",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "clusters_excluded_IP",
+                 surv.median.line = c("hv"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_ST + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_excluded_ST",
+                 title = "Survival analysis on case-matched population Black vs White",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "clusters_excluded_ST",
+                 surv.median.line = c("hv"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_R_FoxP3_tum",
+                 title = "Survival analysis on case-matched population Black vs White",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "clusters_R_FoxP3_tum",
+                 surv.median.line = c("hv"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum.p + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_R_FoxP3_tum.p",
+                 title = "Survival analysis on case-matched population Black vs White",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "clusters_R_FoxP3_tum.p",
+                 surv.median.line = c("hv"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11b_tot",
+                 title = "Survival analysis on case-matched population Black vs White",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "clusters_CD11b_tot",
+                 surv.median.line = c("hv"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot.p + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11b_tot.p",
+                 title = "Survival analysis on case-matched population Black vs White",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "clusters_CD11b_tot.p",
+                 surv.median.line = c("hv"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD15_tot",
+                 title = "Survival analysis on case-matched population Black vs White",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "clusters_CD15_tot",
+                 surv.median.line = c("hv"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot.p + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD15_tot.p",
+                 title = "Survival analysis on case-matched population Black vs White",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "clusters_CD15_tot.p",
+                 surv.median.line = c("hv"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11bCD15_tot",
+                 title = "Survival analysis on case-matched population Black vs White",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "clusters_CD11bCD15_tot",
+                 surv.median.line = c("hv"))
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot.p + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11bCD15_tot.p",
+                 title = "Survival analysis on case-matched population Black vs White",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "clusters_CD11bCD15_tot.p",
+                 surv.median.line = c("hv"))
+
 
 
 ########################################################################################## II ### Plot Matched Cases----
