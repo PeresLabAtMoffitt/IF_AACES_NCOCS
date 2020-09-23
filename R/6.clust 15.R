@@ -1,6 +1,6 @@
 # Intratumor----
 # ratio /CD15 tumor
-a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+a <- clust_markers %>% # filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD15_tumor.i) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2) # clust on ratio
@@ -18,7 +18,7 @@ a %>%
   geom_boxplot()
 
 # ratio /CD15 total
-a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+a <- clust_markers %>% # filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD15_total.i) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2) # clust on ratio
@@ -35,7 +35,7 @@ a %>%
   ggplot(aes(x=suid, y=value, group=clusters_R_CD15_tot, color=clusters_R_CD15_tot))+
   geom_boxplot()
 # ratio /CD15 stroma
-a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+a <- clust_markers %>% # filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD15_stroma.i) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2) 
@@ -100,7 +100,7 @@ ggsurvplot(myplot, data = clin_surv,
 
 ############################################################################################# With no ratio----
 # CD15 tum
-a <- clust_markers %>% filter(clusters_CD38 == "high")
+a <- clust_markers# %>% filter(clusters_CD38 == "high")
 clust <- Mclust(a$percent_CD15_tumor.i, G = 2) 
 summary(clust)
 a$clusters_CD15_tum <- clust$classification
@@ -115,7 +115,7 @@ clust_markers %>%
   geom_boxplot()
 
 # CD15 tot----
-a <- clust_markers %>% filter(clusters_CD38 == "high") 
+a <- clust_markers# %>% filter(clusters_CD38 == "high") 
 clust <- Mclust(a$percent_CD15_total.i, G = 2) 
 summary(clust)
 a$clusters_CD15_tot <- clust$classification
@@ -130,7 +130,7 @@ clust_markers %>%
   geom_boxplot()
 
 # CD15 str
-a <- clust_markers %>% filter(clusters_CD38 == "high")
+a <- clust_markers# %>% filter(clusters_CD38 == "high")
 clust <- Mclust(a$percent_CD15_stroma.i, G = 2)
 summary(clust)
 a$clusters_CD15_str <- clust$classification
@@ -194,7 +194,7 @@ ggsurvplot(myplot, data = clin_surv,
 # Peripheral----
 
 # ratio /CD15 tumor
-a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+a <- clust_markers %>% # filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.p / percent_CD15_tumor.p) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2)
@@ -212,7 +212,7 @@ a %>%
   geom_boxplot()
 
 # ratio /CD15 total
-a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+a <- clust_markers %>% # filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.p / percent_CD15_total.p) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2) # clust on ratio
@@ -229,7 +229,7 @@ a %>%
   ggplot(aes(x=suid, y=value, group=clusters_R_CD15_tot.p, color=clusters_R_CD15_tot.p))+
   geom_boxplot()
 # ratio /CD15 stroma
-a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+a <- clust_markers %>% # filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.p / percent_CD15_stroma.p) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2) 
@@ -294,7 +294,7 @@ ggsurvplot(myplot, data = clin_surv,
 
 ############################################################################################# With no ratio----
 # CD15 tum
-a <- clust_markers %>% filter(clusters_CD38 == "high", !is.na(percent_CD15_tumor.p))
+a <- clust_markers# %>% filter(clusters_CD38 == "high", !is.na(percent_CD15_tumor.p))
 clust <- Mclust(a$percent_CD15_tumor.p, G = 2) 
 summary(clust)
 a$clusters_CD15_tum.p <- clust$classification
@@ -309,7 +309,7 @@ clust_markers %>%
   geom_boxplot()
 
 # CD15 tot----
-a <- clust_markers %>% filter(clusters_CD38 == "high", !is.na(percent_CD15_tumor.p))
+a <- clust_markers# %>% filter(clusters_CD38 == "high", !is.na(percent_CD15_tumor.p))
 clust <- Mclust(a$percent_CD15_total.p, G = 2) 
 summary(clust)
 a$clusters_CD15_tot.p <- clust$classification

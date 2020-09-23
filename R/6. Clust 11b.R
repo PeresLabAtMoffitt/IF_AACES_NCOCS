@@ -1,6 +1,6 @@
 # Intratumor
 # ratio /11b tumor
-a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+a <- clust_markers %>% # filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD11b_tumor.i) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2)
@@ -18,7 +18,7 @@ a %>%
   geom_boxplot()
 
 # ratio /11b total
-a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+a <- clust_markers %>% # filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD11b_total.i) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2)
@@ -35,7 +35,7 @@ a %>%
   ggplot(aes(x=suid, y=value, group=clusters_R_CD11b_tot, color=clusters_R_CD11b_tot))+
   geom_boxplot()
 # ratio /11b stroma
-a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+a <- clust_markers %>% # filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_CD11b_stroma.i) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2)
@@ -100,7 +100,7 @@ ggsurvplot(myplot, data = clin_surv,
 
 ############################################################################################# With no ratio----
 # CD11b tum
-a <- clust_markers %>% filter(clusters_CD38 == "high")
+a <- clust_markers %>% # filter(clusters_CD38 == "high")
 clust <- Mclust(a$percent_CD11b_tumor.i, G = 2)
 summary(clust)
 a$clusters_CD11b_tum <- clust$classification
@@ -117,7 +117,7 @@ clust_markers %>%
   geom_boxplot()
 
 # CD11b tot----
-a <- clust_markers %>% filter(clusters_CD38 == "high")
+a <- clust_markers %>% # filter(clusters_CD38 == "high")
 clust <- Mclust(a$percent_CD11b_total.i, G = 2)
 summary(clust)
 a$clusters_CD11b_tot <- clust$classification
@@ -134,7 +134,7 @@ clust_markers %>%
   geom_boxplot()
 
 # CD11b str
-a <- clust_markers %>% filter(clusters_CD38 == "high")
+a <- clust_markers %>% # filter(clusters_CD38 == "high")
 clust <- Mclust(a$percent_CD11b_stroma.i, G = 2)
 summary(clust)
 a$clusters_CD11b_str <- clust$classification
@@ -201,7 +201,7 @@ ggsurvplot(myplot, data = clin_surv,
 # Peripheral----
 
 # ratio /11b tumor
-a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+a <- clust_markers %>% # filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.p / percent_CD11b_tumor.p) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2)
@@ -219,7 +219,7 @@ a %>%
   geom_boxplot()
 
 # ratio /11b total
-a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+a <- clust_markers %>% # filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.p / percent_CD11b_total.p) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2)
@@ -236,7 +236,7 @@ a %>%
   ggplot(aes(x=suid, y=value, group=clusters_R_CD11b_tot.p, color=clusters_R_CD11b_tot.p))+
   geom_boxplot()
 # ratio /11b stroma
-a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+a <- clust_markers %>% # filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.p / percent_CD11b_stroma.p) %>% 
   filter(is.finite(ratio_eff_suppr))
 clust <- Mclust(a$ratio_eff_suppr, G = 2)
@@ -301,7 +301,7 @@ ggsurvplot(myplot, data = clin_surv,
 
 ############################################################################################# With no ratio----
 # CD11b tum
-a <- clust_markers %>% filter(clusters_CD38 == "high", !is.na(percent_CD11b_tumor.p))
+a <- clust_markers# %>% filter(clusters_CD38 == "high", !is.na(percent_CD11b_tumor.p))
 
 clust <- Mclust(a$percent_CD11b_tumor.p, G = 2)
 summary(clust)
@@ -319,7 +319,7 @@ clust_markers %>%
   geom_boxplot()
 
 # CD11b tot----
-a <- clust_markers %>% filter(clusters_CD38 == "high", !is.na(percent_CD11b_tumor.p))
+a <- clust_markers# %>% filter(clusters_CD38 == "high", !is.na(percent_CD11b_tumor.p))
 clust <- Mclust(a$percent_CD11b_total.p, G = 2)
 summary(clust)
 a$clusters_CD11b_tot.p <- clust$classification
