@@ -1,4 +1,4 @@
-################################################################################################################# I ### Basic plots----
+#################################################################################################### I ### Basic plots----
 # Proportion cancer characteristic between Black and White
 clinical_data %>% 
   group_by(cancersite, race) %>% 
@@ -101,11 +101,11 @@ ggplot(clinical_data, aes(x=race, y=refage, color=race))+
 
 
 
-################################################################################################################# II ### Survival plot----
+#################################################################################################### II ### Survival plot----
 # Limiting to only the case_match ids----
 clin_surv <- markers_match
 # no event should be 0, when event happened should be 1
-# so will use the var surv_vital that I created alive=0, death=1
+# so will use the variable surv_vital that I created alive=0, death=1
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 # median(clin_surv$timelastfu_new)
 # do not use this value as the median survival is tbe time at the survivalship aka function = .5
@@ -113,14 +113,12 @@ mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 # Plot
 # survfit(mysurv~1, type= "kaplan-meier", conf.type = "log-log") # if log
 # can do fleming-harrington or fh2 with log-log too
+
 # For whole population, default mysurv~1, type= "kaplan-meier")
 myplot <- survfit(mysurv~1) 
 plot(myplot)
-# plot(myplot, conf.int = "none") # without confidence interval
-# abline(h=0.5)
-# abline(v=1576) # Here put the median value in the my surv
 # can get a restricted mean 
-# print(myplot,print.mean=TRUE)
+print(myplot,print.mean=TRUE)
 
 # For black and white----
 myplot <- survfit(mysurv~clin_surv$race)
@@ -277,7 +275,6 @@ ggsurv <- ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf.int = FALSE
 )
-# Faceting survival curves
 curv_facet <- ggsurv$plot + facet_grid( ~ race)
 curv_facet
 
@@ -447,7 +444,7 @@ ggsurvplot(myplot, data = clin_surv,
 # Per pregever----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~pregever + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pregever",
-                 title = "Survival analysis on Black vs White population comparing Pregnacy status",
+                 title = "Survival analysis on Black vs White population comparing \nPregnacy status",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -456,7 +453,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pregever",
 # Per agefbirth----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~agefbirth + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "agefbirth",
-                 title = "Survival analysis on Black vs White population comparing Age at first birth",
+                 title = "Survival analysis on Black vs White population comparing \nAge at first birth",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -466,7 +463,7 @@ clin_surv$range_agefbirth <- as.factor(findInterval(clin_surv$agefbirth,c(14,20,
 levels(clin_surv$range_agefbirth) <- c("<20","20-24","25-29","30-34","35-39")
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~range_agefbirth + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "range_agefbirth",
-                 title = "Survival analysis on Black vs White population comparing Age at first birth",
+                 title = "Survival analysis on Black vs White population comparing \nAge at first birth",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -475,7 +472,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "range_agefbirth",
 # Per hyster----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~hyster +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hyster",
-                 title = "Survival analysis on Black vs White population comparing Hysterectomy status",
+                 title = "Survival analysis on Black vs White population comparing \nHysterectomy status",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -484,7 +481,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hyster",
 # Per oophor----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~oophor +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "oophor",
-                 title = "Survival analysis on Black vs White population comparing Oophorectomy status",
+                 title = "Survival analysis on Black vs White population comparing \nOophorectomy status",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -493,7 +490,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "oophor",
 # Per tubelig----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~tubelig +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "tubelig",
-                 title = "Survival analysis on Black vs White population comparing Tubal ligation status",
+                 title = "Survival analysis on Black vs White population comparing \nTubal ligation status",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -502,7 +499,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "tubelig",
 # Per ocever----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~ocever +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ocever",
-                 title = "Survival analysis on Black vs White population comparing Ever use oral contraceptives",
+                 title = "Survival analysis on Black vs White population comparing \nEver use oral contraceptives",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -511,7 +508,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ocever",
 # Per breastfedever----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~breastfedever +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "breastfedever",
-                 title = "Survival analysis on Black vs White population comparing Ever breastfed",
+                 title = "Survival analysis on Black vs White population comparing \nEver breastfed",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -520,7 +517,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "breastfedever",
 # Per menarch_agecat----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~menarch_agecat +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "menarch_agecat",
-                 title = "Survival analysis on Black vs White population comparing Age at menarche",
+                 title = "Survival analysis on Black vs White population comparing \nAge at menarche",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -529,7 +526,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "menarch_agecat",
 # Per menopause----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~menopause +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "menopause",
-                 title = "Survival analysis on Black vs White population comparing Menopausal status",
+                 title = "Survival analysis on Black vs White population comparing \nMenopausal status",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -538,7 +535,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "menopause",
 # Per talcever----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~talcever +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "talcever",
-                 title = "Survival analysis on Black vs White population comparing Ever regular use of body powder (at least 1 time per month for 6 months)",
+                 title = "Survival analysis on Black vs White population comparing \nEver regular use of body powder (at least 1 time per month for 6 months)",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -547,7 +544,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "talcever",
 # Per brcancer----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~brcancer +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "brcancer",
-                 title = "Survival analysis on Black vs White population comparing Ever diagnosed with breast cancer",
+                 title = "Survival analysis on Black vs White population comparing \nEver diagnosed with breast cancer",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -556,7 +553,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "brcancer",
 # Per brcancermom----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~brcancermom +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "brcancermom",
-                 title = "Survival analysis on Black vs White population comparing Biological mother had breast cancer",
+                 title = "Survival analysis on Black vs White population comparing \nBiological mother had breast cancer",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -565,7 +562,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "brcancermom",
 # Per famhxbr----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~famhxbr +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "famhxbr",
-                 title = "Survival analysis on Black vs White population comparing Family history of breast cancer in any first-degree relative",
+                 title = "Survival analysis on Black vs White population comparing \nFamily history of breast cancer in any first-degree relative",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -574,7 +571,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "famhxbr",
 # Per ovcancermom----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~ovcancermom +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancermom",
-                 title = "Survival analysis on Black vs White population comparing Biological mother had ovarian cancer",
+                 title = "Survival analysis on Black vs White population comparing \nBiological mother had ovarian cancer",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -583,7 +580,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancermom",
 # Per ovcancersis----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~ovcancersis +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancersis",
-                 title = "Survival analysis on Black vs White population comparing Any biological sister diagnosed with ovarian cancer",
+                 title = "Survival analysis on Black vs White population comparing \nAny biological sister diagnosed with ovarian cancer",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -592,7 +589,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancersis",
 # Per famhxov----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~famhxov +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "famhxov",
-                 title = "Survival analysis on Black vs White population comparing Family history of ovarian cancer in any first-degree relative",
+                 title = "Survival analysis on Black vs White population comparing \nFamily history of ovarian cancer in any first-degree relative",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -610,7 +607,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancerdaughter",
 # Per endomet----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~endomet +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "endomet",
-                 title = "Survival analysis on Black vs White population comparing diagnosed with endometriosis",
+                 title = "Survival analysis on Black vs White population comparing \ndiagnosed with endometriosis",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -619,7 +616,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "endomet",
 # Per fibroids----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~fibroids +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "fibroids",
-                 title = "Survival analysis on Black vs White population comparing diagnosed with uterine fibroids",
+                 title = "Survival analysis on Black vs White population comparing \ndiagnosed with uterine fibroids",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -628,7 +625,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "fibroids",
 # Per pid----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~pid +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pid",
-                 title = "Survival analysis on Black vs White population comparing diagnosed with pelvic inflammatory disease",
+                 title = "Survival analysis on Black vs White population comparing \ndiagnosed with pelvic inflammatory disease",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -637,7 +634,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pid",
 # Per pcos----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~pcos +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pcos",
-                 title = "Survival analysis on Black vs White population comparing diagnosed with polycystic ovarian syndrome",
+                 title = "Survival analysis on Black vs White population comparing \ndiagnosed with polycystic ovarian syndrome",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -646,7 +643,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pcos",
 # Per ovcyst----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~ovcyst +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcyst",
-                 title = "Survival analysis on Black vs White population comparing diagnosed with an ovarian cyst",
+                 title = "Survival analysis on Black vs White population comparing \ndiagnosed with an ovarian cyst",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -655,7 +652,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcyst",
 # Per anyfhever----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~anyfhever +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "anyfhever",
-                 title = "Survival analysis on Black vs White population comparing use any female hormones (pill patch or injection only)",
+                 title = "Survival analysis on Black vs White population comparing use \nany female hormones (pill patch or injection only)",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -664,7 +661,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "anyfhever",
 # Per eonlyever----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~eonlyever +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "eonlyever",
-                 title = "Survival analysis on Black vs White population comparing use estrogen only (pills, patches, or injections)",
+                 title = "Survival analysis on Black vs White population comparing use \nestrogen only (pills, patches, or injections)",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -673,7 +670,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "eonlyever",
 # Per epever----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~epever +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "epever",
-                 title = "Survival analysis on Black vs White population comparing use estrogen + progestin (pills, patches, or injections)",
+                 title = "Survival analysis on Black vs White population comparing use \nestrogen + progestin (pills, patches, or injections)",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -691,7 +688,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "smokever",
 # Per diab----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~diab +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "diab",
-                 title = "Survival analysis on Black vs White population comparing diabetes diagnosis",
+                 title = "Survival analysis on Black vs White population comparing \ndiabetes diagnosis",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -700,7 +697,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "diab",
 # Per hrtdis----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~hrtdis +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hrtdis",
-                 title = "Survival analysis on Black vs White population comparing heart disease diagnosis",
+                 title = "Survival analysis on Black vs White population comparing \nheart disease diagnosis",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -709,7 +706,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hrtdis",
 # Per hbp----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~hbp +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hbp",
-                 title = "Survival analysis on Black vs White population comparing high blood pressure diagnosis ",
+                 title = "Survival analysis on Black vs White population comparing \nhigh blood pressure diagnosis ",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -718,7 +715,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hbp",
 # Per hchol----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~hchol +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hchol",
-                 title = "Survival analysis on Black vs White population comparing high cholesterol diagnosis",
+                 title = "Survival analysis on Black vs White population comparing \nhigh cholesterol diagnosis",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -727,7 +724,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hchol",
 # Per osteo----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~osteo +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "osteo",
-                 title = "Survival analysis on Black vs White population comparing osteoporosis diagnosis",
+                 title = "Survival analysis on Black vs White population comparing \nosteoporosis diagnosis",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -736,7 +733,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "osteo",
 # Per thyrd----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~thyrd +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "thyrd",
-                 title = "Survival analysis on Black vs White population comparing thyroid condition",
+                 title = "Survival analysis on Black vs White population comparing \nthyroid condition",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "Race",
@@ -787,13 +784,13 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "aceta",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-
+##################################################################### III ### Survival analysis immune cells whole pop----
 # Lymphocytes no race for intratumoral stromal+tumor using quartiles----
 clin_surv <- markers
 # CD3
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-                 title = "Survival analysis on overall population \nseparated by CD3+ lymphocyte occupancy",
+                 title = "Survival analysis on overall population \nseparated by overall intratumoral CD3+ lymphocyte occupancy",
                  font.main = c(16, "bold", "black"),
                  xlab = "Time (days)",
                  legend.title = "CD3+",
@@ -856,7 +853,7 @@ summary(myplot)
 # CD3_CD8
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on overall population \nseparated by CD3+CD8+ lymphocyte occupancy",
+           title = "Survival analysis on overall population \nseparated by overall intartumoral CD3+CD8+ lymphocyte occupancy",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "CD3+CD8+",
@@ -920,7 +917,7 @@ summary(myplot)
 # CD3_FoxP3
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on overall population \nseparated by tumoral CD3+FoxP3+ lymphocyte occupancy",
+           title = "Survival analysis on overall population \nseparated by overall intartumoral CD3+FoxP3+ lymphocyte occupancy",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "CD3+FoxP3+",
@@ -983,7 +980,7 @@ summary(myplot)
 # CD11b+
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on overall population \nseparated by CD11b+ lymphocyte occupancy",
+           title = "Survival analysis on overall population \nseparated by overall intartumoral CD11b+ lymphocyte occupancy",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "CD11b+",
@@ -1046,7 +1043,7 @@ summary(myplot)
 # CD11b+CD15+
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on overall population \nseparated by CD11b+CD15+ lymphocyte occupancy",
+           title = "Survival analysis on overall population \nseparated by overall intartumoral CD11b+CD15+ lymphocyte occupancy",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "CD11b+CD15+",
@@ -1106,6 +1103,314 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_CD15_stroma.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
 
+
+##################################################################### IV ### Survival analysis immune cells B/W----
+# Lymphocytes no race for intratumoral stromal+tumor using quartiles----
+clin_surv <- markers_match
+# CD3
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by overall intratumoral CD3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD3+",
+           surv.median.line = c("hv"))
+# Cox CD3
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_total.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_total.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD3
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3t_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by tumoral CD3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumoral CD3+",
+           surv.median.line = c("hv"))
+# Cox CD3
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3t_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_tumor.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3t_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_tumor.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+## CD3 stroma
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3s_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by stromal CD3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stromal CD3+",
+           surv.median.line = c("hv"))
+#
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3s_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_stroma.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3s_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_stroma.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD3_CD8
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by overall intartumoral CD3+CD8+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD3+CD8+",
+           surv.median.line = c("hv"))
+# Cox
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_CD8_total.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_CD8_total.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD3_CD8 tumor
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8t_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by tumoral CD3+CD8+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumor CD3+CD8+",
+           surv.median.line = c("hv"))
+# Cox
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8t_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_CD8_tumor.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8t_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_CD8_tumor.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD3_CD8 stroma
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8s_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by stromal CD3+CD8+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stroma CD3+CD8+",
+           surv.median.line = c("hv"))
+# Cox
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8s_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_CD8_stroma.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8s_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_CD8_stroma.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+
+# CD3_FoxP3
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by overall intartumoral CD3+FoxP3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD3+FoxP3+",
+           surv.median.line = c("hv"))
+# Cox
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_FoxP3_total.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_FoxP3_total.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD3_FoxP3 tumor
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3t_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by tumoral CD3+FoxP3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumor CD3+FoxP3+",
+           surv.median.line = c("hv"))
+# Cox
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3t_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_FoxP3_tumor.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3t_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_FoxP3_tumor.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD3_FoxP3 stroma
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3s_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by stromal CD3+FoxP3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stroma CD3+FoxP3+",
+           surv.median.line = c("hv"))
+# Cox
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3s_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_FoxP3_stroma.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3s_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_FoxP3_stroma.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD11b+
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by overall intartumoral CD11b+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD11b+",
+           surv.median.line = c("hv"))
+# Cox
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_total.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_total.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD11b+ tumor
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11bt_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by tumoral CD11b+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumoral CD11b+",
+           surv.median.line = c("hv"))
+# Cox
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bt_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_tumor.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bt_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_tumor.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD11b+ stroma
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11bs_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by stromal CD11b+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stromal CD11b+",
+           surv.median.line = c("hv"))
+# Cox
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bs_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_stroma.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bs_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_stroma.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD11b+CD15+
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by overall intartumoral CD11b+CD15+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD11b+CD15+",
+           surv.median.line = c("hv"))
+# Cox
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_CD15_total.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_CD15_total.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD11b+CD15+ tumor
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15t_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by tumoral CD11b+CD15+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumor CD11b+CD15+",
+           surv.median.line = c("hv"))
+# Cox
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15t_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_CD15_tumor.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15t_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_CD15_tumor.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+# CD11b+CD15+ stroma
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
+           title = "Survival analysis on case-matched population Black vs White \nseparated by stromal CD11b+CD15+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stromal CD11b+CD15+",
+           surv.median.line = c("hv"))
+# Cox
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_CD15_stroma.i + race, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_CD15_stroma.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+
+
+##################################################################### V ### Survival analysis immune cells ----
 
 # Lymphocytes keep----
 clin_surv <- markers_match
