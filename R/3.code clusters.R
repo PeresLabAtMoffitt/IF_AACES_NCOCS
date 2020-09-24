@@ -332,7 +332,7 @@ clust_markers <- clust_markers %>%
   ))
 
 
-clin_surv <- left_join(markers, 
+markers <- left_join(markers, 
                        clust_markers[, c("suid", "clusters_Brooke", "clusters_all_IandP", "clusters_CD3CD8", "dbl_pos",
                                          "clusters_CD38",
                                          "excluded_double_ratioIP",
@@ -340,3 +340,10 @@ clin_surv <- left_join(markers,
                                          "special_cluster", "special_cluster2", "special_cluster3", 
                                          "special_cluster4", "special_cluster5")], by="suid")
 
+
+
+
+
+######################################################################################## VI ### Create df for pair_id----
+markers_match <-  markers %>% drop_na(pair_id) %>% 
+  group_by(pair_id) %>% filter( n() > 1 )

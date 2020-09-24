@@ -1,12 +1,12 @@
 ######################################################################################## I ### Survivals by clusters----
-mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
+mysurv <- Surv(time = markers$timelastfu_new, event = markers$surv_vital)
 
 # 1. Quick cluster----
 
 # 1.1.Does Intratumoral tumor+stroma markers are predictive?----
 # clusters_Brooke
-myplot <- survfit(mysurv~clin_surv$clusters_Brooke)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$clusters_Brooke)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by Brooke",
@@ -18,12 +18,12 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf.int = FALSE
 )
-survdiff(mysurv~clin_surv$clusters_Brooke)
+survdiff(mysurv~markers$clusters_Brooke)
 
 # 1.2.Does Intratumoral+Peripheral tumor+stroma markers are predictive?----
 # clusters_all_IandP
-myplot <- survfit(mysurv~clin_surv$clusters_all_IandP)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$clusters_all_IandP)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by Brooke",
@@ -35,12 +35,12 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf.int = FALSE
 )
-survdiff(mysurv~+clin_surv$clusters_all_IandP)
+survdiff(mysurv~+markers$clusters_all_IandP)
 
 # 1.3.Does double positive markers are predictive?----
 # clusters 
-myplot <- survfit(mysurv~clin_surv$dbl_pos)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$dbl_pos)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by Brooke",
@@ -52,7 +52,7 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf.int = FALSE
 )
-survdiff(mysurv~clin_surv$race+clin_surv$dbl_pos)
+survdiff(mysurv~markers$race+markers$dbl_pos)
 
 p1 <- clust_markers %>% filter(!is.na(race)) %>% 
   ggplot(aes(x=race, y=sqrt_CD3_CD8_tumor.i, color=dbl_pos))+
@@ -76,8 +76,8 @@ gridExtra::grid.arrange(p1, p2, p3, ncol=3)
 
 # 1.4.Does tumoral CD3CD8 markers are predictive?----
 # clusters_CD3CD8
-myplot <- survfit(mysurv~clin_surv$clusters_CD3CD8)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$clusters_CD3CD8)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clusters_CD3CD8",
@@ -115,8 +115,8 @@ ggsurvplot(myplot, data = clin_surv,
 
 # 2.1.Does tumoral CD3CD8 markers are predictive?----
 # clusters_CD38
-myplot <- survfit(mysurv~clin_surv$clusters_CD38)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$clusters_CD38)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clusters_CD38",
@@ -151,8 +151,8 @@ ggsurvplot(myplot, data = clin_surv,
 
 # 2.1.Does tumoral Low_CD38 can be separated into cold or excluded?----
 # excluded
-myplot <- survfit(mysurv~clin_surv$excluded_double_ratioIP)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$excluded_double_ratioIP)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by excluded_double_ratioIP",
@@ -164,8 +164,8 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf.int = FALSE
 )
-myplot <- survfit(mysurv~clin_surv$excluded_double_ratioST)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$excluded_double_ratioST)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by excluded_double_ratioST",
@@ -177,8 +177,8 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf.int = FALSE
 )
-myplot <- survfit(mysurv~clin_surv$clusters_excluded_IP)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$clusters_excluded_IP)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by clusters_excluded_IP",
@@ -190,8 +190,8 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf.int = FALSE
 )
-myplot <- survfit(mysurv~clin_surv$clusters_excluded_ST)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$clusters_excluded_ST)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by clusters_excluded_ST",
@@ -218,8 +218,8 @@ clust_markers %>%
 
 # 2.2.Does tumoral High_CD38 can be separated into immunosuppressed and hot?----
 # immunosuppressed
-myplot <- survfit(mysurv~clin_surv$clusters_immsuppr)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$clusters_immsuppr)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clusters_immsuppr",
@@ -232,8 +232,8 @@ ggsurvplot(myplot, data = clin_surv,
            conf.pnt = FALSE
 )
 
-myplot <- survfit(mysurv~clin_surv$clusters_FoxP3)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$clusters_FoxP3)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clusters_FoxP3",
@@ -247,8 +247,8 @@ ggsurvplot(myplot, data = clin_surv,
 )
 
 # Other cluster on FoxP3 alone (total) and check if we should add it up to ration or cd3foxp3 cluster
-myplot <- survfit(mysurv~clin_surv$clusters_FoxP3_)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$clusters_FoxP3_)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by clusters_FoxP3_",
@@ -266,8 +266,8 @@ ggsurvplot(myplot, data = clin_surv,
 
 # 2.3.Does special clustering (excluded,immunosupp, hot, cold) is predictive?----
 # special_cluster
-myplot <- survfit(mysurv~clin_surv$special_cluster)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$special_cluster)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by CD8 then FoxP3", 
@@ -279,10 +279,10 @@ ggsurvplot(myplot, data = clin_surv,
            tables.height = 0.2,
            risk.table.title = "Risk table"
 )
-survdiff(mysurv~clin_surv$race+clin_surv$special_cluster)
+survdiff(mysurv~markers$race+markers$special_cluster)
 # special_cluster2
-myplot <- survfit(mysurv~clin_surv$special_cluster2)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$special_cluster2)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by CD8 -ratioCD8<2 -ratioCD8/FoxP3", 
@@ -294,10 +294,10 @@ ggsurvplot(myplot, data = clin_surv,
            tables.height = 0.2,
            risk.table.title = "Risk table"
 )
-survdiff(mysurv~clin_surv$race+clin_surv$special_cluster2)
+survdiff(mysurv~markers$race+markers$special_cluster2)
 # special_cluster3
-myplot <- survfit(mysurv~clin_surv$special_cluster3)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$special_cluster3)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by  CD8 -ratioCD8cluster -ratioCD8/FoxP3", 
@@ -309,10 +309,10 @@ ggsurvplot(myplot, data = clin_surv,
            tables.height = 0.2,
            risk.table.title = "Risk table"
 )
-survdiff(mysurv~clin_surv$race+clin_surv$special_cluster3)
+survdiff(mysurv~markers$race+markers$special_cluster3)
 # special_cluster4
-myplot <- survfit(mysurv~clin_surv$special_cluster4)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$special_cluster4)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by CD8 -ratioCD8<2 -FoxP3", 
@@ -324,10 +324,10 @@ ggsurvplot(myplot, data = clin_surv,
            tables.height = 0.2,
            risk.table.title = "Risk table"
 )
-survdiff(mysurv~clin_surv$race+clin_surv$special_cluster4)
+survdiff(mysurv~markers$race+markers$special_cluster4)
 # special_cluster5
-myplot <- survfit(mysurv~clin_surv$special_cluster5)
-ggsurvplot(myplot, data = clin_surv,
+myplot <- survfit(mysurv~markers$special_cluster5)
+ggsurvplot(myplot, data = markers,
            title = "Survival analysis on whole population",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by CD8 -ratioCD8clustaer -FoxP3", 
@@ -339,5 +339,5 @@ ggsurvplot(myplot, data = clin_surv,
            tables.height = 0.2,
            risk.table.title = "Risk table"
 )
-survdiff(mysurv~clin_surv$race+clin_surv$special_cluster5)
+survdiff(mysurv~markers$race+markers$special_cluster5)
 
