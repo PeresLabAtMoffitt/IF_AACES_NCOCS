@@ -764,15 +764,8 @@ markers_match <-  markers %>% drop_na(pair_id) %>%
 
 global_28 <- left_join(TMA_global, ROI_global, by = "suid")
 global_28 <- global_28[(grepl(uid, global_28$suid)),]
-######################################################################################## VII ### to look----
 
-# # 3.3.Add case_match and race to ROI data
-# cases_match <- left_join(cases_match,
-#                          clinical_data %>% select("suid", "race"),
-#                          by= "suid")
-# cases_match1 <- dcast(setDT(cases_match), pair_id ~ rowid(pair_id),
-#                       value.var = c("suid", "race")) %>%
-#   drop_na("race_1", "race_2") # We all have the matching
+
 
 
 
