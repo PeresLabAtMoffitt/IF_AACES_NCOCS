@@ -199,46 +199,45 @@ rm(df1, df2, cols)
 
 ########################################################################################## II ### Immune hot vs cold----
 ############################################################################################### Immunoscore calculation----
-# https://jitc.biomedcentral.com/articles/10.1186/s40425-016-0161-x
-# The best performing algorithm to compute the Immunoscore has been defined in the large international SITC -
-#   led retrospective validation study [1, 2] conducted on more than 3800 St I-III colon cancer patients, 
-# Briefly, for each marker (CD3 & CD8) and each zone (CT & IM), densities distributions have been established 
-# on the study training set; for each parameter of a tested sample (CD3, CD8, CT, IM), a percentile is derived 
-# from these distributions. An average percentile is calculated based on these 4 values. The Immunoscore® is 
-# reported as IS-0, 1 – 2 – 3 – 4 based on the following average percentile classes respectively: 
-#   [0 %; 10 %] - [>10 %; 25 %] - [>25 %; 70 %] - [>70 %; 95 %] - [>95 %; 100 %].
-# CD3 and CD8 in two regions (CT and IM)
-
-# distribution CD3 intra
-quantile(markers$percent_CD3_total.i, c(.10, .25, .70, .95), na.rm = TRUE) 
-# distribution CD3 periph
-quantile(markers$percent_CD3_total.p, c(.10, .25, .70, .95), na.rm = TRUE) 
-# distribution CD8 intra
-quantile(markers$percent_CD8_total.i, c(.10, .25, .70, .95), na.rm = TRUE) 
-# distribution CD8 periph
-quantile(markers$percent_CD8_total.p, c(.10, .25, .70, .95), na.rm = TRUE) 
-# Calculate percentile for each patient for CD3, 8, i, p
-markers <- markers %>% 
-  mutate(percentile_score_CD3_i = ntile(percent_CD3_total.i, 100) ) %>% 
-  mutate(percentile_score_CD3_p = ntile(percent_CD3_total.p, 100) ) %>% 
-  mutate(percentile_score_CD8_i = ntile(percent_CD8_total.i, 100) ) %>% 
-  mutate(percentile_score_CD8_p = ntile(percent_CD8_total.p, 100) ) 
-markers <- markers %>%
-  mutate(percentile_score_mean = rowMeans(markers[c("percentile_score_CD3_i", "percentile_score_CD3_p", 
-                              "percentile_score_CD8_i", "percentile_score_CD8_p")])
-         ) %>% 
-  mutate(immunoscore_ = case_when(
-    percentile_score_mean <= 10 ~ 0,
-    percentile_score_mean <= 25 ~ 1,
-    percentile_score_mean <= 70 ~ 2,
-    percentile_score_mean <= 95 ~ 3,
-    percentile_score_mean > 95 ~ 4 
-  ))
+# # https://jitc.biomedcentral.com/articles/10.1186/s40425-016-0161-x
+# # The best performing algorithm to compute the Immunoscore has been defined in the large international SITC -
+# #   led retrospective validation study [1, 2] conducted on more than 3800 St I-III colon cancer patients, 
+# # Briefly, for each marker (CD3 & CD8) and each zone (CT & IM), densities distributions have been established 
+# # on the study training set; for each parameter of a tested sample (CD3, CD8, CT, IM), a percentile is derived 
+# # from these distributions. An average percentile is calculated based on these 4 values. The Immunoscore® is 
+# # reported as IS-0, 1 – 2 – 3 – 4 based on the following average percentile classes respectively: # -----------------------------------remove
+# #   [0 %; 10 %] - [>10 %; 25 %] - [>25 %; 70 %] - [>70 %; 95 %] - [>95 %; 100 %].
+# # CD3 and CD8 in two regions (CT and IM)
+# 
+# # distribution CD3 intra
+# quantile(markers$percent_CD3_total.i, c(.10, .25, .70, .95), na.rm = TRUE) 
+# # distribution CD3 periph
+# quantile(markers$percent_CD3_total.p, c(.10, .25, .70, .95), na.rm = TRUE) 
+# # distribution CD8 intra
+# quantile(markers$percent_CD8_total.i, c(.10, .25, .70, .95), na.rm = TRUE) 
+# # distribution CD8 periph
+# quantile(markers$percent_CD8_total.p, c(.10, .25, .70, .95), na.rm = TRUE) 
+# # Calculate percentile for each patient for CD3, 8, i, p
+# markers <- markers %>% 
+#   mutate(percentile_score_CD3_i = ntile(percent_CD3_total.i, 100) ) %>% 
+#   mutate(percentile_score_CD3_p = ntile(percent_CD3_total.p, 100) ) %>% 
+#   mutate(percentile_score_CD8_i = ntile(percent_CD8_total.i, 100) ) %>% 
+#   mutate(percentile_score_CD8_p = ntile(percent_CD8_total.p, 100) ) 
+# markers <- markers %>%
+#   mutate(percentile_score_mean = rowMeans(markers[c("percentile_score_CD3_i", "percentile_score_CD3_p", 
+#                               "percentile_score_CD8_i", "percentile_score_CD8_p")])
+#          ) %>% 
+#   mutate(immunoscore_ = case_when(
+#     percentile_score_mean <= 10 ~ 0,
+#     percentile_score_mean <= 25 ~ 1,
+#     percentile_score_mean <= 70 ~ 2,
+#     percentile_score_mean <= 95 ~ 3,
+#     percentile_score_mean > 95 ~ 4 
+#   ))
 # Survival
 clin_surv <- markers
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 myplot <- survfit(mysurv~clin_surv$immunoscore_)
-myplot
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on matched patient",
            font.main = c(16, "bold", "black"),
