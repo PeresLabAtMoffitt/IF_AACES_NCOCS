@@ -189,6 +189,11 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "immunoscore_",
                  xlab = "Time (days)",
                  legend.title = "Immunoscore",
                  surv.median.line = c("hv"))
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_ + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_ + refage + race + stage, data = clin_surv)
+summary(myplot)
+# clusters_CD38
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD38 + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD38",
                  title = "Survival analysis on case-matched population Black vs White",
@@ -196,6 +201,11 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD38",
                  xlab = "Time (days)",
                  legend.title = "clusters_CD38",
                  surv.median.line = c("hv"))
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD38 + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD38 + refage + race + stage, data = clin_surv)
+summary(myplot)
+# clusters_excluded_IP
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_IP + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_excluded_IP",
                  title = "Survival analysis on case-matched population Black vs White",
@@ -203,6 +213,11 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_excluded_IP",
                  xlab = "Time (days)",
                  legend.title = "clusters_excluded_IP",
                  surv.median.line = c("hv"))
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_IP + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_IP + refage + race + stage, data = clin_surv)
+summary(myplot)
+# clusters_excluded_ST
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_ST + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_excluded_ST",
                  title = "Survival analysis on case-matched population Black vs White",
@@ -210,6 +225,11 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_excluded_ST",
                  xlab = "Time (days)",
                  legend.title = "clusters_excluded_ST",
                  surv.median.line = c("hv"))
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_ST + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_ST + refage + race + stage, data = clin_surv)
+summary(myplot)
+# clusters_R_FoxP3_tum
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_R_FoxP3_tum",
                  title = "Survival analysis on case-matched population Black vs White",
@@ -217,6 +237,11 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_R_FoxP3_tum",
                  xlab = "Time (days)",
                  legend.title = "clusters_R_FoxP3_tum",
                  surv.median.line = c("hv"))
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum + refage + race + stage, data = clin_surv)
+summary(myplot)
+# clusters_R_FoxP3_tum.p
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum.p + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_R_FoxP3_tum.p",
                  title = "Survival analysis on case-matched population Black vs White",
@@ -224,6 +249,11 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_R_FoxP3_tum.p",
                  xlab = "Time (days)",
                  legend.title = "clusters_R_FoxP3_tum.p",
                  surv.median.line = c("hv"))
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum.p + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum.p + refage + race + stage, data = clin_surv)
+summary(myplot)
+# clusters_CD11b_tot
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11b_tot",
                  title = "Survival analysis on case-matched population Black vs White",
@@ -231,6 +261,11 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11b_tot",
                  xlab = "Time (days)",
                  legend.title = "clusters_CD11b_tot",
                  surv.median.line = c("hv"))
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot + refage + race + stage, data = clin_surv)
+summary(myplot)
+# clusters_CD11b_tot.p
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot.p + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11b_tot.p",
                  title = "Survival analysis on case-matched population Black vs White",
@@ -238,6 +273,11 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11b_tot.p",
                  xlab = "Time (days)",
                  legend.title = "clusters_CD11b_tot.p",
                  surv.median.line = c("hv"))
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot.p + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot.p + refage + race + stage, data = clin_surv)
+summary(myplot)
+# clusters_CD15_tot
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD15_tot",
                  title = "Survival analysis on case-matched population Black vs White",
@@ -245,6 +285,11 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD15_tot",
                  xlab = "Time (days)",
                  legend.title = "clusters_CD15_tot",
                  surv.median.line = c("hv"))
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot + refage + race + stage, data = clin_surv)
+summary(myplot)
+# clusters_CD15_tot.p
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot.p + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD15_tot.p",
                  title = "Survival analysis on case-matched population Black vs White",
@@ -252,6 +297,11 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD15_tot.p",
                  xlab = "Time (days)",
                  legend.title = "clusters_CD15_tot.p",
                  surv.median.line = c("hv"))
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot.p + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot.p + refage + race + stage, data = clin_surv)
+summary(myplot)
+# clusters_CD11bCD15_tot
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11bCD15_tot",
                  title = "Survival analysis on case-matched population Black vs White",
@@ -259,6 +309,11 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11bCD15_tot",
                  xlab = "Time (days)",
                  legend.title = "clusters_CD11bCD15_tot",
                  surv.median.line = c("hv"))
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot + refage + race + stage, data = clin_surv)
+summary(myplot)
+# clusters_CD11bCD15_tot.p
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot.p + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11bCD15_tot.p",
                  title = "Survival analysis on case-matched population Black vs White",
@@ -266,7 +321,10 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11bCD15_tot.p"
                  xlab = "Time (days)",
                  legend.title = "clusters_CD11bCD15_tot.p",
                  surv.median.line = c("hv"))
-
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot.p + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot.p + refage + race + stage, data = clin_surv)
+summary(myplot)
 
 
 ########################################################################################## II ### Plot Matched Cases----
