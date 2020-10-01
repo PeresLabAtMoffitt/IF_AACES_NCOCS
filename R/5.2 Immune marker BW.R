@@ -31,6 +31,7 @@ markers_match %>%
 
 
 # Paired plot----
+# Intratumoral
 markers_match %>%
   gather(key = "markers", value = "value", 
          c("percent_CD3_tumor.i", "percent_CD3_total.i", "percent_CD3_stroma.i")) %>% 
@@ -85,6 +86,60 @@ markers_match %>%
   stat_compare_means(paired = TRUE)+
   facet_grid(. ~ markers)
 
+# Pripheral
+markers_match %>%
+  gather(key = "markers", value = "value", 
+         c("percent_CD3_tumor.p", "percent_CD3_total.p", "percent_CD3_stroma.p")) %>% 
+  select("markers", "value", "race") %>% 
+  ggpaired(x = "race", y = "value",
+           color = "race", line.color = "gray", line.size = 0.4)+
+  stat_compare_means(paired = TRUE)+
+  facet_grid(. ~ markers)
+
+markers_match %>%
+  gather(key = "markers", value = "value", 
+         c("percent_CD3_CD8_tumor.p", "percent_CD3_CD8_total.p", "percent_CD3_CD8_stroma.p")) %>% 
+  select("markers", "value", "race") %>% 
+  ggpaired(x = "race", y = "value",
+           color = "race", line.color = "gray", line.size = 0.4)+
+  stat_compare_means(paired = TRUE)+
+  facet_grid(. ~ markers)
+
+markers_match %>%
+  gather(key = "markers", value = "value", 
+         c("percent_FoxP3_tumor.p", "percent_FoxP3_total.p", "percent_FoxP3_stroma.p")) %>% 
+  select("markers", "value", "race") %>% 
+  ggpaired(x = "race", y = "value",
+           color = "race", line.color = "gray", line.size = 0.4)+
+  stat_compare_means(paired = TRUE)+
+  facet_grid(. ~ markers)
+
+markers_match %>%
+  gather(key = "markers", value = "value", 
+         c("percent_CD11b_tumor.p", "percent_CD11b_total.p", "percent_CD11b_stroma.p")) %>% 
+  select("markers", "value", "race") %>% 
+  ggpaired(x = "race", y = "value",
+           color = "race", line.color = "gray", line.size = 0.4)+
+  stat_compare_means(paired = TRUE)+
+  facet_grid(. ~ markers)
+
+markers_match %>%
+  gather(key = "markers", value = "value", 
+         c("percent_CD15_tumor.p", "percent_CD15_total.p", "percent_CD15_stroma.p")) %>% 
+  select("markers", "value", "race") %>% 
+  ggpaired(x = "race", y = "value",
+           color = "race", line.color = "gray", line.size = 0.4)+
+  stat_compare_means(paired = TRUE)+
+  facet_grid(. ~ markers)
+
+markers_match %>%
+  gather(key = "markers", value = "value", 
+         c("percent_CD11b_CD15_tumor.p", "percent_CD11b_CD15_total.p", "percent_CD11b_CD15_stroma.p")) %>% 
+  select("markers", "value", "race") %>% 
+  ggpaired(x = "race", y = "value",
+           color = "race", line.color = "gray", line.size = 0.4)+
+  stat_compare_means(paired = TRUE)+
+  facet_grid(. ~ markers)
 
 # Paired----
 p1 <- markers_match %>% 
@@ -112,18 +167,21 @@ p1 <- markers_match %>%
   stat_compare_means(paired = TRUE)+
   labs(x=NULL, y="percent_CD3_tumor.i")+
   facet_grid(. ~ immunoscore_)
+p1$layers <- p1$layers[-2]
 p2 <- markers_match %>%
   ggpaired(x = "race", y = "percent_CD3_total.i", id= "pair_id",
            color = "race", line.color = "gray", line.size = 0.4)+
   stat_compare_means(paired = TRUE)+
   labs(x=NULL, y="percent_CD3_total.i")+
   facet_grid(. ~ immunoscore_)
+p2$layers <- p2$layers[-2]
 p3 <- markers_match %>%
   ggpaired(x = "race", y = "percent_CD3_stroma.i", id= "pair_id",
            color = "race", line.color = "gray", line.size = 0.4)+
   stat_compare_means(paired = TRUE)+
   labs(x=NULL, y="percent_CD3_stroma.i")+
   facet_grid(. ~ immunoscore_)
+p3$layers <- p3$layers[-2]
 gridExtra::grid.arrange(p1,p2,p3, ncol=3)
 
 
@@ -134,18 +192,21 @@ p1 <- markers_match %>%
   stat_compare_means(paired = TRUE)+
   labs(x=NULL, y="percent_CD3_tumor.i")+
   facet_grid(. ~ clusters_CD38)
+p1$layers <- p1$layers[-2]
 p2 <- markers_match %>%
   ggpaired(x = "race", y = "percent_CD3_total.i", id= "pair_id",
            color = "race", line.color = "gray", line.size = 0.4)+
   stat_compare_means(paired = TRUE)+
   labs(x=NULL, y="percent_CD3_total.i")+
   facet_grid(. ~ clusters_CD38)
+p2$layers <- p2$layers[-2]
 p3 <- markers_match %>%
   ggpaired(x = "race", y = "percent_CD3_stroma.i", id= "pair_id",
            color = "race", line.color = "gray", line.size = 0.4)+
   stat_compare_means(paired = TRUE)+
   labs(x=NULL, y="percent_CD3_stroma.i")+
   facet_grid(. ~ clusters_CD38)
+p3$layers <- p3$layers[-2]
 gridExtra::grid.arrange(p1,p2,p3, ncol=3)
 
 
