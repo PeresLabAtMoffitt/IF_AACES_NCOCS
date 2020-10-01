@@ -1,4 +1,6 @@
 ######################################################################################## I ### Survivals by clusters----
+clin_surv <- markers
+
 mysurv <- Surv(time = markers$timelastfu_new, event = markers$surv_vital)
 
 # 1. Quick cluster----
@@ -340,4 +342,124 @@ ggsurvplot(myplot, data = markers,
            risk.table.title = "Risk table"
 )
 survdiff(mysurv~markers$race+markers$special_cluster5)
+
+
+# 2.5.Does special clustering (immunosupp, hot) is predictive?----
+myplot <- survfit(mysurv~clin_surv$clusters_R_FoxP3_tum)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters_R_FoxP3_tum",
+           # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+myplot <- survfit(mysurv~clin_surv$clusters_R_FoxP3_tum.p)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters_R_FoxP3_tum.p",
+           # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.pnt = FALSE
+)
+
+# 2.6.How CD11b affect survivals? Can it be predictive?----
+myplot <- survfit(mysurv~clin_surv$clusters_CD11b_tot)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(14, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters CD11b intratumoral tumor and stroma",
+           legend.labs = c("high CD11b", "low CD11b"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+myplot <- survfit(mysurv~clin_surv$clusters_CD11b_tot.p)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(14, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters CD11b peripheral tumor and stroma",
+           legend.labs = c("high CD11b", "low CD11b"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.pnt = FALSE
+)
+
+# 2.7.How CD15 affect survivals? Can it be predictive?----
+myplot <- survfit(mysurv~clin_surv$clusters_CD15_tot)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(14, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters CD15 intratumoral tumor and stroma",
+           legend.labs = c("high CD15", "low CD15"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+myplot <- survfit(mysurv~clin_surv$clusters_CD15_tot.p)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(14, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters CD15 peripheral tumor and stroma",
+           legend.labs = c("high CD15", "low CD15"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.pnt = FALSE
+)
+
+# 2.8.How CD11bCD15 affect survivals? Can it be predictive?----
+myplot <- survfit(mysurv~clin_surv$clusters_CD11bCD15_tot)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(14, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters CD11bCD15 intratumoral tumor and stroma",
+           legend.labs = c("high CD11bCD15", "low CD11bCD15"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+myplot <- survfit(mysurv~clin_surv$clusters_CD11bCD15_tot.p)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on whole population",
+           font.main = c(14, "bold", "black"),
+           xlab = "Time (days)", legend.title = "clusters CD11bCD15 peripheral tumor and stroma",
+           legend.labs = c("high CD11bCD15", "low CD11bCD15"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.pnt = FALSE
+)
+
+
+
+
+
+
+
 
