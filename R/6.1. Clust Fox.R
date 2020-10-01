@@ -101,7 +101,7 @@ ggsurvplot(myplot, data = clin_surv,
 
 
 ############################################################################################# ratio Fox alone----
-# ratio /FoxP3 tumor----
+# ratio /FoxP3 tumor (use this) ----
 a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
   mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_FoxP3_tumor.i) %>% 
   filter(is.finite(ratio_eff_suppr))

@@ -116,7 +116,7 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_CD11b_tum, color=clusters_CD11b_tum))+
   geom_boxplot()
 
-# CD11b tot----
+# CD11b tot (use this)----
 a <- clust_markers %>% # filter(clusters_CD38 == "high")
 clust <- Mclust(a$percent_CD11b_total.i, G = 2)
 summary(clust)
@@ -318,7 +318,7 @@ clust_markers %>%
   ggplot(aes(x=suid, y=value, group=clusters_CD11b_tum.p, color=clusters_CD11b_tum.p))+
   geom_boxplot()
 
-# CD11b tot----
+# CD11b tot (use this)----
 a <- clust_markers# %>% filter(clusters_CD38 == "high", !is.na(percent_CD11b_tumor.p))
 clust <- Mclust(a$percent_CD11b_total.p, G = 2)
 summary(clust)
