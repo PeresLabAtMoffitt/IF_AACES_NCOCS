@@ -144,7 +144,7 @@ low_CD38 <- low_CD38 %>% mutate(ratio_IP = percent_CD3_CD8_tumor.p / percent_CD3
     ratio_IP ==  "NaN" ~ 0,
     TRUE ~ ratio_IP
   )) %>% 
-  mutate(excluded_double_ratioIP = case_when(
+  mutate(excluded_double_ratioIP = case_when( # 2 is not a good cutoff
     ratio_IP < 2 | ratio_IP == "NaN"     ~ "cold",
     ratio_IP >=2 | is.infinite(ratio_IP) ~ "excluded"
   )) %>% mutate(ratio_ST = percent_CD3_CD8_stroma.i / percent_CD3_CD8_tumor.i) %>% 
@@ -152,7 +152,7 @@ low_CD38 <- low_CD38 %>% mutate(ratio_IP = percent_CD3_CD8_tumor.p / percent_CD3
     ratio_ST ==  "NaN" ~ 0,
     TRUE ~ ratio_ST
   )) %>% 
-  mutate(excluded_double_ratioST = case_when(
+  mutate(excluded_double_ratioST = case_when( # 2 is not a good cutoff
     ratio_ST < 2 | ratio_ST == "NaN"     ~ "cold",
     ratio_ST >=2 | is.infinite(ratio_ST) ~ "excluded"))
 clust_markers <- 
@@ -288,7 +288,7 @@ high_CD38 %>%
   geom_boxplot()
 
 # cluster with CD3Foxp3 in tumor
-high_CD38 <- clust_markers %>% filter(clusters_CD38 == "high") # 2 is high in CD38
+high_CD38 <- clust_markers %>% filter(clusters_CD38 == "high") 
 clust <- Mclust(high_CD38$percent_CD3_FoxP3_tumor.i, G = 2) # clust on CD3-FoxP3
 summary(clust)
 high_CD38$clusters_FoxP3 <- clust$classification
@@ -377,6 +377,153 @@ markers <- left_join(markers,
                                          "clusters_excluded_IP", "clusters_immsuppr", "clusters_FoxP3", "clusters_FoxP3_",
                                          "special_cluster", "special_cluster2", "special_cluster3", 
                                          "special_cluster4", "special_cluster5")], by="suid")
+
+## Hot vs Immunosuppressed
+# Look at the ratio between effector cells (CD3+CD8+) and suppressor (global FoxP3).
+
+# ratio /FoxP3 tumor (use this) ----
+# Intratumoral
+clust_markers <- markers
+a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+  mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.i / percent_FoxP3_tumor.i) %>% 
+  filter(is.finite(ratio_eff_suppr))
+clust <- Mclust(a$ratio_eff_suppr, G = 2) 
+summary(clust)
+a$clusters_R_FoxP3_tum <- clust$classification
+a$clusters_R_FoxP3_tum <- factor(a$clusters_R_FoxP3_tum, 
+                                 levels = c(1, 2),
+                                 labels = c("immunosuppressed", "hot"))
+clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_R_FoxP3_tum")], by= "suid")
+
+a %>% 
+  gather(key = "markers_cat", value = "value", ratio_eff_suppr) %>% 
+  select(suid, clusters_R_FoxP3_tum, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_R_FoxP3_tum, color=clusters_R_FoxP3_tum))+
+  geom_boxplot()
+# Peripheral
+a <- clust_markers %>% filter(clusters_CD38 == "high") %>%
+  mutate(ratio_eff_suppr = percent_CD3_CD8_tumor.p / percent_FoxP3_tumor.p) %>% 
+  filter(is.finite(ratio_eff_suppr))
+clust <- Mclust(a$ratio_eff_suppr, G = 2) 
+summary(clust)
+a$clusters_R_FoxP3_tum.p <- clust$classification
+a$clusters_R_FoxP3_tum.p <- factor(a$clusters_R_FoxP3_tum.p, 
+                                   levels = c(1, 2),
+                                   labels = c("immunosuppressed", "hot"))
+clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_R_FoxP3_tum.p")], by= "suid")
+
+a %>% 
+  gather(key = "markers_cat", value = "value", ratio_eff_suppr) %>% 
+  select(suid, clusters_R_FoxP3_tum.p, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_R_FoxP3_tum.p, color=clusters_R_FoxP3_tum.p))+
+  geom_boxplot()
+
+
+## What happened for CD11 or CD15
+## CD11b
+# Intratumoral
+a <- clust_markers %>% filter(!is.na(percent_CD11b_total.i))
+clust <- Mclust(a$percent_CD11b_total.i, G = 2)
+summary(clust)
+a$clusters_CD11b_tot <- clust$classification
+a$clusters_CD11b_tot <- factor(a$clusters_CD11b_tot, 
+                               levels = c(1, 2),
+                               labels = c("low CD11b", "high CD11b"))
+clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11b_tot")], by= "suid")
+
+clust_markers %>% 
+  gather(key = "markers_cat", value = "value", c("percent_FoxP3_total.i", "percent_CD11b_total.i",
+                                                 "percent_CD3_CD8_total.i")) %>% 
+  select(suid, markers_cat, clusters_CD11b_tot, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_CD11b_tot, color=clusters_CD11b_tot))+
+  geom_boxplot()
+# Peripheral
+a <- clust_markers %>% filter(!is.na(percent_CD11b_total.p))
+clust <- Mclust(a$percent_CD11b_total.p, G = 2)
+summary(clust)
+a$clusters_CD11b_tot.p <- clust$classification
+a$clusters_CD11b_tot.p <- factor(a$clusters_CD11b_tot.p, 
+                                 levels = c(1, 2),
+                                 labels = c("low CD11b", "high CD11b"))
+clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11b_tot.p")], by= "suid")
+
+clust_markers %>% 
+  gather(key = "markers_cat", value = "value", c("percent_FoxP3_total.p", "percent_CD11b_total.p",
+                                                 "percent_CD3_CD8_total.p")) %>% 
+  select(suid, markers_cat, clusters_CD11b_tot.p, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_CD11b_tot.p, color=clusters_CD11b_tot.p))+
+  geom_boxplot()
+
+
+## CD15
+# Intratumoral
+a <- clust_markers %>% filter(!is.na(percent_CD15_total.i))
+clust <- Mclust(a$percent_CD15_total.i, G = 2) 
+summary(clust)
+a$clusters_CD15_tot <- clust$classification
+a$clusters_CD15_tot <- factor(a$clusters_CD15_tot, 
+                              levels = c(1, 2),
+                              labels = c("low CD15", "high CD15"))
+clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD15_tot")], by= "suid")
+clust_markers %>% 
+  gather(key = "markers_cat", value = "value", percent_CD11b_CD15_tumor.i) %>% 
+  select(suid, markers_cat, clusters_CD15_tot, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_CD15_tot, color=clusters_CD15_tot))+
+  geom_boxplot()
+# Peripheral
+a <- clust_markers %>% filter(!is.na(percent_CD15_total.p))
+clust <- Mclust(a$percent_CD15_total.p, G = 2) 
+summary(clust)
+a$clusters_CD15_tot.p <- clust$classification
+a$clusters_CD15_tot.p <- factor(a$clusters_CD15_tot.p, 
+                                levels = c(1, 2),
+                                labels = c("low CD15", "high CD15"))
+clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD15_tot.p")], by= "suid")
+clust_markers %>% 
+  gather(key = "markers_cat", value = "value", percent_CD11b_CD15_tumor.p) %>% 
+  select(suid, markers_cat, clusters_CD15_tot.p, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_CD15_tot.p, color=clusters_CD15_tot.p))+
+  geom_boxplot()
+
+## CD11b+CD15+
+# Intratumoral
+a <- clust_markers %>% filter(!is.na(percent_CD11b_CD15_total.i))
+clust <- Mclust(a$percent_CD11b_CD15_total.i, G = 2) 
+summary(clust)
+a$clusters_CD11bCD15_tot <- clust$classification
+a$clusters_CD11bCD15_tot <- factor(a$clusters_CD11bCD15_tot, 
+                                   levels = c(1, 2),
+                                   labels = c("lowCD11bCD15", "highCD11bCD15"))
+clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11bCD15_tot")], by= "suid")
+
+clust_markers %>% 
+  gather(key = "markers_cat", value = "value", percent_CD11b_CD15_tumor.i) %>% 
+  select(suid, markers_cat, clusters_CD11bCD15_tot, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_CD11bCD15_tot, color=clusters_CD11bCD15_tot))+
+  geom_boxplot()
+
+# Peripheral
+a <- clust_markers %>% filter(!is.na(percent_CD11b_CD15_total.p))
+clust <- Mclust(a$percent_CD11b_CD15_total.p, G = 2) 
+summary(clust)
+a$clusters_CD11bCD15_tot.p <- clust$classification
+a$clusters_CD11bCD15_tot.p <- factor(a$clusters_CD11bCD15_tot.p, 
+                                     levels = c(1, 2),
+                                     labels = c("lowCD11bCD15", "highCD11bCD15"))
+clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11bCD15_tot.p")], by= "suid")
+
+clust_markers %>% 
+  gather(key = "markers_cat", value = "value", percent_CD11b_CD15_tumor.p) %>% 
+  select(suid, markers_cat, clusters_CD11bCD15_tot.p, value) %>% 
+  ggplot(aes(x=suid, y=value, group=clusters_CD11bCD15_tot.p, color=clusters_CD11bCD15_tot.p))+
+  geom_boxplot()
+
+markers <- left_join(markers, 
+                     clust_markers[, c("suid", "clusters_R_FoxP3_tum", "clusters_R_FoxP3_tum.p", 
+                                       "clusters_CD3CD8", "dbl_pos",
+                                       "clusters_CD11b_tot", "clusters_CD11b_tot.p",
+                                       "clusters_CD15_tot", "clusters_CD15_tot.p", 
+                                       "clusters_CD11bCD15_tot", "clusters_CD11bCD15_tot.p")], by="suid")
 
 
 
