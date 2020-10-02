@@ -193,6 +193,10 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_ + r
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_ + refage + race + stage, data = clin_surv)
 summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_ + race  + immunoscore_*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_ + refage + race + stage  + immunoscore_*race, data = clin_surv)
+summary(myplot)
 # clusters_CD38
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD38 + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD38",
@@ -204,6 +208,10 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD38",
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD38 + race, data = clin_surv) 
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD38 + refage + race + stage, data = clin_surv)
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD38 + race  + clusters_CD38*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD38 + refage + race + stage  + clusters_CD38*race, data = clin_surv)
 summary(myplot)
 # clusters_excluded_IP
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_IP + race, data = clin_surv) 
@@ -217,6 +225,10 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_exclude
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_IP + refage + race + stage, data = clin_surv)
 summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_IP + race  + clusters_excluded_IP*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_IP + refage + race + stage  + clusters_excluded_IP*race, data = clin_surv)
+summary(myplot)
 # clusters_excluded_ST
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_ST + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_excluded_ST",
@@ -228,6 +240,10 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_excluded_ST",
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_ST + race, data = clin_surv) 
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_ST + refage + race + stage, data = clin_surv)
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_ST + race  + clusters_excluded_ST*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_ST + refage + race + stage  + clusters_excluded_ST*race, data = clin_surv)
 summary(myplot)
 # clusters_R_FoxP3_tum
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum + race, data = clin_surv) 
@@ -241,6 +257,10 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum + refage + race + stage, data = clin_surv)
 summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum + race  + clusters_R_FoxP3_tum*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum + refage + race + stage  + clusters_R_FoxP3_tum*race, data = clin_surv)
+summary(myplot)
 # clusters_R_FoxP3_tum.p
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum.p + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_R_FoxP3_tum.p",
@@ -252,6 +272,10 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_R_FoxP3_tum.p",
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum.p + race, data = clin_surv) 
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum.p + refage + race + stage, data = clin_surv)
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum.p + race  + clusters_R_FoxP3_tum.p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_R_FoxP3_tum.p + refage + race + stage  + clusters_R_FoxP3_tum.p*race, data = clin_surv)
 summary(myplot)
 # clusters_CD11b_tot
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot + race, data = clin_surv) 
@@ -265,6 +289,10 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_t
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot + refage + race + stage, data = clin_surv)
 summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot + race  + clusters_CD11b_tot*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot + refage + race + stage  + clusters_CD11b_tot*race, data = clin_surv)
+summary(myplot)
 # clusters_CD11b_tot.p
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot.p + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11b_tot.p",
@@ -276,6 +304,10 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11b_tot.p",
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot.p + race, data = clin_surv) 
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot.p + refage + race + stage, data = clin_surv)
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot.p + race  + clusters_CD11b_tot.p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11b_tot.p + refage + race + stage  + clusters_CD11b_tot.p*race, data = clin_surv)
 summary(myplot)
 # clusters_CD15_tot
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot + race, data = clin_surv) 
@@ -289,6 +321,10 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_to
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot + refage + race + stage, data = clin_surv)
 summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot + race  + clusters_CD15_tot*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot + refage + race + stage  + clusters_CD15_tot*race, data = clin_surv)
+summary(myplot)
 # clusters_CD15_tot.p
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot.p + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD15_tot.p",
@@ -300,6 +336,10 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD15_tot.p",
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot.p + race, data = clin_surv) 
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot.p + refage + race + stage, data = clin_surv)
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot.p + race  + clusters_CD15_tot.p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD15_tot.p + refage + race + stage  + clusters_CD15_tot.p*race, data = clin_surv)
 summary(myplot)
 # clusters_CD11bCD15_tot
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot + race, data = clin_surv) 
@@ -313,6 +353,10 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot + refage + race + stage, data = clin_surv)
 summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot + race  + clusters_CD11bCD15_tot*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot + refage + race + stage  + clusters_CD11bCD15_tot*race, data = clin_surv)
+summary(myplot)
 # clusters_CD11bCD15_tot.p
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot.p + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11bCD15_tot.p",
@@ -324,6 +368,10 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "clusters_CD11bCD15_tot.p"
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot.p + race, data = clin_surv) 
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot.p + refage + race + stage, data = clin_surv)
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot.p + race  + clusters_CD11bCD15_tot.p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD11bCD15_tot.p + refage + race + stage  + clusters_CD11bCD15_tot.p*race, data = clin_surv)
 summary(myplot)
 
 
