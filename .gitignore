@@ -18,6 +18,10 @@ Prelim_R01.Rmd
 *.jpg
 *.csv
 
+# Rmd and pptx
+*.pptx
+*.Rmd
+
 # Example code in progress
 *-Ex.R
 *-Ex.Rmd
