@@ -1127,7 +1127,12 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_total.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
 
-# CD3
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp + race, CD3_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp + refage + race + stage, CD3_grp*race, data = clin_surv) 
+summary(myplot)
+
+# CD3t
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3t_grp + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
            title = "Survival analysis on case-matched population Black vs White \nseparated by tumoral CD3+ lymphocyte occupancy",
