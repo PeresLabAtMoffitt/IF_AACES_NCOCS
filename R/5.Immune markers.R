@@ -125,7 +125,7 @@ library(gplots)
 library(heatmap.plus)
 library(RColorBrewer)
 # Plot SQRT
-df1 <- as.data.frame(markers[,c(104, 106, 108:109, 111:112, 114, 116:117, 119)]) %>% 
+df1 <- as.data.frame(markers[,c(116, 118:124, 126:131)]) %>% 
   `row.names<-`(markers$suid) %>% drop_na(.)
 df1$suid <- NULL
 df1 <- as.matrix(df1)
@@ -146,7 +146,7 @@ heatmap.2(df2, main = "Immune Marker Presentation",
           scale = "row")
 
 # Plot 
-df1 <- as.data.frame(markers[,c(120, 122, 124:125, 127)]) %>% 
+df1 <- as.data.frame(markers[,c(132, 134:139)]) %>% 
   `row.names<-`(markers$suid) %>% 
   drop_na(.)
 df1$suid <- NULL

@@ -532,3 +532,5 @@ markers <- left_join(markers,
 ######################################################################################## III ### Create df for pair_id----
 markers_match <-  markers %>% drop_na(pair_id) %>% 
   group_by(pair_id) %>% filter( n() > 1 )
+
+# End----
