@@ -647,6 +647,113 @@ markers <- markers %>%
   
   select(-c("temp", "tertile"))
 
+# Tertile For peripheral marker
+markers <- markers %>% 
+  mutate(tertile = ntile(sqrt_CD3_total.p, 3)) %>% 
+  mutate(CD3_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  mutate(CD3_grp_p = factor(.$CD3_grp_p, levels = c("Low","Medium","High"))) %>% 
+  mutate(tertile = ntile(sqrt_CD3_tumor.p, 3)) %>% 
+  mutate(CD3t_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  mutate(CD3t_grp_p = factor(.$CD3t_grp_p, levels = c("Low","Medium","High"))) %>% 
+  mutate(tertile = ntile(sqrt_CD3_stroma.p, 3)) %>% 
+  mutate(CD3s_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  mutate(CD3s_grp_p = factor(.$CD3s_grp_p, levels = c("Low","Medium","High"))) %>% 
+  mutate(tertile = ntile(sqrt_CD3_CD8_total.p, 3)) %>% 
+  mutate(CD3_CD8_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  mutate(CD3_CD8_grp_p = factor(.$CD3_CD8_grp_p, levels = c("Low","Medium","High"))) %>% 
+  mutate(tertile = ntile(sqrt_CD3_CD8_tumor.p, 3)) %>% 
+  mutate(CD3_CD8t_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  mutate(CD3_CD8t_grp_p = factor(.$CD3_CD8t_grp_p, levels = c("Low","Medium","High"))) %>% 
+  mutate(tertile = ntile(sqrt_CD3_CD8_stroma.p, 3)) %>% 
+  mutate(CD3_CD8s_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  mutate(CD3_CD8s_grp_p = factor(.$CD3_CD8s_grp_p, levels = c("Low","Medium","High"))) %>% 
+  mutate(tertile = ntile(sqrt_CD3_FoxP3_total.p, 3)) %>% 
+  mutate(CD3_FoxP3_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  mutate(CD3_FoxP3_grp_p = factor(.$CD3_FoxP3_grp_p, levels = c("Low","Medium","High"))) %>% 
+  mutate(tertile = ntile(sqrt_CD3_FoxP3_tumor.p, 3)) %>% 
+  mutate(CD3_FoxP3t_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  mutate(CD3_FoxP3t_grp_p = factor(.$CD3_FoxP3t_grp_p, levels = c("Low","Medium","High"))) %>% 
+  mutate(tertile = ntile(sqrt_CD3_FoxP3_stroma.p, 3)) %>% 
+  mutate(CD3_FoxP3s_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "Medium",
+    tertile == 3 ~ "High",
+  )) %>% 
+  mutate(CD3_FoxP3s_grp_p = factor(.$CD3_FoxP3s_grp_p, levels = c("Low","Medium","High"))) %>% 
+  mutate(tertile = ntile(sqrt_CD11b_total.p, 2)) %>% 
+  mutate(CD11b_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "High"
+  )) %>% 
+  mutate(CD11b_grp_p = factor(.$CD11b_grp_p, levels = c("Low","High"))) %>% 
+  mutate(tertile = ntile(sqrt_CD11b_tumor.p, 2)) %>% 
+  mutate(CD11bt_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "High",
+  )) %>% 
+  mutate(CD11bt_grp_p = factor(.$CD11bt_grp_p, levels = c("Low","High"))) %>% 
+  mutate(tertile = ntile(sqrt_CD11b_stroma.p, 2)) %>% 
+  mutate(CD11bs_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "High",
+  )) %>% 
+  mutate(CD11bs_grp_p = factor(.$CD11bs_grp_p, levels = c("Low","High"))) %>% 
+  
+  mutate(temp= case_when(
+    sqrt_CD11b_CD15_total.p > 0 ~ sqrt_CD11b_CD15_total.p
+  )) %>% 
+  mutate(tertile = ntile(sqrt_CD11b_CD15_total.p, 2)) %>% 
+  mutate(CD11b_CD15_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "High"
+  )) %>% 
+  mutate(CD11b_CD15_grp_p = factor(.$CD11b_CD15_grp_p, levels = c("Low","High"))) %>% 
+  mutate(tertile = ntile(sqrt_CD11b_CD15_tumor.p, 2)) %>% 
+  mutate(CD11b_CD15t_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "High",
+  )) %>% 
+  mutate(CD11b_CD15t_grp_p = factor(.$CD11b_CD15t_grp_p, levels = c("Low","High"))) %>% 
+  mutate(tertile = ntile(sqrt_CD11b_CD15_stroma.p, 2)) %>% 
+  mutate(CD11b_CD15s_grp_p = case_when(
+    tertile == 1 ~ "Low",
+    tertile == 2 ~ "High",
+  )) %>% 
+  mutate(CD11b_CD15s_grp_p = factor(.$CD11b_CD15s_grp_p, levels = c("Low","High"))) %>% 
+  
+  select(-c("tertile"))
 
 # 4.1. Create variation data ----
 # Look at the variation between each patient and the global mean # Should we mot compare Black and White?
