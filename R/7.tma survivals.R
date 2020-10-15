@@ -15,6 +15,7 @@ ggsurvplot(myplot, data = clin_surv,
            conf_tmant = FALSE
 )
 
+
 # 1.1. Clustering----
 tma_clust_markers <- markers %>% filter( !is.na(markers$percent_CD3_CD8_tumor_tma) )
 

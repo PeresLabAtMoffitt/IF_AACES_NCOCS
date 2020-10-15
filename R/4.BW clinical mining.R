@@ -117,8 +117,8 @@ mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 # For whole population, default mysurv~1, type= "kaplan-meier")
 myplot <- survfit(mysurv~1) 
 plot(myplot)
-# can get a restricted mean 
-print(myplot,print.mean=TRUE)
+# # can get a restricted mean 
+# print(myplot,print.mean=TRUE)
 
 # For black and white----
 myplot <- survfit(mysurv~clin_surv$race)
@@ -200,7 +200,7 @@ clin_surv <- clin_surv %>%
   mutate(BMI_grp = ifelse(BMI_recent >=31.00538, "higher", "lower")) %>%  # 31.00538 is the median
   mutate(BMI_grp = factor(BMI_grp, levels = c("lower", "higher")))
 
-myplot <- survfit(Surv(time = timelastfu_new, event = $surv_vital)~BMI_grp, data = clin_surv) 
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~BMI_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Effect of recent BMI on Survival within Black population",
            font.main = c(16, "bold", "black"),
@@ -260,7 +260,7 @@ ggsurvplot(myplot, data = clin_surv,
            conf.int = FALSE
 )
 
-# Black vs White
+# Black vs White----
 clin_surv <- markers_match
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~BMI_classification+ race, data = clin_surv) 
 ggsurv <- ggsurvplot(myplot, data = clin_surv,
@@ -315,7 +315,7 @@ ggsurvplot(myplot, data = clin_surv,
   theme (legend.position = "right")+
   facet_grid(. ~ stage)
 
-# Per histology
+# Per histology----
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~histology + race, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on Black vs White population comparing tumor Histology",
@@ -387,7 +387,7 @@ ggsurvplot(myplot, data = clin_surv,
   theme (legend.position = "right")+
   facet_grid(. ~ histotype)
 
-# Per birthplace----
+# Per birthplace
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~birthplace + race, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on Black vs White population comparing Country of birth",
@@ -423,7 +423,7 @@ ggsurvplot(myplot, data = clin_surv,
   theme (legend.position = "right")+
   facet_grid(. ~ education)
 
-# Per married----
+# Per married
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~married + race, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on Black vs White population comparing Marrital status",
@@ -478,7 +478,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hyster",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per oophor----
+# Per oophor
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~oophor +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "oophor",
                  title = "Survival analysis on Black vs White population comparing \nOophorectomy status",
@@ -559,7 +559,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "brcancermom",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per famhxbr----
+# Per famhxbr
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~famhxbr +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "famhxbr",
                  title = "Survival analysis on Black vs White population comparing \nFamily history of breast cancer in any first-degree relative",
@@ -568,7 +568,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "famhxbr",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per ovcancermom----
+# Per ovcancermom
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~ovcancermom +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancermom",
                  title = "Survival analysis on Black vs White population comparing \nBiological mother had ovarian cancer",
@@ -577,7 +577,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancermom",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per ovcancersis----
+# Per ovcancersis
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~ovcancersis +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancersis",
                  title = "Survival analysis on Black vs White population comparing \nAny biological sister diagnosed with ovarian cancer",
@@ -586,7 +586,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancersis",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per famhxov----
+# Per famhxov
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~famhxov +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "famhxov",
                  title = "Survival analysis on Black vs White population comparing \nFamily history of ovarian cancer in any first-degree relative",
@@ -595,7 +595,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "famhxov",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per ovcancerdaughter----
+# Per ovcancerdaughter
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~ovcancerdaughter +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcancerdaughter",
                  title = "Survival analysis on Black vs White population comparing ovcancerdaughter",
@@ -613,7 +613,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "endomet",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per fibroids----
+# Per fibroids
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~fibroids +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "fibroids",
                  title = "Survival analysis on Black vs White population comparing \ndiagnosed with uterine fibroids",
@@ -631,7 +631,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pid",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per pcos----
+# Per pcos
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~pcos +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pcos",
                  title = "Survival analysis on Black vs White population comparing \ndiagnosed with polycystic ovarian syndrome",
@@ -640,7 +640,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "pcos",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per ovcyst----
+# Per ovcyst
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~ovcyst +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcyst",
                  title = "Survival analysis on Black vs White population comparing \ndiagnosed with an ovarian cyst",
@@ -649,7 +649,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "ovcyst",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per anyfhever----
+# Per anyfhever
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~anyfhever +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "anyfhever",
                  title = "Survival analysis on Black vs White population comparing use \nany female hormones (pill patch or injection only)",
@@ -676,7 +676,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "epever",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per smokever----
+# Per smokever
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~smokever +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "smokever",
                  title = "Survival analysis on Black vs White population comparing smoker status",
@@ -685,7 +685,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "smokever",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per diab----
+# Per diab
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~diab +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "diab",
                  title = "Survival analysis on Black vs White population comparing \ndiabetes diagnosis",
@@ -694,7 +694,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "diab",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per hrtdis----
+# Per hrtdis
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~hrtdis +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hrtdis",
                  title = "Survival analysis on Black vs White population comparing \nheart disease diagnosis",
@@ -712,7 +712,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hbp",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per hchol----
+# Per hchol
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~hchol +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hchol",
                  title = "Survival analysis on Black vs White population comparing \nhigh cholesterol diagnosis",
@@ -721,7 +721,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "hchol",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per osteo----
+# Per osteo
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~osteo +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "osteo",
                  title = "Survival analysis on Black vs White population comparing \nosteoporosis diagnosis",
@@ -739,7 +739,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "thyrd",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per infert----
+# Per infert
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~infert +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "infert",
                  title = "Survival analysis on Black vs White population comparing infertility for 1+ year",
@@ -757,7 +757,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "cancersite",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per aspirin----
+# Per aspirin
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~aspirin +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "aspirin",
                  title = "Survival analysis on Black vs White population comparing aspirin",
@@ -766,7 +766,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "aspirin",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per NSAID----
+# Per NSAID
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~NSAID +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "NSAID",
                  title = "Survival analysis on Black vs White population comparing NSAID",
@@ -775,7 +775,7 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "NSAID",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-# Per aceta----
+# Per aceta
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~aceta +race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "aceta",
                  title = "Survival analysis on Black vs White population comparing aceta",
@@ -799,13 +799,22 @@ ggsurvplot(myplot, data = clin_surv,
 # Cox CD3
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp, data = clin_surv) 
 summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp + race + CD3_grp*race, data = clin_surv) 
+summary(myplot)
+
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_total.i, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_total.i + race + percent_CD3_total.i*race, data = clin_surv) 
 summary(myplot)
 
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp + refage + race + stage, data = clin_surv) 
 summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp + refage + race + stage + CD3_grp*race, data = clin_surv) 
+summary(myplot)
 
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_total.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_total.i + refage + race + stage + percent_CD3_total.i*race, data = clin_surv) 
 summary(myplot)
 
 # CD3
@@ -989,6 +998,8 @@ ggsurvplot(myplot, data = clin_surv,
 # Cox
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_grp, data = clin_surv) 
 summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_grp + race + CD11b_grp*race, data = clin_surv) 
+summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_total.i, data = clin_surv) 
 summary(myplot)
 
@@ -1127,9 +1138,9 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_total.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
 
-myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp + race, CD3_grp*race, data = clin_surv) 
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp + race + CD3_grp*race, data = clin_surv) 
 summary(myplot)
-myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp + refage + race + stage, CD3_grp*race, data = clin_surv) 
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp + refage + race + stage + CD3_grp*race, data = clin_surv) 
 summary(myplot)
 
 # CD3t
@@ -1152,6 +1163,11 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_tumor.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
 
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3t_grp + race + CD3t_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3t_grp + refage + race + stage + CD3t_grp*race, data = clin_surv) 
+summary(myplot)
+
 ## CD3 stroma
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3s_grp + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
@@ -1170,6 +1186,11 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3s_grp + refag
 summary(myplot)
 
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_stroma.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3s_grp + race + CD3s_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3s_grp + refage + race + stage + CD3s_grp*race, data = clin_surv) 
 summary(myplot)
 
 # CD3_CD8
@@ -1192,6 +1213,11 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_CD8_total.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
 
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8_grp + race + CD3_CD8_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8_grp + refage + race + stage + CD3_CD8_grp*race, data = clin_surv) 
+summary(myplot)
+
 # CD3_CD8 tumor
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8t_grp + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
@@ -1210,6 +1236,11 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8t_grp + r
 summary(myplot)
 
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_CD8_tumor.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8t_grp + race + CD3_CD8t_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8t_grp + refage + race + stage + CD3_CD8t_grp*race, data = clin_surv) 
 summary(myplot)
 
 # CD3_CD8 stroma
@@ -1232,6 +1263,10 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_CD8_stroma.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
 
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8s_grp + race + CD3_CD8s_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8s_grp + refage + race + stage + CD3_CD8s_grp*race, data = clin_surv) 
+summary(myplot)
 
 # CD3_FoxP3
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3_grp + race, data = clin_surv) 
@@ -1251,6 +1286,11 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3_grp + 
 summary(myplot)
 
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_FoxP3_total.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3_grp + race + CD3_FoxP3_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3_grp + refage + race + stage + CD3_FoxP3_grp*race, data = clin_surv) 
 summary(myplot)
 
 # CD3_FoxP3 tumor
@@ -1273,6 +1313,11 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_FoxP3_tumor.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
 
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3t_grp + race + CD3_FoxP3t_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3t_grp + refage + race + stage + CD3_FoxP3t_grp*race, data = clin_surv) 
+summary(myplot)
+
 # CD3_FoxP3 stroma
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3s_grp + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
@@ -1291,6 +1336,11 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3s_grp +
 summary(myplot)
 
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD3_FoxP3_stroma.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3s_grp + race + CD3_FoxP3s_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3s_grp + refage + race + stage + CD3_FoxP3s_grp*race, data = clin_surv) 
 summary(myplot)
 
 # CD11b+
@@ -1313,6 +1363,11 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_total.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
 
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_grp + race + CD11b_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_grp + refage + race + stage + CD11b_grp*race, data = clin_surv) 
+summary(myplot)
+
 # CD11b+ tumor
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11bt_grp + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
@@ -1331,6 +1386,11 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bt_grp + ref
 summary(myplot)
 
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_tumor.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bt_grp + race + CD11bt_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bt_grp + refage + race + stage + CD11bt_grp*race, data = clin_surv) 
 summary(myplot)
 
 # CD11b+ stroma
@@ -1353,6 +1413,11 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_stroma.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
 
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bs_grp + race + CD11bs_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bs_grp + refage + race + stage + CD11bs_grp*race, data = clin_surv) 
+summary(myplot)
+
 # CD11b+CD15+
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15_grp + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
@@ -1371,6 +1436,11 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15_grp +
 summary(myplot)
 
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_CD15_total.i + refage + race + stage, data = clin_surv) 
+summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15_grp + race + CD11b_CD15_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15_grp + refage + race + stage + CD11b_CD15_grp*race, data = clin_surv) 
 summary(myplot)
 
 # CD11b+CD15+ tumor
@@ -1393,6 +1463,11 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_CD15_tumor.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
 
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15t_grp + race + CD11b_CD15t_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15t_grp + refage + race + stage + CD11b_CD15t_grp*race, data = clin_surv) 
+summary(myplot)
+
 # CD11b+CD15+ stroma
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp + race, data = clin_surv) 
 ggsurvplot_facet(myplot, data = clin_surv, facet.by = "race",
@@ -1412,6 +1487,26 @@ summary(myplot)
 
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_CD15_stroma.i + refage + race + stage, data = clin_surv) 
 summary(myplot)
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp + race + CD11b_CD15s_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp + refage + race + stage + CD11b_CD15s_grp*race, data = clin_surv) 
+summary(myplot)
+
+# Extra cox----
+clin_surv <- markers_match
+# Cox CD3
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp + refage + stage, data = clin_surv) 
+summary(myplot)
+
+
+
+
+
+
+
+
+
 
 
 
