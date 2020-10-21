@@ -42,8 +42,8 @@ set.seed(1234)
 clust_markers <- markers %>% filter(!is.na(markers$percent_CD3_CD8_tumor.i ))
 # Idea:
 # Do not take CD3 alone for clustering because contain effector, regulator, helper, gamma delta
-# Do not take FoxP3 alone because tumor cells can express FoxP3
-# Do not take CD11b alone because CD3CD11b can be NK cells
+# Test FoxP3 alone and CD3-FoxP3 because tumor cells can express FoxP3
+# Do not take CD11b alone because CD3CD11b can be NK cells?
 # CD11bCD15 are myeloid cells prevent other immune cells to traffic into the tumor
 
 # 1. Quick cluster----
@@ -137,7 +137,8 @@ clust_markers %>%
   facet_grid(.~ clusters_CD38)
 
 
-### 2.2_From Low_CD38, cluster into Cold or Excluded----
+### 2.2_From Low_CD38, separate into Cold or Excluded using ratio Intra/Periph or Stroma?Tumor----
+# With ratio difference = 2
 low_CD38 <- clust_markers %>% filter(clusters_CD38 == "low")
 low_CD38 <- low_CD38 %>% mutate(ratio_IP = percent_CD3_CD8_tumor.p / percent_CD3_CD8_tumor.i) %>% 
   mutate(ratio_IP = case_when(
@@ -170,7 +171,7 @@ low_CD38 %>%
   ggplot(aes(x=suid, y=value, group=excluded_double_ratioST, color=excluded_double_ratioST))+ # Take home: bad separation, MORE outliers
   geom_boxplot()
 
-# Try another by clustering ######################################### Need to compare ratio separation or ratio cluster
+# With ratio difference = Mclust----better separation
 ratio_IP <- low_CD38 %>% filter(is.finite(ratio_IP))
 clust <- Mclust(ratio_IP$ratio_IP, G = 2)
 summary(clust)
@@ -531,6 +532,6 @@ markers <- left_join(markers,
 
 ######################################################################################## III ### Create df for pair_id----
 markers_match <-  markers %>% drop_na(pair_id) %>% 
-  group_by(pair_id) %>% filter( n() > 1 )
+  group_by(pair_id) %>% filter(n() > 1)
 
-# End----
+# End Cluster coding----

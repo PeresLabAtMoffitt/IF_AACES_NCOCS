@@ -96,16 +96,17 @@ clinical_data %>%
 
 # Age at diag between black and white----
 ggplot(clinical_data, aes(x=race, y=refage, color=race))+
-  geom_violin(scale = "count") 
+  geom_violin(scale = "count") +
+  theme_minimal()
 # choose count to refect areas are scaled proportionally to the number of observations.
 
 
 
 #################################################################################################### II ### Survival plot----
-# Limiting to only the case_match ids----
+# 2.1.General----
+# By race in ROis matched----
 clin_surv <- markers_match
-# no event should be 0, when event happened should be 1
-# so will use the variable surv_vital that I created alive=0, death=1
+# Use the variable surv_vital alive=0, death=1
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 # median(clin_surv$timelastfu_new)
 # do not use this value as the median survival is tbe time at the survivalship aka function = .5
@@ -114,13 +115,12 @@ mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 # survfit(mysurv~1, type= "kaplan-meier", conf.type = "log-log") # if log
 # can do fleming-harrington or fh2 with log-log too
 
-# For whole population, default mysurv~1, type= "kaplan-meier")
+# For Strata = All, default mysurv~1, type= "kaplan-meier")
 myplot <- survfit(mysurv~1) 
 plot(myplot)
-# # can get a restricted mean 
+# restricted mean 
 # print(myplot,print.mean=TRUE)
 
-# For black and white----
 myplot <- survfit(mysurv~clin_surv$race)
 # jpeg(paste0(path, "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/Survival paired ID.jpg"))
 ggsurvplot(myplot, data = clin_surv,
@@ -137,11 +137,12 @@ ggsurvplot(myplot, data = clin_surv,
            # Color
            # palette = c("#E7B800", "#2E9FDF"),
            conf.int = FALSE
-           )
+           )+
+  theme_survminer()
 # dev.off()
 survdiff(mysurv~clin_surv$race)
 
-# With all patients----
+# By race with whole ROIs + TMAs patients----
 clin_surv <- markers
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 myplot <- survfit(mysurv~clin_surv$race)
@@ -169,16 +170,14 @@ survdiff(mysurv~clin_surv$race)
 # plot(myplot, fun="cumhaz")
 # plot(myplot, fun="event")
 
-# What if we look at only Black and comparing lower vs higher BMI----all black patients
+# Black population BMI with whole ROIs + TMAs patients----
+# Fold increase
+median(clin_surv$BMI_fold_increase, na.rm = TRUE)
 clin_surv <- markers %>% 
-  mutate(BMI_fold_increase = BMI_recent/BMI_YA)
-
-clin_surv <- clin_surv %>% 
   filter(race == "Black") %>% 
   mutate(BMI_fold_increase = BMI_recent/BMI_YA) %>% 
   mutate(BMI_grp = ifelse(BMI_fold_increase >=1.442222, "higher", "lower")) %>%  # 1.442222 is the median
   mutate(BMI_grp = factor(BMI_grp, levels = c("lower", "higher")))
-median(clin_surv$BMI_fold_increase, na.rm = TRUE)
 
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~BMI_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
@@ -196,7 +195,8 @@ ggsurvplot(myplot, data = clin_surv,
 
 # BMI_recent
 median(clin_surv$BMI_recent, na.rm = TRUE)
-clin_surv <- clin_surv %>% 
+clin_surv <- markers %>% 
+  filter(race == "Black") %>% 
   mutate(BMI_grp = ifelse(BMI_recent >=31.00538, "higher", "lower")) %>%  # 31.00538 is the median
   mutate(BMI_grp = factor(BMI_grp, levels = c("lower", "higher")))
 
@@ -216,7 +216,8 @@ ggsurvplot(myplot, data = clin_surv,
 
 # BMI_YA
 median(clin_surv$BMI_YA, na.rm = TRUE)
-clin_surv <- clin_surv %>% 
+clin_surv <- markers %>% 
+  filter(race == "Black") %>% 
   mutate(BMI_grp = ifelse(BMI_YA >=21.14375, "higher", "lower")) %>%  # 21.14375 is the median
   mutate(BMI_grp = factor(BMI_grp, levels = c("lower", "higher")))
 
@@ -235,17 +236,6 @@ ggsurvplot(myplot, data = clin_surv,
 )
 
 # per BMI classification----
-# Black
-# clin_surv1 <- clin_surv %>% 
-#   filter(race == "Black") %>% 
-  # mutate(BMI_classification = case_when(
-  #   BMI_recent < 18.5	~ "underweight",
-  #   BMI_recent >=18.5 & BMI_recent <25 ~ "normal",
-  #   BMI_recent >=25.0 & BMI_recent <30 ~ "overweight",
-  #   BMI_recent >=30.0 & BMI_recent <35 ~ "obesity I",
-  #   BMI_recent >=35.0 & BMI_recent <40 ~ "obesity II",
-  #   BMI_recent >= 40.0 ~ "obesity III"
-  # ))
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~BMI_classification, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
            title = "Effect of BMI classification on Survival within Black population",
@@ -260,11 +250,12 @@ ggsurvplot(myplot, data = clin_surv,
            conf.int = FALSE
 )
 
-# Black vs White----
+# 2.2.ROIs matched-general survivals----
+# Black vs White in ROIs matched BMI----
 clin_surv <- markers_match
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~BMI_classification+ race, data = clin_surv) 
 ggsurv <- ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on Black population comparing recent BMI",
+           title = "Survival analysis on Black vs White population comparing recent BMI recent classification",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "BMI classification",# legend.labs = c("higher", "lower"),
@@ -279,7 +270,7 @@ curv_facet <- ggsurv$plot + facet_grid( ~ race)
 curv_facet
 
 ggsurvplot(myplot, data = clin_surv,
-                     title = "Survival analysis on Black vs White population comparing BMI classification",
+                     title = "Survival analysis on Black vs White population comparing BMI recent classification",
                      font.main = c(16, "bold", "black"),
                      xlab = "Time (days)",
                      legend.title = "BMI classification",
@@ -784,7 +775,8 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "aceta",
                  legend.title = "Race",
                  surv.median.line = c("hv"))
 
-##################################################################### III ### Survival analysis immune cells whole pop----
+
+##################################################################### III ### Survival analysis on immune cells tertiles whole pop----
 # Lymphocytes no race for intratumoral stromal+tumor using quartiles----
 clin_surv <- markers
 # CD3
@@ -1115,7 +1107,7 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~percent_CD11b_CD
 summary(myplot)
 
 
-##################################################################### IV ### Survival analysis immune cells B/W----
+##################################################################### IV ### Survival analysis on immune cells tertiles B/W----
 # Lymphocytes grouping for intratumoral stromal+tumor using quartiles----
 clin_surv <- markers_match
 # CD3
@@ -1652,7 +1644,8 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp + refage + stage, data = clin_surv) 
 summary(myplot)
 
-# Lymphocytes grouping for peripheral stromal+tumor using tiles----
+
+# Lymphocytes grouping for peripheral stromal+tumor using tertiles----
 clin_surv <- markers_match
 # CD3
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp_p + race, data = clin_surv) 
@@ -2189,7 +2182,7 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp_
 summary(myplot)
 
 
-##################################################################### V ### Survival analysis immune cells ----
+##################################################################### V ### Survival analysis immune cells using median/mean ----
 
 # Lymphocytes keep----
 clin_surv <- markers_match
@@ -2402,5 +2395,5 @@ ggsurvplot_facet(myplot, data = clin_surv, facet.by = "CD11bCD15",
                  surv.median.line = c("hv"))
 
 # Cleaning
-rm(clin_surv, myplot, mysurv)
+rm(clin_surv, myplot, mysurv, clust, curv_facet, ggsurv, clust_marker, clust_markers)
 
