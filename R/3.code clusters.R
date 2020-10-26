@@ -59,7 +59,7 @@ clust_markers$clusters_Brooke <- factor(clust_markers$clusters_Brooke,
 
 clust_markers %>% 
   gather(key = "markers_cat", value = "value", 
-         c("sqrt_CD3_CD8_total.i","sqrt_CD3_FoxP3_total.i", "sqrt_CD11b_stroma.i":"sqrt_CD11b_CD15_stroma.i")) %>% 
+         c("sqrt_CD3_CD8_total.i":"sqrt_CD11b_CD15_total.i")) %>% 
   select(suid, clusters_Brooke, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=markers_cat, color=markers_cat))+
   geom_boxplot()+
@@ -77,7 +77,15 @@ clust_marker$clusters_all_IandP <- factor(clust_marker$clusters_all_IandP,
 
 clust_marker %>% 
   gather(key = "markers_cat", value = "value", 
-         c("sqrt_CD3_CD8_total.i","sqrt_CD3_FoxP3_total.i", "sqrt_CD11b_stroma.i":"sqrt_CD11b_CD15_stroma.i")) %>% 
+         c("percent_CD3_tumor.i":"percent_CD11b_CD15_stroma.i")) %>% 
+  select(suid, clusters_all_IandP, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=markers_cat,  color=markers_cat))+
+  geom_boxplot()+
+  facet_grid(.~ clusters_all_IandP)
+
+clust_marker %>% 
+  gather(key = "markers_cat", value = "value", 
+         c("percent_CD3_tumor.p":"percent_CD11b_CD15_stroma.p")) %>% 
   select(suid, clusters_all_IandP, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=markers_cat,  color=markers_cat))+
   geom_boxplot()+
