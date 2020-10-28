@@ -4,7 +4,7 @@ clin_surv <- tma_clust_markers
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 myplot <- survfit(mysurv~clin_surv$race)
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on case-matched population",
+           title = "Survival analysis on TMA",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "Race", # legend.labs = c("mid-high", "mid-low", "high", "low"), # 4253
            pval = TRUE, # pval.coord = c(2100,.53),
@@ -55,7 +55,7 @@ tma_clust_markers %>%
   geom_boxplot()+
   facet_grid(.~ tmaclusters_CD38)
 
-# clusters_excluded_ST
+# tmaclusters_excluded_ST
 excl_ST <- tma_clust_markers %>% filter(tmaclusters_CD38 == "low")
 excl_ST <- excl_ST %>% 
   mutate(ratio_ST = percent_CD3_CD8_stroma.i / percent_CD3_CD8_tumor.i) %>% 
@@ -67,16 +67,16 @@ excl_ST <- excl_ST %>%
 
 clust <- Mclust(excl_ST$ratio_ST, G = 2)
 summary(clust)
-excl_ST$clusters_excluded_ST <- clust$classification
-excl_ST$clusters_excluded_ST <- factor(excl_ST$clusters_excluded_ST, 
+excl_ST$tmaclusters_excluded_ST <- clust$classification
+excl_ST$tmaclusters_excluded_ST <- factor(excl_ST$tmaclusters_excluded_ST, 
                                  levels = c(1, 2),
                                  labels = c("cold", "excluded"))
-tma_clust_markers <- left_join(tma_clust_markers, excl_ST[, c("suid", "clusters_excluded_ST")], by= "suid")
+tma_clust_markers <- left_join(tma_clust_markers, excl_ST[, c("suid", "tmaclusters_excluded_ST")], by= "suid")
 
 excl_ST %>% 
   gather(key = "markers_cat", value = "value", ratio_ST) %>% 
-  select(suid, clusters_excluded_ST, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=clusters_excluded_ST, color=clusters_excluded_ST))+
+  select(suid, tmaclusters_excluded_ST, markers_cat, value) %>% 
+  ggplot(aes(x=suid, y=value, group=tmaclusters_excluded_ST, color=tmaclusters_excluded_ST))+
   geom_boxplot()
 
 # tmaclusters_R_FoxP3_tum
@@ -153,7 +153,7 @@ clin_surv <- tma_clust_markers
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
 myplot <- survfit(mysurv~clin_surv$immunoscore_)
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on case-matched population",
+           title = "Survival analysis on TMA",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "Immunoscore", 
            legend.labs = c("0", "1", "2", "3", "4"),
@@ -174,7 +174,7 @@ summary(myplot)
 # CD3CD8
 myplot <- survfit(mysurv~clin_surv$tmaclusters_CD38)
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on case-matched population",
+           title = "Survival analysis on TMA",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clusters_CD38",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
@@ -193,11 +193,11 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~tmaclusters_CD38
 summary(myplot)
 
 # Excluded
-myplot <- survfit(mysurv~clin_surv$clusters_excluded_ST)
+myplot <- survfit(mysurv~clin_surv$tmaclusters_excluded_ST)
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on case-matched population",
+           title = "Survival analysis on TMA",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "clustered by clusters_excluded_ST",
+           xlab = "Time (days)", legend.title = "clustered by stroma/tumor exclusion cluster",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
            pval = TRUE, # pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
@@ -206,19 +206,19 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf_tmant = FALSE
 )
-myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_ST, data = clin_surv) 
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~tmaclusters_excluded_ST, data = clin_surv) 
 summary(myplot)
-myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_ST + refage + stage, data = clin_surv)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~tmaclusters_excluded_ST + refage + stage, data = clin_surv)
 summary(myplot)
-myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~clusters_excluded_ST + refage + stage + histotype, data = clin_surv)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~tmaclusters_excluded_ST + refage + stage + histotype, data = clin_surv)
 summary(myplot)
 
 # Immunosuppressed
 myplot <- survfit(mysurv~clin_surv$tmaclusters_R_FoxP3_tum)
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on case-matched population",
+           title = "Survival analysis on TMA",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "clusters ratio CD3CD8/FoxP3 in intratumoral tumor",
+           xlab = "Time (days)", legend.title = "clusters ratio CD3CD8/FoxP3 in tumor",
            # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
            pval = TRUE, # pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
@@ -237,9 +237,9 @@ summary(myplot)
 # CD11b
 myplot <- survfit(mysurv~clin_surv$tmaclusters_CD11b_tot)
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on case-matched population",
+           title = "Survival analysis on TMA",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "clusters CD11b intratumoral tumor and stroma",
+           xlab = "Time (days)", legend.title = "clusters CD11b tumor and stroma",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
            pval = TRUE, # pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
@@ -258,9 +258,9 @@ summary(myplot)
 # CD15
 myplot <- survfit(mysurv~clin_surv$tmaclusters_CD15_tot)
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on case-matched population",
+           title = "Survival analysis on TMA",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "clusters CD15 intratumoral tumor and stroma",
+           xlab = "Time (days)", legend.title = "clusters CD15 tumor and stroma",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
            pval = TRUE, # pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
@@ -279,9 +279,9 @@ summary(myplot)
 # CD11bCD15
 myplot <- survfit(mysurv~clin_surv$tmaclusters_CD11bCD15_tot)
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on case-matched population",
+           title = "Survival analysis on TMA",
            font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", legend.title = "clusters CD11bCD15 intratumoral tumor and stroma",
+           xlab = "Time (days)", legend.title = "clusters CD11bCD15 tumor and stroma",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
            pval = TRUE, # pval.coord = c(2100,.53),
            surv.median.line = c("hv"),
@@ -299,6 +299,274 @@ summary(myplot)
 
 
 ##################################################################### III ### Survival analysis on immune cells tertiles----
+# CD3
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by overall CD3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD3+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2600, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+
+# CD3 tumor
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3t_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by tumoral CD3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumoral CD3+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2600, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3t_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3t_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3t_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+## CD3 stroma
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3s_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by stromal CD3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stromal CD3+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2600, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3s_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3s_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3s_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+
+# CD3_CD8
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by overall CD3+CD8+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD3+CD8+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2500, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+
+# CD3_CD8 tumor
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8t_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by tumoral CD3+CD8+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumor CD3+CD8+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2500, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8t_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8t_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8t_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+
+# CD3_CD8 stroma
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8s_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by stromal CD3+CD8+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stroma CD3+CD8+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2500, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8s_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8s_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8s_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+
+# CD3_FoxP3
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by overall CD3+FoxP3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD3+FoxP3+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2100, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+
+# CD3_FoxP3 tumor
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3t_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by tumoral CD3+FoxP3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumor CD3+FoxP3+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2100, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3t_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3t_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3t_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+
+# CD3_FoxP3 stroma
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3s_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by stromal CD3+FoxP3+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stroma CD3+FoxP3+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2100, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3s_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3s_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3s_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+
+# CD11b+
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by overall CD11b+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD11b+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2500, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+
+# CD11b+ tumor
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11bt_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by tumoral CD11b+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumoral CD11b+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2500, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bt_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bt_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bt_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+
+# CD11b+ stroma
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11bs_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by stromal CD11b+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stromal CD11b+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(2500, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bs_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bs_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11bs_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+
+# CD11b+CD15+
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by overall CD11b+CD15+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "CD11b+CD15+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(3000, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+
+# CD11b+CD15+ tumor
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15t_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by tumoral CD11b+CD15+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "tumor CD11b+CD15+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(3000, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15t_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15t_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15t_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
+
+# CD11b+CD15+ stroma
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp_tma, data = clin_surv) 
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA \nseparated by stromal CD11b+CD15+ lymphocyte occupancy",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)",
+           legend.title = "stromal CD11b+CD15+",
+           surv.median.line = c("hv"),
+           pval = TRUE, pval.coord = c(3000, .52))
+
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp_tma, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp_tma + refage + stage, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp_tma + refage + stage + histotype, data = clin_surv) 
+summary(myplot)
+
 
 
 
