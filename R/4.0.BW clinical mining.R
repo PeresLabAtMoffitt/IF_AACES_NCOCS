@@ -854,7 +854,7 @@ summary(myplot)
 # CD3_CD8
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_CD8_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on overall population \nseparated by overall intartumoral CD3+CD8+ lymphocyte occupancy",
+           title = "Survival analysis on overall population \nseparated by overall intratumoral CD3+CD8+ lymphocyte occupancy",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "CD3+CD8+",
@@ -918,7 +918,7 @@ summary(myplot)
 # CD3_FoxP3
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD3_FoxP3_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on overall population \nseparated by overall intartumoral CD3+FoxP3+ lymphocyte occupancy",
+           title = "Survival analysis on overall population \nseparated by overall intratumoral CD3+FoxP3+ lymphocyte occupancy",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "CD3+FoxP3+",
@@ -981,7 +981,7 @@ summary(myplot)
 # CD11b+
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on overall population \nseparated by overall intartumoral CD11b+ lymphocyte occupancy",
+           title = "Survival analysis on overall population \nseparated by overall intratumoral CD11b+ lymphocyte occupancy",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "CD11b+",
@@ -1046,7 +1046,7 @@ summary(myplot)
 # CD11b+CD15+
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15_grp, data = clin_surv) 
 ggsurvplot(myplot, data = clin_surv,
-           title = "Survival analysis on overall population \nseparated by overall intartumoral CD11b+CD15+ lymphocyte occupancy",
+           title = "Survival analysis on overall population \nseparated by overall intratumoral CD11b+CD15+ lymphocyte occupancy",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)",
            legend.title = "CD11b+CD15+",
