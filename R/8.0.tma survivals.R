@@ -33,7 +33,7 @@ tma_clust_markers <- tma_clust_markers %>%
   mutate(percentile_score_mean = rowMeans(tma_clust_markers[c("percentile_score_CD3_tma", 
                                                     "percentile_score_CD8_tma")])
   ) %>% 
-  mutate(immunoscore_ = case_when(
+  mutate(immunoscore_tma = case_when(
     percentile_score_mean <= 10 ~ 0,
     percentile_score_mean <= 25 ~ 1,
     percentile_score_mean <= 70 ~ 2,
@@ -151,7 +151,7 @@ CD11b15_tma %>%
 # Immunoscore----
 clin_surv <- tma_clust_markers
 mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
-myplot <- survfit(mysurv~clin_surv$immunoscore_)
+myplot <- survfit(mysurv~clin_surv$immunoscore_tma)
 ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on TMA",
            font.main = c(16, "bold", "black"),
@@ -164,11 +164,11 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf_tmant = FALSE
 )
-myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_, data = clin_surv) 
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_tma, data = clin_surv) 
 summary(myplot)
-myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_ + refage + stage, data = clin_surv)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_tma + refage + stage, data = clin_surv)
 summary(myplot)
-myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_ + refage + stage + histotype, data = clin_surv)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_tma + refage + stage + histotype, data = clin_surv)
 summary(myplot)
 
 # CD3CD8
