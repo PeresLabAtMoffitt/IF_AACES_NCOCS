@@ -387,19 +387,19 @@ markers_ROI_CM <- markers_ROI %>%
 
 # plots----
 # plot(markers_ROI_CM)
-ggplot(markers_ROI_CM, aes(x=race, y=percent_CD3_tumor.i)) +
+ggplot(markers_match, aes(x=race, y=percent_CD3_tumor.i)) +
   geom_boxplot() +
   theme_minimal() +
   labs(x="Race", y="CD3 tumor", title="CD3 in Race") + geom_jitter(shape=16, position=position_jitter(0.2))
 
 library(ggpubr)
-ggpaired(markers_ROI_CM, x = "race", y = "percent_CD3_tumor.i",
+ggpaired(markers_match, x = "race", y = "percent_CD3_tumor.i",
          id = "pair_id",
          color = "race", line.color = "gray", line.size = 0.4,
          palette = "jco")+ # depends of the journal to publish on
   stat_compare_means(paired = TRUE)
 
-ggpaired(markers_ROI_CM, x = "race", y = "percent_FoxP3_tumor.i",
+ggpaired(markers_match, x = "race", y = "percent_FoxP3_tumor.i",
          id = "pair_id",
          color = "race", line.color = "gray", line.size = 0.4,
          palette = "jco")+
@@ -409,7 +409,7 @@ ggpaired(markers_ROI_CM, x = "race", y = "percent_FoxP3_tumor.i",
 
 
 
-markers_ROI_CM %>% 
+markers_match %>% 
   gather(key = "race", value = c("percent_CD3_tumor.i", "percent_FoxP3_tumor.i"))
 ggpaired(markers_ROI_CM, x = "race", y = "percent_CD3_tumor",
          id = "pair_id",
@@ -422,15 +422,15 @@ ggpaired(markers_ROI_CM, x = "race", y = "percent_CD3_tumor",
 
 
 # Ratio on case_matched
-ggplot(markers_ROI_CM, aes(x=percent_CD3_tumor.p, y=percent_CD3_tumor.i))+
+ggplot(markers_match, aes(x=percent_CD3_tumor.p, y=percent_CD3_tumor.i))+
   geom_point()
-ggplot(markers_ROI_CM, aes(x=percent_CD8_tumor.p, y=percent_CD8_tumor.i))+
+ggplot(markers_match, aes(x=percent_CD8_tumor.p, y=percent_CD8_tumor.i))+
   geom_point()
-ggplot(markers_ROI_CM, aes(x=percent_FoxP3_tumor.p, y=percent_FoxP3_tumor.i))+
+ggplot(markers_match, aes(x=percent_FoxP3_tumor.p, y=percent_FoxP3_tumor.i))+
   geom_point()
-ggplot(markers_ROI_CM, aes(x=percent_CD11b_tumor.p, y=percent_CD11b_tumor.i))+
+ggplot(markers_match, aes(x=percent_CD11b_tumor.p, y=percent_CD11b_tumor.i))+
   geom_point()
-ggplot(markers_ROI_CM, aes(x=percent_CD15_tumor.p, y=percent_CD15_tumor.i))+
+ggplot(markers_match, aes(x=percent_CD15_tumor.p, y=percent_CD15_tumor.i))+
   geom_point()
 
 
