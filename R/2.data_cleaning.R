@@ -93,16 +93,16 @@ clinical_data <- clinical_data %>%
   )) %>% 
   mutate(histotype = case_when(
     histotype == 1                                     ~ "high-grade serous",
-    histotype == 2                                     ~ "low-grade serous",
-    histotype == 3                                     ~ "endometrioid",
-    histotype == 4                                     ~ "clear cell",
-    histotype == 5                                     ~ "mucinous",
-    histotype == 6                                     ~ "carcinosarcoma",
-    histotype == 7                                     ~ "other epithelial ovarian cancer \n(e.g. Malignant Brenner, mixed, carcinoma, NOS)",
-    histotype == 9                                     ~ "serous borderline",
-    histotype == 10                                    ~ "mucinous borderline",
-    histotype == 11                                    ~ "other epithelial borderline",
-    histotype == 13                                    ~ "synchronous",
+    histotype %in% (2:13)                              ~ "non-high-grade serous",
+    # histotype == 3                                     ~ "endometrioid",
+    # histotype == 4                                     ~ "clear cell",
+    # histotype == 5                                     ~ "mucinous",
+    # histotype == 6                                     ~ "carcinosarcoma",
+    # histotype == 7                                     ~ "other epithelial ovarian cancer \n(e.g. Malignant Brenner, mixed, carcinoma, NOS)",
+    # histotype == 9                                     ~ "serous borderline",
+    # histotype == 10                                    ~ "mucinous borderline",
+    # histotype == 11                                    ~ "other epithelial borderline",
+    # histotype == 13                                    ~ "synchronous",
     TRUE                                                ~ NA_character_
   )) %>%
   mutate(race = case_when(

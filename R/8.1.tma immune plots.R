@@ -85,742 +85,746 @@ tma_clust_markers %>%
   stat_compare_means(paired = TRUE)+
   facet_grid(. ~ markers)
 
+
 # Paired----
 p1 <- tma_clust_markers %>% 
-  ggpaired(x = "race", y = "percent_CD3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
+  ggplot(aes(x = race, y = percent_CD3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_tumor_tma")
 p2 <- tma_clust_markers %>% 
-  ggpaired(x = "race", y = "percent_CD3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
+  ggplot(aes(x = race, y = percent_CD3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_total_tma")
 p3 <- tma_clust_markers %>% 
-  ggpaired(x = "race", y = "percent_CD3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
+  ggplot(aes(x = race, y = percent_CD3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_stroma_tma")
 gridExtra::grid.arrange(p1,p2,p3, ncol=3)
 
 
 # By Immunoscore----
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_tumor_tma")+
   facet_grid(. ~ immunoscore_tma)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_total_tma")+
   facet_grid(. ~ immunoscore_tma)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_stroma_tma")+
   facet_grid(. ~ immunoscore_tma)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3)
 
 
 # By cluster----
 # tmaclusters_CD38
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_total_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Tumor CD3+CD8+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_total_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Tumor CD3+CD8+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_total_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Tumor CD3+CD8+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_total_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Tumor CD3+CD8+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_total_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD38)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Tumor CD3+CD8+ in TMA")
 
 # tmaclusters_excluded_ST
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_tumor_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_total_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_stroma_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Stroma/Tumor Exclusion in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_tumor_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_total_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_stroma_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Stroma/Tumor Exclusion in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_tumor_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_total_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_stroma_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Stroma/Tumor Exclusion in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_tumor_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_total_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_stroma_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Stroma/Tumor Exclusion in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_tumor_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_total_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_stroma_tma")+
   facet_grid(. ~ tmaclusters_excluded_ST)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Stroma/Tumor Exclusion in TMA")
 
 # tmaclusters_R_FoxP3_tum
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_tumor_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_total_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_stroma_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Ratio of Tumor CD3+CD8+/FoxP3 in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_tumor_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_total_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_stroma_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Ratio of Tumor CD3+CD8+/FoxP3 in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_tumor_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_total_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_stroma_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Ratio of Tumor CD3+CD8+/FoxP3 in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_tumor_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_total_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_stroma_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Ratio of Tumor CD3+CD8+/FoxP3 in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_tumor_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_total_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_stroma_tma")+
   facet_grid(. ~ tmaclusters_R_FoxP3_tum)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster Ratio of Tumor CD3+CD8+/FoxP3 in TMA")
 
 # tmaclusters_CD11b_tot
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_total_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD11b+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_total_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD11b+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_total_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD11b+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_total_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD11b+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_total_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD11b_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD11b+ in TMA")
 
 # tmaclusters_CD15_tot
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_total_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD15+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_total_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD15+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_total_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD15+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_total_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD15+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_total_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD15_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD15+ in TMA")
 
 # tmaclusters_CD11bCD15_tot
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_total_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD11b+CD15+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_total_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD3_CD8_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD3_CD8_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD3_CD8_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD11b+CD15+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_total_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_FoxP3_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_FoxP3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_FoxP3_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD11b+CD15+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_total_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD11b+CD15+ in TMA")
 
 p1 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_tumor_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_tumor_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p1$layers <- p1$layers[-2]
+
 p2 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_total_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_total_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p2$layers <- p2$layers[-2]
+
 p3 <- tma_clust_markers %>%
-  ggpaired(x = "race", y = "percent_CD11b_CD15_stroma_tma",
-           color = "race", line.color = "gray", line.size = 0.4)+
-  stat_compare_means(paired = FALSE)+
+  ggplot(aes(x = race, y = percent_CD11b_CD15_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
   labs(x=NULL, y="percent_CD11b_CD15_stroma_tma")+
   facet_grid(. ~ tmaclusters_CD11bCD15_tot)
-p3$layers <- p3$layers[-2]
+
 gridExtra::grid.arrange(p1,p2,p3, ncol=3, top = "Marker Expression per Cluster CD11b+CD15+ in TMA")
 
 
