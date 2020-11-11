@@ -528,6 +528,9 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_grp = factor(.$CD3_grp, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_grp) %>%
+  mutate(averaged.CD3_grp = median(sqrt_CD3_total.i)) %>% 
+  ungroup %>% 
   mutate(tertile = ntile(sqrt_CD3_tumor.i, 3)) %>% 
   mutate(CD3t_grp = case_when(
     tertile == 1 ~ "Low",
@@ -535,6 +538,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3t_grp = factor(.$CD3t_grp, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3t_grp) %>%
+  mutate(averaged.CD3t_grp = median(sqrt_CD3_tumor.i)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_stroma.i, 3)) %>% 
   mutate(CD3s_grp = case_when(
     tertile == 1 ~ "Low",
@@ -542,6 +549,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3s_grp = factor(.$CD3s_grp, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3s_grp) %>%
+  mutate(averaged.CD3s_grp = median(sqrt_CD3_stroma.i)) %>% 
+  ungroup %>% 
+  
   # mutate(temp= case_when(
   #   sqrt_CD3_CD8_total.i > 0 ~ sqrt_CD3_CD8_total.i
   # )) %>% 
@@ -552,6 +563,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_CD8_grp = factor(.$CD3_CD8_grp, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_CD8_grp) %>%
+  mutate(averaged.CD3_CD8_grp = median(sqrt_CD3_CD8_total.i)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_CD8_tumor.i, 3)) %>% 
   mutate(CD3_CD8t_grp = case_when(
     tertile == 1 ~ "Low",
@@ -559,6 +574,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_CD8t_grp = factor(.$CD3_CD8t_grp, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_CD8t_grp) %>%
+  mutate(averaged.CD3_CD8t_grp = median(sqrt_CD3_CD8_tumor.i)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_CD8_stroma.i, 3)) %>% 
   mutate(CD3_CD8s_grp = case_when(
     tertile == 1 ~ "Low",
@@ -566,6 +585,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_CD8s_grp = factor(.$CD3_CD8s_grp, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_CD8s_grp) %>%
+  mutate(averaged.CD3_CD8s_grp = median(sqrt_CD3_CD8_stroma.i)) %>% 
+  ungroup %>% 
+  
   # mutate(temp= case_when(
   #   sqrt_CD3_FoxP3_total.i > 0 ~ sqrt_CD3_FoxP3_total.i
   # )) %>% 
@@ -576,6 +599,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_FoxP3_grp = factor(.$CD3_FoxP3_grp, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_FoxP3_grp) %>%
+  mutate(averaged.CD3_FoxP3_grp = median(sqrt_CD3_FoxP3_total.i)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_FoxP3_tumor.i, 3)) %>% 
   mutate(CD3_FoxP3t_grp = case_when(
     tertile == 1 ~ "Low",
@@ -583,6 +610,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_FoxP3t_grp = factor(.$CD3_FoxP3t_grp, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_FoxP3t_grp) %>%
+  mutate(averaged.CD3_FoxP3t_grp = median(sqrt_CD3_FoxP3_tumor.i)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_FoxP3_stroma.i, 3)) %>% 
   mutate(CD3_FoxP3s_grp = case_when(
     tertile == 1 ~ "Low",
@@ -590,6 +621,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_FoxP3s_grp = factor(.$CD3_FoxP3s_grp, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_FoxP3s_grp) %>%
+  mutate(averaged.CD3_FoxP3s_grp = median(sqrt_CD3_FoxP3_stroma.i)) %>% 
+  ungroup %>% 
+  
   # mutate(temp= case_when(
   #   sqrt_CD11b_total.i > 0 ~ sqrt_CD11b_total.i
   # )) %>% 
@@ -599,18 +634,30 @@ markers <- markers %>%
     tertile == 2 ~ "High"
   )) %>% 
   mutate(CD11b_grp = factor(.$CD11b_grp, levels = c("Low","High"))) %>% 
+  group_by(CD11b_grp) %>%
+  mutate(averaged.CD11b_grp = median(sqrt_CD11b_total.i)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_tumor.i, 2)) %>% 
   mutate(CD11bt_grp = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High",
   )) %>% 
   mutate(CD11bt_grp = factor(.$CD11bt_grp, levels = c("Low","High"))) %>% 
+  group_by(CD11bt_grp) %>%
+  mutate(averaged.CD11bt_grp = median(sqrt_CD11b_tumor.i)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_stroma.i, 2)) %>% 
   mutate(CD11bs_grp = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High",
   )) %>% 
   mutate(CD11bs_grp = factor(.$CD11bs_grp, levels = c("Low","High"))) %>% 
+  group_by(CD11bs_grp) %>%
+  mutate(averaged.CD11bs_grp = median(sqrt_CD11b_stroma.i)) %>% 
+  ungroup %>% 
+  
   # mutate(temp= case_when(
   #   sqrt_CD11b_CD15_total.i > 0 ~ sqrt_CD11b_CD15_total.i
   # )) %>% 
@@ -620,18 +667,30 @@ markers <- markers %>%
     tertile == 2 ~ "High"
   )) %>% 
   mutate(CD11b_CD15_grp = factor(.$CD11b_CD15_grp, levels = c("Low","High"))) %>% 
+  group_by(CD11b_CD15_grp) %>%
+  mutate(averaged.CD11b_CD15_grp = median(sqrt_CD11b_CD15_total.i)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_CD15_tumor.i, 2)) %>% 
   mutate(CD11b_CD15t_grp = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High",
   )) %>% 
   mutate(CD11b_CD15t_grp = factor(.$CD11b_CD15t_grp, levels = c("Low","High"))) %>% 
+  group_by(CD11b_CD15t_grp) %>%
+  mutate(averaged.CD11b_CD15t_grp = median(sqrt_CD11b_CD15_tumor.i)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_CD15_stroma.i, 2)) %>% 
   mutate(CD11b_CD15s_grp = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High",
   )) %>% 
-  mutate(CD11b_CD15s_grp = factor(.$CD11b_CD15s_grp, levels = c("Low","High")))
+  mutate(CD11b_CD15s_grp = factor(.$CD11b_CD15s_grp, levels = c("Low","High"))) %>% 
+  group_by(CD11b_CD15s_grp) %>%
+  mutate(averaged.CD11b_CD15s_grp = median(sqrt_CD11b_CD15_stroma.i)) %>% 
+  ungroup
+  
 
 # Tertile for peripheral marker
 markers <- markers %>% 
@@ -642,6 +701,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_grp_p = factor(.$CD3_grp_p, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_grp_p) %>%
+  mutate(averaged.CD3_grp_p = median(sqrt_CD3_total.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_tumor.p, 3)) %>% 
   mutate(CD3t_grp_p = case_when(
     tertile == 1 ~ "Low",
@@ -649,6 +712,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3t_grp_p = factor(.$CD3t_grp_p, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3t_grp_p) %>%
+  mutate(averaged.CD3t_grp_p = median(sqrt_CD3_tumor.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_stroma.p, 3)) %>% 
   mutate(CD3s_grp_p = case_when(
     tertile == 1 ~ "Low",
@@ -656,6 +723,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3s_grp_p = factor(.$CD3s_grp_p, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3s_grp_p) %>%
+  mutate(averaged.CD3s_grp_p = median(sqrt_CD3_stroma.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_CD8_total.p, 3)) %>% 
   mutate(CD3_CD8_grp_p = case_when(
     tertile == 1 ~ "Low",
@@ -663,6 +734,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_CD8_grp_p = factor(.$CD3_CD8_grp_p, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_CD8_grp_p) %>%
+  mutate(averaged.CD3_CD8_grp_p = median(sqrt_CD3_CD8_total.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_CD8_tumor.p, 3)) %>% 
   mutate(CD3_CD8t_grp_p = case_when(
     tertile == 1 ~ "Low",
@@ -670,6 +745,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_CD8t_grp_p = factor(.$CD3_CD8t_grp_p, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_CD8t_grp_p) %>%
+  mutate(averaged.CD3_CD8t_grp_p = median(sqrt_CD3_CD8_tumor.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_CD8_stroma.p, 3)) %>% 
   mutate(CD3_CD8s_grp_p = case_when(
     tertile == 1 ~ "Low",
@@ -677,6 +756,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_CD8s_grp_p = factor(.$CD3_CD8s_grp_p, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_CD8s_grp_p) %>%
+  mutate(averaged.CD3_CD8s_grp_p = median(sqrt_CD3_CD8_stroma.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_FoxP3_total.p, 3)) %>% 
   mutate(CD3_FoxP3_grp_p = case_when(
     tertile == 1 ~ "Low",
@@ -684,6 +767,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_FoxP3_grp_p = factor(.$CD3_FoxP3_grp_p, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_FoxP3_grp_p) %>%
+  mutate(averaged.CD3_FoxP3_grp_p = median(sqrt_CD3_FoxP3_total.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_FoxP3_tumor.p, 3)) %>% 
   mutate(CD3_FoxP3t_grp_p = case_when(
     tertile == 1 ~ "Low",
@@ -691,6 +778,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_FoxP3t_grp_p = factor(.$CD3_FoxP3t_grp_p, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_FoxP3t_grp_p) %>%
+  mutate(averaged.CD3_FoxP3t_grp_p = median(sqrt_CD3_FoxP3_tumor.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_FoxP3_stroma.p, 3)) %>% 
   mutate(CD3_FoxP3s_grp_p = case_when(
     tertile == 1 ~ "Low",
@@ -698,42 +789,70 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_FoxP3s_grp_p = factor(.$CD3_FoxP3s_grp_p, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_FoxP3s_grp_p) %>%
+  mutate(averaged.CD3_FoxP3s_grp_p = median(sqrt_CD3_FoxP3_stroma.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_total.p, 2)) %>% 
   mutate(CD11b_grp_p = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High"
   )) %>% 
   mutate(CD11b_grp_p = factor(.$CD11b_grp_p, levels = c("Low","High"))) %>% 
+  group_by(CD11b_grp_p) %>%
+  mutate(averaged.CD11b_grp_p = median(sqrt_CD11b_total.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_tumor.p, 2)) %>% 
   mutate(CD11bt_grp_p = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High",
   )) %>% 
   mutate(CD11bt_grp_p = factor(.$CD11bt_grp_p, levels = c("Low","High"))) %>% 
+  group_by(CD11bt_grp_p) %>%
+  mutate(averaged.CD11bt_grp_p = median(sqrt_CD11b_tumor.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_stroma.p, 2)) %>% 
   mutate(CD11bs_grp_p = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High",
   )) %>% 
   mutate(CD11bs_grp_p = factor(.$CD11bs_grp_p, levels = c("Low","High"))) %>% 
+  group_by(CD11bs_grp_p) %>%
+  mutate(averaged.CD11bs_grp_p = median(sqrt_CD11b_stroma.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_CD15_total.p, 2)) %>% 
   mutate(CD11b_CD15_grp_p = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High"
   )) %>% 
   mutate(CD11b_CD15_grp_p = factor(.$CD11b_CD15_grp_p, levels = c("Low","High"))) %>% 
+  group_by(CD11b_CD15_grp_p) %>%
+  mutate(averaged.CD11b_CD15_grp_p = median(sqrt_CD11b_CD15_total.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_CD15_tumor.p, 2)) %>% 
   mutate(CD11b_CD15t_grp_p = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High",
   )) %>% 
   mutate(CD11b_CD15t_grp_p = factor(.$CD11b_CD15t_grp_p, levels = c("Low","High"))) %>% 
+  group_by(CD11b_CD15t_grp_p) %>%
+  mutate(averaged.CD11b_CD15t_grp_p = median(sqrt_CD11b_CD15_tumor.p)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_CD15_stroma.p, 2)) %>% 
   mutate(CD11b_CD15s_grp_p = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High",
   )) %>% 
-  mutate(CD11b_CD15s_grp_p = factor(.$CD11b_CD15s_grp_p, levels = c("Low","High")))
+  mutate(CD11b_CD15s_grp_p = factor(.$CD11b_CD15s_grp_p, levels = c("Low","High"))) %>% 
+  group_by(CD11b_CD15s_grp_p) %>%
+  mutate(averaged.CD11b_CD15s_grp_p = median(sqrt_CD11b_CD15_stroma.p)) %>% 
+  ungroup
+  
 
 # Tertile for TMA marker
 markers <- markers %>% 
@@ -744,6 +863,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_grp_tma = factor(.$CD3_grp_tma, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_grp_tma) %>%
+  mutate(averaged.CD3_grp_tma = median(sqrt_CD3_total_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_tumor_tma, 3)) %>% 
   mutate(CD3t_grp_tma = case_when(
     tertile == 1 ~ "Low",
@@ -751,6 +874,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3t_grp_tma = factor(.$CD3t_grp_tma, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3t_grp_tma) %>%
+  mutate(averaged.CD3t_grp_tma = median(sqrt_CD3_tumor_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_stroma_tma, 3)) %>% 
   mutate(CD3s_grp_tma = case_when(
     tertile == 1 ~ "Low",
@@ -758,6 +885,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3s_grp_tma = factor(.$CD3s_grp_tma, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3s_grp_tma) %>%
+  mutate(averaged.CD3s_grp_tma = median(sqrt_CD3_stroma_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_CD8_total_tma, 3)) %>% 
   mutate(CD3_CD8_grp_tma = case_when(
     tertile == 1 ~ "Low",
@@ -765,6 +896,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_CD8_grp_tma = factor(.$CD3_CD8_grp_tma, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_CD8_grp_tma) %>%
+  mutate(averaged.CD3_CD8_grp_tma = median(sqrt_CD3_CD8_total_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_CD8_tumor_tma, 3)) %>% 
   mutate(CD3_CD8t_grp_tma = case_when(
     tertile == 1 ~ "Low",
@@ -772,6 +907,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_CD8t_grp_tma = factor(.$CD3_CD8t_grp_tma, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_CD8t_grp_tma) %>%
+  mutate(averaged.CD3_CD8t_grp_tma = median(sqrt_CD3_CD8_tumor_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_CD8_stroma_tma, 3)) %>% 
   mutate(CD3_CD8s_grp_tma = case_when(
     tertile == 1 ~ "Low",
@@ -779,6 +918,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_CD8s_grp_tma = factor(.$CD3_CD8s_grp_tma, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_CD8s_grp_tma) %>%
+  mutate(averaged.CD3_CD8s_grp_tma = median(sqrt_CD3_CD8_stroma_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_FoxP3_total_tma, 3)) %>% 
   mutate(CD3_FoxP3_grp_tma = case_when(
     tertile == 1 ~ "Low",
@@ -786,6 +929,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_FoxP3_grp_tma = factor(.$CD3_FoxP3_grp_tma, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_FoxP3_grp_tma) %>%
+  mutate(averaged.CD3_FoxP3_grp_tma = median(sqrt_CD3_FoxP3_total_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_FoxP3_tumor_tma, 3)) %>% 
   mutate(CD3_FoxP3t_grp_tma = case_when(
     tertile == 1 ~ "Low",
@@ -793,6 +940,10 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_FoxP3t_grp_tma = factor(.$CD3_FoxP3t_grp_tma, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_FoxP3t_grp_tma) %>%
+  mutate(averaged.CD3_FoxP3t_grp_tma = median(sqrt_CD3_FoxP3_tumor_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD3_FoxP3_stroma_tma, 3)) %>% 
   mutate(CD3_FoxP3s_grp_tma = case_when(
     tertile == 1 ~ "Low",
@@ -800,42 +951,70 @@ markers <- markers %>%
     tertile == 3 ~ "High",
   )) %>% 
   mutate(CD3_FoxP3s_grp_tma = factor(.$CD3_FoxP3s_grp_tma, levels = c("Low","Medium","High"))) %>% 
+  group_by(CD3_FoxP3s_grp_tma) %>%
+  mutate(averaged.CD3_FoxP3s_grp_tma = median(sqrt_CD3_FoxP3_stroma_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_total_tma, 2)) %>% 
   mutate(CD11b_grp_tma = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High"
   )) %>% 
   mutate(CD11b_grp_tma = factor(.$CD11b_grp_tma, levels = c("Low","High"))) %>% 
+  group_by(CD11b_grp_tma) %>%
+  mutate(averaged.CD11b_grp_tma = median(sqrt_CD11b_total_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_tumor_tma, 2)) %>% 
   mutate(CD11bt_grp_tma = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High",
   )) %>% 
   mutate(CD11bt_grp_tma = factor(.$CD11bt_grp_tma, levels = c("Low","High"))) %>% 
+  group_by(CD11bt_grp_tma) %>%
+  mutate(averaged.CD11bt_grp_tma = median(sqrt_CD11b_tumor_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_stroma_tma, 2)) %>% 
   mutate(CD11bs_grp_tma = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High",
   )) %>% 
   mutate(CD11bs_grp_tma = factor(.$CD11bs_grp_tma, levels = c("Low","High"))) %>% 
+  group_by(CD11bs_grp_tma) %>%
+  mutate(averaged.CD11bs_grp_tma = median(sqrt_CD11b_stroma_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_CD15_total_tma, 2)) %>% 
   mutate(CD11b_CD15_grp_tma = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High"
   )) %>% 
   mutate(CD11b_CD15_grp_tma = factor(.$CD11b_CD15_grp_tma, levels = c("Low","High"))) %>% 
+  group_by(CD11b_CD15_grp_tma) %>%
+  mutate(averaged.CD11b_CD15_grp_tma = median(sqrt_CD11b_CD15_total_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_CD15_tumor_tma, 2)) %>% 
   mutate(CD11b_CD15t_grp_tma = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High",
   )) %>% 
   mutate(CD11b_CD15t_grp_tma = factor(.$CD11b_CD15t_grp_tma, levels = c("Low","High"))) %>% 
+  group_by(CD11b_CD15t_grp_tma) %>%
+  mutate(averaged.CD11b_CD15t_grp_tma = median(sqrt_CD11b_CD15_tumor_tma)) %>% 
+  ungroup %>% 
+  
   mutate(tertile = ntile(sqrt_CD11b_CD15_stroma_tma, 2)) %>% 
   mutate(CD11b_CD15s_grp_tma = case_when(
     tertile == 1 ~ "Low",
     tertile == 2 ~ "High",
   )) %>% 
   mutate(CD11b_CD15s_grp_tma = factor(.$CD11b_CD15s_grp_tma, levels = c("Low","High"))) %>% 
+  group_by(CD11b_CD15s_grp_tma) %>%
+  mutate(averaged.CD11b_CD15s_grp_tma = median(sqrt_CD11b_CD15_stroma_tma)) %>% 
+  ungroup %>% 
+  
   
   select(-c("tertile"))
 
