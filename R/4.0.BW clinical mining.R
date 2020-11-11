@@ -1644,6 +1644,89 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp + refage + stage, data = clin_surv) 
 summary(myplot)
 
+# Extra cox with median tertile----
+# Cox CD3
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_grp + race + averaged.CD3_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_grp + refage + race + stage + averaged.CD3_grp*race, data = clin_surv) 
+summary(myplot)
+
+# Cox CD3t
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3t_grp + race + averaged.CD3t_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3t_grp + refage + race + stage + averaged.CD3t_grp*race, data = clin_surv) 
+summary(myplot)
+# Cox CD3s
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3s_grp + race + averaged.CD3s_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3s_grp + refage + race + stage + averaged.CD3s_grp*race, data = clin_surv) 
+summary(myplot)
+
+# Cox CD3FoxP3
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3_grp + race + averaged.CD3_FoxP3_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3_grp + refage + race + stage + averaged.CD3_FoxP3_grp*race, data = clin_surv) 
+summary(myplot)
+# Cox CD3FoxP3t
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3t_grp + race + averaged.CD3_FoxP3t_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3t_grp + refage + race + stage + averaged.CD3_FoxP3t_grp*race, data = clin_surv) 
+summary(myplot)
+# Cox CD3FoxP3s
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3s_grp + race + averaged.CD3_FoxP3s_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3s_grp + refage + race + stage + averaged.CD3_FoxP3s_grp*race, data = clin_surv) 
+summary(myplot)
+
+
+# Cox CD3CD8
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8_grp + race + averaged.CD3_CD8_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8_grp + refage + race + stage + averaged.CD3_CD8_grp*race, data = clin_surv) 
+summary(myplot)
+# Cox CD3CD8t
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8t_grp + race + averaged.CD3_CD8t_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8t_grp + refage + race + stage + averaged.CD3_CD8t_grp*race, data = clin_surv) 
+summary(myplot)
+# Cox CD3CD8s
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8s_grp + race + averaged.CD3_CD8s_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8s_grp + refage + race + stage + averaged.CD3_CD8s_grp*race, data = clin_surv) 
+summary(myplot)
+
+# Cox CD11b
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_grp + race + averaged.CD11b_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_grp + refage + race + stage + averaged.CD11b_grp*race, data = clin_surv) 
+summary(myplot)
+# Cox CD11bt
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11bt_grp + race + averaged.CD11bt_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11bt_grp + refage + race + stage + averaged.CD11bt_grp*race, data = clin_surv) 
+summary(myplot)
+# Cox CD11bs
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11bs_grp + race + averaged.CD11bs_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11bs_grp + refage + race + stage + averaged.CD11bs_grp*race, data = clin_surv) 
+summary(myplot)
+
+# Cox CD11bCD15
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15_grp + race + averaged.CD11b_CD15_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15_grp + refage + race + stage + averaged.CD11b_CD15_grp*race, data = clin_surv) 
+summary(myplot)
+# Cox CD11bCD15t
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15t_grp + race + averaged.CD11b_CD15t_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15t_grp + refage + race + stage + averaged.CD11b_CD15t_grp*race, data = clin_surv) 
+summary(myplot)
+# Cox CD11bCD15s
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15s_grp + race + averaged.CD11b_CD15s_grp*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15s_grp + refage + race + stage + averaged.CD11b_CD15s_grp*race, data = clin_surv) 
+summary(myplot)
+
 
 # Lymphocytes grouping for peripheral stromal+tumor using tertiles----
 clin_surv <- markers_match
@@ -2179,6 +2262,89 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15t_grp_
 summary(myplot)
 # Cox CD11bCD15s
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp_p + refage + stage, data = clin_surv) 
+summary(myplot)
+
+# Extra cox with median tertile----
+# Cox CD3
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_grp_p + race + averaged.CD3_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_grp_p + refage + race + stage + averaged.CD3_grp_p*race, data = clin_surv) 
+summary(myplot)
+
+# Cox CD3t
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3t_grp_p + race + averaged.CD3t_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3t_grp_p + refage + race + stage + averaged.CD3t_grp_p*race, data = clin_surv) 
+summary(myplot)
+# Cox CD3s
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3s_grp_p + race + averaged.CD3s_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3s_grp_p + refage + race + stage + averaged.CD3s_grp_p*race, data = clin_surv) 
+summary(myplot)
+
+# Cox CD3FoxP3
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3_grp_p + race + averaged.CD3_FoxP3_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3_grp_p + refage + race + stage + averaged.CD3_FoxP3_grp_p*race, data = clin_surv) 
+summary(myplot)
+# Cox CD3FoxP3t
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3t_grp_p + race + averaged.CD3_FoxP3t_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3t_grp_p + refage + race + stage + averaged.CD3_FoxP3t_grp_p*race, data = clin_surv) 
+summary(myplot)
+# Cox CD3FoxP3s
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3s_grp_p + race + averaged.CD3_FoxP3s_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3s_grp_p + refage + race + stage + averaged.CD3_FoxP3s_grp_p*race, data = clin_surv) 
+summary(myplot)
+
+
+# Cox CD3CD8
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8_grp_p + race + averaged.CD3_CD8_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8_grp_p + refage + race + stage + averaged.CD3_CD8_grp_p*race, data = clin_surv) 
+summary(myplot)
+# Cox CD3CD8t
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8t_grp_p + race + averaged.CD3_CD8t_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8t_grp_p + refage + race + stage + averaged.CD3_CD8t_grp_p*race, data = clin_surv) 
+summary(myplot)
+# Cox CD3CD8s
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8s_grp_p + race + averaged.CD3_CD8s_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8s_grp_p + refage + race + stage + averaged.CD3_CD8s_grp_p*race, data = clin_surv) 
+summary(myplot)
+
+# Cox CD11b
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_grp_p + race + averaged.CD11b_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_grp_p + refage + race + stage + averaged.CD11b_grp_p*race, data = clin_surv) 
+summary(myplot)
+# Cox CD11bt
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11bt_grp_p + race + averaged.CD11bt_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11bt_grp_p + refage + race + stage + averaged.CD11bt_grp_p*race, data = clin_surv) 
+summary(myplot)
+# Cox CD11bs
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11bs_grp_p + race + averaged.CD11bs_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11bs_grp_p + refage + race + stage + averaged.CD11bs_grp_p*race, data = clin_surv) 
+summary(myplot)
+
+# Cox CD11bCD15
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15_grp_p + race + averaged.CD11b_CD15_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15_grp_p + refage + race + stage + averaged.CD11b_CD15_grp_p*race, data = clin_surv) 
+summary(myplot)
+# Cox CD11bCD15t
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15t_grp_p + race + averaged.CD11b_CD15t_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15t_grp_p + refage + race + stage + averaged.CD11b_CD15t_grp_p*race, data = clin_surv) 
+summary(myplot)
+# Cox CD11bCD15s
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15s_grp_p + race + averaged.CD11b_CD15s_grp_p*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15s_grp_p + refage + race + stage + averaged.CD11b_CD15s_grp_p*race, data = clin_surv) 
 summary(myplot)
 
 
