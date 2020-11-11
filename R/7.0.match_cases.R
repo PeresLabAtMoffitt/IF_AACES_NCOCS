@@ -28,6 +28,21 @@ ggsurvplot(myplot, data = clin_surv,
            risk.table.title = "Risk table",
            conf.int = FALSE
 )
+
+clin_surv <- markers_match
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
+myplot <- survfit(mysurv~clin_surv$immunoscore_2018lancet)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on case-matched population",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "Immunoscore Lancet 2018", # legend.labs = c("mid-high", "mid-low", "high", "low"), # 4253
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
 # CD3CD8
 myplot <- survfit(mysurv~clin_surv$clusters_CD38)
 ggsurvplot(myplot, data = clin_surv,
@@ -196,6 +211,22 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_ + race  + immunoscore_*race, data = clin_surv) 
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_ + refage + race + stage  + immunoscore_*race, data = clin_surv)
+summary(myplot)
+
+myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_2018lancet + race, data = clin_surv) 
+ggsurvplot_facet(myplot, data = clin_surv, facet.by = "immunoscore_2018lancet",
+                 title = "Survival analysis on case-matched population Black vs White",
+                 font.main = c(16, "bold", "black"),
+                 xlab = "Time (days)",
+                 legend.title = "Immunoscore Lancet 2018",
+                 surv.median.line = c("hv"))
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_2018lancet + race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_2018lancet + refage + race + stage, data = clin_surv)
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_2018lancet + race  + immunoscore_2018lancet*race, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_2018lancet + refage + race + stage  + immunoscore_2018lancet*race, data = clin_surv)
 summary(myplot)
 # clusters_CD38
 myplot <- survfit(Surv(time = timelastfu_new, event = surv_vital)~clusters_CD38 + race, data = clin_surv) 

@@ -129,6 +129,26 @@ p3 <- tma_clust_markers %>%
 
 gridExtra::grid.arrange(p1,p2,p3, ncol=3)
 
+p1 <- tma_clust_markers %>%
+  ggplot(aes(x = race, y = percent_CD3_tumor_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
+  labs(x=NULL, y="percent_CD3_tumor_tma")+
+  facet_grid(. ~ immunoscore_tma_2018lancet)
+p2 <- tma_clust_markers %>%
+  ggplot(aes(x = race, y = percent_CD3_total_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
+  labs(x=NULL, y="percent_CD3_total_tma")+
+  facet_grid(. ~ immunoscore_tma_2018lancet)
+p3 <- tma_clust_markers %>%
+  ggplot(aes(x = race, y = percent_CD3_stroma_tma, color = race))+
+  geom_boxplot()+
+  theme_minimal() + theme(legend.position = "none") +
+  labs(x=NULL, y="percent_CD3_stroma_tma")+
+  facet_grid(. ~ immunoscore_tma_2018lancet)
+gridExtra::grid.arrange(p1,p2,p3, ncol=3)
+
 
 # By cluster----
 # tmaclusters_CD38

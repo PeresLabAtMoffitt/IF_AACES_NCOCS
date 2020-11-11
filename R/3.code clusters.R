@@ -9,6 +9,9 @@
 #   [0 %; 10 %] - [>10 %; 25 %] - [>25 %; 70 %] - [>70 %; 95 %] - [>95 %; 100 %].
 # CD3 and CD8 in two regions (CT and IM)
 
+# For a 3 immunosore group
+# https://pubmed.ncbi.nlm.nih.gov/29754777/
+
 # distribution CD3 intra
 quantile(markers$percent_CD3_total.i, c(.10, .25, .70, .95), na.rm = TRUE) 
 # distribution CD3 periph
@@ -23,17 +26,25 @@ markers <- markers %>%
   mutate(percentile_score_CD3_p = ntile(percent_CD3_total.p, 100) ) %>% 
   mutate(percentile_score_CD8_i = ntile(percent_CD8_total.i, 100) ) %>% 
   mutate(percentile_score_CD8_p = ntile(percent_CD8_total.p, 100) ) 
+
 markers <- markers %>%
-  mutate(percentile_score_mean = rowMeans(markers[c("percentile_score_CD3_i", "percentile_score_CD3_p", 
-                                                    "percentile_score_CD8_i", "percentile_score_CD8_p")])
-  ) %>% 
+  mutate(percentile_score_mean = rowMeans( markers[c("percentile_score_CD3_i", "percentile_score_CD3_p", 
+                                                    "percentile_score_CD8_i", "percentile_score_CD8_p")] ))
+markers <- markers %>%
   mutate(immunoscore_ = case_when(
-    percentile_score_mean <= 10 ~ 0,
-    percentile_score_mean <= 25 ~ 1,
-    percentile_score_mean <= 70 ~ 2,
-    percentile_score_mean <= 95 ~ 3,
-    percentile_score_mean > 95 ~ 4 
-  ))
+    percentile_score_mean <= 10        ~ 0,
+    percentile_score_mean <= 25        ~ 1,
+    percentile_score_mean <= 70        ~ 2,
+    percentile_score_mean <= 95        ~ 3,
+    percentile_score_mean > 95         ~ 4 
+  )) %>% 
+  mutate(immunoscore_ = factor(immunoscore_)) %>% 
+  mutate(immunoscore_2018lancet = case_when(
+    percentile_score_mean <= 25        ~ "Low",
+    percentile_score_mean <= 70        ~ "Intermediate",
+    percentile_score_mean > 70         ~ "High"
+    )) %>% 
+  mutate(immunoscore_2018lancet = factor(immunoscore_2018lancet, levels = c("Low", "Intermediate", "High"))) 
 
 
 ######################################################################################## II ### Prepare clusters----

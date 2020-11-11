@@ -184,6 +184,29 @@ p3 <- markers_match %>%
 p3$layers <- p3$layers[-2]
 gridExtra::grid.arrange(p1,p2,p3, ncol=3)
 
+p1 <- markers_match %>%
+  ggpaired(x = "race", y = "percent_CD3_tumor.i", id= "pair_id",
+           color = "race", line.color = "gray", line.size = 0.4)+
+  stat_compare_means(paired = FALSE)+
+  labs(x=NULL, y="percent_CD3_tumor.i")+
+  facet_grid(. ~ immunoscore_2018lancet)
+p1$layers <- p1$layers[-2]
+p2 <- markers_match %>%
+  ggpaired(x = "race", y = "percent_CD3_total.i", id= "pair_id",
+           color = "race", line.color = "gray", line.size = 0.4)+
+  stat_compare_means(paired = FALSE)+
+  labs(x=NULL, y="percent_CD3_total.i")+
+  facet_grid(. ~ immunoscore_2018lancet)
+p2$layers <- p2$layers[-2]
+p3 <- markers_match %>%
+  ggpaired(x = "race", y = "percent_CD3_stroma.i", id= "pair_id",
+           color = "race", line.color = "gray", line.size = 0.4)+
+  stat_compare_means(paired = FALSE)+
+  labs(x=NULL, y="percent_CD3_stroma.i")+
+  facet_grid(. ~ immunoscore_2018lancet)
+p3$layers <- p3$layers[-2]
+gridExtra::grid.arrange(p1,p2,p3, ncol=3)
+
 
 # By cluster----
 # clusters_CD38

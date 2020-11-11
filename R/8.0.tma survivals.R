@@ -30,16 +30,24 @@ tma_clust_markers <- tma_clust_markers %>%
   mutate(percentile_score_CD3_tma = ntile(percent_CD3_total_tma, 100) ) %>% 
   mutate(percentile_score_CD8_tma = ntile(percent_CD8_total_tma, 100) )
 tma_clust_markers <- tma_clust_markers %>%
-  mutate(percentile_score_mean = rowMeans(tma_clust_markers[c("percentile_score_CD3_tma", 
+  mutate(percentile_score_mean_tma = rowMeans(tma_clust_markers[c("percentile_score_CD3_tma", 
                                                     "percentile_score_CD8_tma")])
   ) %>% 
   mutate(immunoscore_tma = case_when(
-    percentile_score_mean <= 10 ~ 0,
-    percentile_score_mean <= 25 ~ 1,
-    percentile_score_mean <= 70 ~ 2,
-    percentile_score_mean <= 95 ~ 3,
-    percentile_score_mean > 95 ~ 4 
-  ))
+    percentile_score_mean_tma <= 10        ~ 0,
+    percentile_score_mean_tma <= 25        ~ 1,
+    percentile_score_mean_tma <= 70        ~ 2,
+    percentile_score_mean_tma <= 95        ~ 3,
+    percentile_score_mean_tma > 95         ~ 4 
+  )) %>% 
+  mutate(immunoscore_tma = factor(immunoscore_tma)) %>% 
+  mutate(immunoscore_tma_2018lancet = case_when(
+    percentile_score_mean_tma <= 25        ~ "Low",
+    percentile_score_mean_tma <= 70        ~ "Intermediate",
+    percentile_score_mean_tma > 70         ~ "High"
+  )) %>% 
+  mutate(immunoscore_tma_2018lancet = factor(immunoscore_tma_2018lancet, levels = c("Low", "Intermediate", "High"))) 
+
 # CD3CD8
 clust <- Mclust(tma_clust_markers$percent_CD3_CD8_tumor_tma, G = 2)
 summary(clust)
@@ -169,6 +177,28 @@ summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_tma + refage + stage, data = clin_surv)
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_tma + refage + stage + histotype, data = clin_surv)
+summary(myplot)
+
+clin_surv <- tma_clust_markers
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
+myplot <- survfit(mysurv~clin_surv$immunoscore_tma_2018lancet)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on TMA",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "Immunoscore", 
+           legend.labs = c("0", "1", "2", "3", "4"),
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf_tmant = FALSE
+)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_tma_2018lancet, data = clin_surv) 
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_tma_2018lancet + refage + stage, data = clin_surv)
+summary(myplot)
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_tma_2018lancet + refage + stage + histotype, data = clin_surv)
 summary(myplot)
 
 # CD3CD8

@@ -251,6 +251,22 @@ ggsurvplot(myplot, data = clin_surv,
 )
 survdiff(mysurv~clin_surv$race+clin_surv$immunoscore_)
 
+clin_surv <- markers
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
+myplot <- survfit(mysurv~clin_surv$immunoscore_2018lancet)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on matched patient",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "Immunoscore", # legend.labs = c("mid-high", "mid-low", "high", "low"), # 4253
+           pval = TRUE, # pval.coord = c(2100,.53),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf.int = FALSE
+)
+survdiff(mysurv~clin_surv$race+clin_surv$immunoscore_2018lancet)
+
 
 # 2.1.Exclusion: Immune markers difference between periph and intra.----
 # Here
