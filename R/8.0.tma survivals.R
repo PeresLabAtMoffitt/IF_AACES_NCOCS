@@ -7,7 +7,7 @@ ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on TMA",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "Race", # legend.labs = c("mid-high", "mid-low", "high", "low"), # 4253
-           pval = TRUE, # pval.coord = c(2100,.53),
+           pval = TRUE,
            surv.median.line = c("hv"),
            risk.table = TRUE,
            tables.height = 0.2,
@@ -165,10 +165,10 @@ ggsurvplot(myplot, data = clin_surv,
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "Immunoscore", 
            legend.labs = c("0", "1", "2", "3", "4"),
-           pval = TRUE, # pval.coord = c(2100,.53),
+           pval = TRUE, pval.coord = c(1000,.25),
            surv.median.line = c("hv"),
            risk.table = TRUE,
-           tables.height = 0.2,
+           tables.height = 0.25,
            risk.table.title = "Risk table",
            conf_tmant = FALSE
 )
@@ -186,8 +186,8 @@ ggsurvplot(myplot, data = clin_surv,
            title = "Survival analysis on TMA",
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "Immunoscore", 
-           legend.labs = c("0", "1", "2", "3", "4"),
-           pval = TRUE, # pval.coord = c(2100,.53),
+           legend.labs = c("Low", "Intermediate", "High"),
+           pval = TRUE, pval.coord = c(1000,.25),
            surv.median.line = c("hv"),
            risk.table = TRUE,
            tables.height = 0.2,
@@ -208,7 +208,7 @@ ggsurvplot(myplot, data = clin_surv,
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clusters_CD38",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
+           pval = TRUE, pval.coord = c(1000,.25),
            surv.median.line = c("hv"),
            risk.table = TRUE,
            tables.height = 0.2,
@@ -229,7 +229,7 @@ ggsurvplot(myplot, data = clin_surv,
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clustered by stroma/tumor exclusion cluster",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
+           pval = TRUE, pval.coord = c(1000,.25),
            surv.median.line = c("hv"),
            risk.table = TRUE,
            tables.height = 0.2,
@@ -240,8 +240,8 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~tmaclusters_excl
 summary(myplot)
 myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~tmaclusters_excluded_ST + refage + stage, data = clin_surv)
 summary(myplot)
-myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~tmaclusters_excluded_ST + refage + stage + histotype, data = clin_surv)
-summary(myplot)
+# myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~tmaclusters_excluded_ST + refage + stage + histotype, data = clin_surv)
+# summary(myplot)
 
 # Immunosuppressed
 myplot <- survfit(mysurv~clin_surv$tmaclusters_R_FoxP3_tum)
@@ -250,7 +250,7 @@ ggsurvplot(myplot, data = clin_surv,
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clusters ratio CD3CD8/FoxP3 in tumor",
            # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
+           pval = TRUE, pval.coord = c(1000,.25),
            surv.median.line = c("hv"),
            risk.table = TRUE,
            tables.height = 0.2,
@@ -271,7 +271,7 @@ ggsurvplot(myplot, data = clin_surv,
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clusters CD11b tumor and stroma",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
+           pval = TRUE, pval.coord = c(1000,.25),
            surv.median.line = c("hv"),
            risk.table = TRUE,
            tables.height = 0.2,
@@ -292,7 +292,7 @@ ggsurvplot(myplot, data = clin_surv,
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clusters CD15 tumor and stroma",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
+           pval = TRUE, pval.coord = c(1000,.25),
            surv.median.line = c("hv"),
            risk.table = TRUE,
            tables.height = 0.2,
@@ -313,7 +313,7 @@ ggsurvplot(myplot, data = clin_surv,
            font.main = c(16, "bold", "black"),
            xlab = "Time (days)", legend.title = "clusters CD11bCD15 tumor and stroma",
            #legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
+           pval = TRUE, pval.coord = c(1000,.25),
            surv.median.line = c("hv"),
            risk.table = TRUE,
            tables.height = 0.2,
@@ -598,6 +598,57 @@ myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~CD11b_CD15s_grp_
 summary(myplot)
 
 
+# Extra cox with median tertile----
+# Cox CD3
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_grp_tma + refage + stage + averaged.CD3_grp_tma, data = clin_surv) 
+summary(myplot)
+# Cox CD3t
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3t_grp_tma + refage + stage + averaged.CD3t_grp_tma, data = clin_surv) 
+summary(myplot)
+# Cox CD3s
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3s_grp_tma + refage + stage + averaged.CD3s_grp_tma, data = clin_surv) 
+summary(myplot)
+
+# Cox CD3FoxP3
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3_grp_tma + refage + stage + averaged.CD3_FoxP3_grp_tma, data = clin_surv) 
+summary(myplot)
+# Cox CD3FoxP3t
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3t_grp_tma + refage + stage + averaged.CD3_FoxP3t_grp_tma, data = clin_surv) 
+summary(myplot)
+# Cox CD3FoxP3s
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_FoxP3s_grp_tma + refage + stage + averaged.CD3_FoxP3s_grp_tma, data = clin_surv) 
+summary(myplot)
+
+
+# Cox CD3CD8
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8_grp_tma + refage + stage + averaged.CD3_CD8_grp_tma, data = clin_surv) 
+summary(myplot)
+# Cox CD3CD8t
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8t_grp_tma + refage + stage + averaged.CD3_CD8t_grp_tma, data = clin_surv) 
+summary(myplot)
+# Cox CD3CD8s
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD3_CD8s_grp_tma + refage + stage + averaged.CD3_CD8s_grp_tma, data = clin_surv) 
+summary(myplot)
+
+# Cox CD11b
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_grp_tma + refage + stage + averaged.CD11b_grp_tma, data = clin_surv) 
+summary(myplot)
+# Cox CD11bt
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11bt_grp_tma + refage + stage + averaged.CD11bt_grp_tma, data = clin_surv) 
+summary(myplot)
+# Cox CD11bs
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11bs_grp_tma + refage + stage + averaged.CD11bs_grp_tma, data = clin_surv) 
+summary(myplot)
+
+# Cox CD11bCD15
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15_grp_tma + refage + stage + averaged.CD11b_CD15_grp_tma, data = clin_surv) 
+summary(myplot)
+# Cox CD11bCD15t
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15t_grp_tma + refage + stage + averaged.CD11b_CD15t_grp_tma, data = clin_surv) 
+summary(myplot)
+# Cox CD11bCD15s
+myplot <- coxph(Surv(time = timelastfu_new, event = surv_vital)~averaged.CD11b_CD15s_grp_tma + refage + stage + averaged.CD11b_CD15s_grp_tma, data = clin_surv) 
+summary(myplot)
 
 
 
