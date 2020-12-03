@@ -89,11 +89,21 @@ clinical_data <- clinical_data %>%
     grade == 2                                         ~ "moderately differentiated",
     grade == 3                                         ~ "poorly differentiated",
     grade == 4                                         ~ "undifferentiated",
-    TRUE                                                ~ NA_character_
+    TRUE                                               ~ NA_character_
   )) %>% 
-  mutate(histotype = case_when(
+  mutate(histotype1 = case_when(
     histotype == 1                                     ~ "high-grade serous",
-    histotype %in% (2:13)                              ~ "non-high-grade serous",
+    histotype == 2                                     ~ "low-grade serous",
+    histotype == 5 |
+      histotype == 10                                  ~ "mucinous",
+    histotype == 3                                     ~ "endometrioid",
+    histotype == 4                                     ~ "clear cell",
+    histotype %in% (6:13)                              ~ "other epithelial", # Will not take the 10
+    TRUE                                               ~ NA_character_
+  )) %>% 
+  mutate(histotype2 = case_when(
+    histotype == 1                                     ~ "high-grade serous",
+    histotype %in% (2:13)                              ~ "non-high-grade serous", # 2 == "low-grade serous"
     # histotype == 3                                     ~ "endometrioid",
     # histotype == 4                                     ~ "clear cell",
     # histotype == 5                                     ~ "mucinous",
@@ -230,10 +240,12 @@ clinical_data <- clinical_data %>%
     mdvisitrsn == 4                                     ~ "No problem was found",
     TRUE                                                ~ NA_character_
   ))
-
+clinical_data$refage_cat <- as.factor(findInterval(clinical_data$refage,c(0,50,60,70,80)))
+levels(clinical_data$refage_cat) <-  
+  c("<50", "50-59", "60-69", "70-79", ">80")
 # x <- clinical_data %>% drop_na("menopause_age") %>% # To answer why is there 777 in menopause_age -> removed
 #   select("suid", "hyster", "menopause_age", "menopause", "periodstopreason")
-
+a <- clinical_data %>% select(c(suid, refage, refage_cat))
 
 ######################################################################################## Ia ### Add paired_id to clinical----
 # Add paired_id to clinical----
@@ -294,6 +306,7 @@ ROI_global <-
     intratumoral_i_vs_peripheral_p_ == "i" ~ "Intratumoral")
     ) %>% 
   mutate(suid = as.character(suid)) %>% 
+  mutate(slide_type = "ROI") %>% 
   select(suid, everything())#  %>% 
   # mutate(CD3_tumor_mm2 = (tumor_cd3_opal_650_positive_cells/tumor_area_analyzed_mm2_)) %>% # density of marker per mm2
   # mutate(CD3_stroma_mm2 = (stroma_cd3_opal_650_positive_cells/stroma_area_analyzed_mm2_)) %>% 
@@ -330,6 +343,7 @@ TMA_global <-
   mutate(percent_total = round((total_cells / total_cells)*100, 2)
   ) %>% 
   mutate(suid = as.character(suid)) %>% 
+  mutate(slide_type = "TMA") %>% 
   select(suid, everything())# %>% 
   # mutate(CD3_tumor_mm2 = (tumor_cd3_opal_650_positive_cells/tumor_area_analyzed_mm2_)) %>% 
   # mutate(CD3_stroma_mm2 = (stroma_cd3_opal_650_positive_cells/stroma_area_analyzed_mm2_)) %>% 
@@ -403,7 +417,8 @@ colnames(sqrt.markers) <- c("sqrt_CD3_tumor", "sqrt_CD8_tumor", "sqrt_CD3_CD8_tu
                             "sqrt_CD3_total", "sqrt_CD8_total",
                             "sqrt_CD3_CD8_total", "sqrt_FoxP3_total", "sqrt_CD3_FoxP3_total",
                             "sqrt_CD11b_total", "sqrt_CD15_total", "sqrt_CD11b_CD15_total")
-markers_TMA <- cbind(markers_TMA, sqrt.markers)
+markers_TMA <- cbind(markers_TMA, sqrt.markers) %>% 
+  mutate(slide_type = "TMA")
 
 #
 markers_ROIi <- ROI_global %>% 
@@ -505,7 +520,8 @@ colnames(sqrt.markers) <- c("sqrt_CD3_tumor.i", "sqrt_CD8_tumor.i", "sqrt_CD3_CD
                             "sqrt_CD3_total.p", "sqrt_CD8_total.p", "sqrt_CD3_CD8_total.p",
                             "sqrt_FoxP3_total.p", "sqrt_CD3_FoxP3_total.p", "sqrt_CD11b_total.p",      
                             "sqrt_CD15_total.p", "sqrt_CD11b_CD15_total.p")
-markers_ROI <- cbind(markers_ROI, sqrt.markers)
+markers_ROI <- cbind(markers_ROI, sqrt.markers) %>% 
+  mutate(slide_type = "ROI")
 
 
 ######################################################################################## IV ### Merging all df----
@@ -1014,7 +1030,6 @@ markers <- markers %>%
   group_by(CD11b_CD15s_grp_tma) %>%
   mutate(median.CD11b_CD15s_grp_tma = median(sqrt_CD11b_CD15_stroma_tma)) %>% 
   ungroup %>% 
-  
   
   select(-c("tertile"))
 
