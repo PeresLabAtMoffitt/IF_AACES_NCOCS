@@ -156,7 +156,8 @@ clinical_data <- clinical_data %>%
               . == 1                                              ~ "yes",
               . == 2                                              ~ "no",
               TRUE                                                ~ NA_character_
-            )) %>%  
+            )) %>%
+  mutate(aspirin_use = factor(aspirin, levels = c("no", "yes"))) %>% 
   mutate(hysterreason = case_when(
     hysterreason == 1                                   ~ "Ovarian/FT/peritoneal cancer diagnosis",
     hysterreason == 2                                   ~ "Any reason not due to ovarian/FT/peritoneal cancer diagnosis",
@@ -226,6 +227,7 @@ clinical_data <- clinical_data %>%
     smokcurrent == 3                                    ~ "former",
     TRUE                                                ~ NA_character_
   )) %>% 
+  mutate(smoker = factor(smokcurrent, levels = c("never", "former", "current"))) %>% 
   mutate(thyrd = case_when(
     thyrd == 1                                          ~ "yes unspecified",
     thyrd == 2                                          ~ "no",
@@ -243,9 +245,19 @@ clinical_data <- clinical_data %>%
 clinical_data$refage_cat <- as.factor(findInterval(clinical_data$refage,c(0,50,60,70,80)))
 levels(clinical_data$refage_cat) <-  
   c("<50", "50-59", "60-69", "70-79", ">80")
+
+clinical_data$BMI_recent_grp <- as.factor(findInterval(clinical_data$BMI_recent,c(0, 21, 25, 30, 35)))
+levels(clinical_data$BMI_recent_grp) <-  
+  c("<21","21-24","25-29","30-35", ">35")
+
+clinical_data$BMI_YA_grp <- as.factor(findInterval(clinical_data$BMI_YA,c(0, 21, 25, 30, 35)))
+levels(clinical_data$BMI_YA_grp) <-  
+  c("<21","21-24","25-29","30-35", ">35")
+
+
 # x <- clinical_data %>% drop_na("menopause_age") %>% # To answer why is there 777 in menopause_age -> removed
 #   select("suid", "hyster", "menopause_age", "menopause", "periodstopreason")
-a <- clinical_data %>% select(c(suid, refage, refage_cat))
+
 
 ######################################################################################## Ia ### Add paired_id to clinical----
 # Add paired_id to clinical----
@@ -1029,9 +1041,48 @@ markers <- markers %>%
   mutate(CD11b_CD15s_grp_tma = factor(.$CD11b_CD15s_grp_tma, levels = c("Low","High"))) %>% 
   group_by(CD11b_CD15s_grp_tma) %>%
   mutate(median.CD11b_CD15s_grp_tma = median(sqrt_CD11b_CD15_stroma_tma)) %>% 
-  ungroup %>% 
+  ungroup
+
+markers <- markers %>% 
+  mutate(median = median(sqrt_CD3_total.i, na.rm = TRUE)) %>% 
+  mutate(med.CD3_total.i = case_when(
+    sqrt_CD3_total.i < median ~ "Low",
+    sqrt_CD3_total.i > median ~ "High",
+  )) %>% 
+  mutate(med.CD3_total.i = factor(.$med.CD3_total.i, levels = c("Low","High"))) %>% 
+  mutate(median = median(sqrt_CD3_CD8_total.i, na.rm = TRUE)) %>% 
+  mutate(med.CD3_CD8_total.i = case_when(
+    sqrt_CD3_CD8_total.i < median ~ "Low",
+    sqrt_CD3_CD8_total.i > median ~ "High",
+  )) %>% 
+  mutate(med.CD3_CD8_total.i = factor(.$med.CD3_CD8_total.i, levels = c("Low","High"))) %>% 
+  mutate(median = median(sqrt_CD3_FoxP3_total.i, na.rm = TRUE)) %>%
+  mutate(med.CD3_FoxP3_total.i = case_when(
+    sqrt_CD3_FoxP3_total.i < median ~ "Low",
+    sqrt_CD3_FoxP3_total.i > median ~ "High",
+  )) %>% 
+  mutate(med.CD3_FoxP3_total.i = factor(.$med.CD3_FoxP3_total.i, levels = c("Low","High"))) %>% 
+  mutate(median = median(sqrt_CD3_total_tma, na.rm = TRUE)) %>%
+  mutate(med.CD3_total_tma = case_when(
+    sqrt_CD3_total_tma < median ~ "Low",
+    sqrt_CD3_total_tma > median ~ "High",
+  )) %>% 
+  mutate(med.CD3_total_tma = factor(.$med.CD3_total_tma, levels = c("Low","High"))) %>% 
+  mutate(median = median(sqrt_CD3_CD8_total_tma, na.rm = TRUE)) %>%
+  mutate(med.CD3_CD8_total_tma = case_when(
+    sqrt_CD3_CD8_total_tma < median ~ "Low",
+    sqrt_CD3_CD8_total_tma > median ~ "High",
+  )) %>% 
+  mutate(med.CD3_CD8_total_tma = factor(.$med.CD3_CD8_total_tma, levels = c("Low","High"))) %>% 
+  mutate(median = median(sqrt_CD3_FoxP3_total_tma, na.rm = TRUE)) %>% 
+  mutate(med.CD3_FoxP3_total_tma = case_when(
+    sqrt_CD3_FoxP3_total_tma < median ~ "Low",
+    sqrt_CD3_FoxP3_total_tma > median ~ "High",
+  )) %>% 
+  mutate(med.CD3_FoxP3_total_tma = factor(.$med.CD3_FoxP3_total_tma, levels = c("Low","High"))) %>% 
   
-  select(-c("tertile"))
+  select(-c("tertile", "median"))
+
 
 # 4.1. Create variation data ----
 # Look at the variation between each patient and the global mean # Should we mot compare Black and White?
