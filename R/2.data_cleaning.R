@@ -241,20 +241,24 @@ clinical_data <- clinical_data %>%
     mdvisitrsn == 3                                     ~ "Both female and partner problem",
     mdvisitrsn == 4                                     ~ "No problem was found",
     TRUE                                                ~ NA_character_
-  ))
-clinical_data$refage_cat <- as.factor(findInterval(clinical_data$refage,c(0,50,60,70,80)))
+  )) 
+
+clinical_data$refage_cat <- as.factor(findInterval(clinical_data$refage, c(0,50,60,70,80)))
 levels(clinical_data$refage_cat) <-  
   c("<50", "50-59", "60-69", "70-79", ">80")
 
-clinical_data$BMI_recent_grp <- as.factor(findInterval(clinical_data$BMI_recent,c(0, 21, 25, 30, 35)))
-levels(clinical_data$BMI_recent_grp) <-  
-  c("<21","21-24","25-29","30-35", ">35")
+clinical_data$BMI_recent_grp <- as.factor(findInterval(clinical_data$BMI_recent, c(0, 25, 30, 35)))
+levels(clinical_data$BMI_recent_grp) <-
+  c("<25", "25-29", "30-35", ">=35")
+# levels(clinical_data$BMI_recent_grp) <-  
+#   c("21-24", "<21", "25-29", "30-35", ">35")
 
-clinical_data$BMI_YA_grp <- as.factor(findInterval(clinical_data$BMI_YA,c(0, 21, 25, 30, 35)))
+clinical_data$BMI_YA_grp <- as.factor(findInterval(clinical_data$BMI_YA, c(0, 20, 25)))
 levels(clinical_data$BMI_YA_grp) <-  
-  c("<21","21-24","25-29","30-35", ">35")
+  c("<20","20-24",">=25")
+clinical_data$BMI_YA_grp <- factor(clinical_data$BMI_YA_grp, levels = c("20-24", "<20", ">=25"))
 
-
+# a <- clinical_data[c("BMI_YA", "BMI_YA_grp")]
 # x <- clinical_data %>% drop_na("menopause_age") %>% # To answer why is there 777 in menopause_age -> removed
 #   select("suid", "hyster", "menopause_age", "menopause", "periodstopreason")
 
