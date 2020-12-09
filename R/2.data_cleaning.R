@@ -6,8 +6,8 @@ clinical_data <- clinical_data %>%
     casecon == 2                                       ~ "Control"
   )) %>% 
   mutate(vitalstatus = case_when(
-    vitalstatus_new == 1                                   ~ "Alive",
-    vitalstatus_new == 2                                   ~ "Deceased",
+    vitalstatus_new == 1                               ~ "Alive",
+    vitalstatus_new == 2                               ~ "Deceased",
     TRUE                                               ~ NA_character_
   )) %>% 
   mutate(surv_vital = case_when(
@@ -103,18 +103,23 @@ clinical_data <- clinical_data %>%
   )) %>% 
   mutate(histotype2 = case_when(
     histotype == 1                                     ~ "high-grade serous",
-    histotype %in% (2:13)                              ~ "non-high-grade serous", # 2 == "low-grade serous"
-    # histotype == 3                                     ~ "endometrioid",
-    # histotype == 4                                     ~ "clear cell",
-    # histotype == 5                                     ~ "mucinous",
-    # histotype == 6                                     ~ "carcinosarcoma",
-    # histotype == 7                                     ~ "other epithelial ovarian cancer \n(e.g. Malignant Brenner, mixed, carcinoma, NOS)",
-    # histotype == 9                                     ~ "serous borderline",
-    # histotype == 10                                    ~ "mucinous borderline",
-    # histotype == 11                                    ~ "other epithelial borderline",
-    # histotype == 13                                    ~ "synchronous",
-    TRUE                                                ~ NA_character_
+    histotype %in% (2:13)                              ~ "non-high-grade serous",
+    TRUE                                               ~ NA_character_
   )) %>%
+  mutate(histotype = case_when(
+    histotype == 1                                     ~ "high-grade serous",
+    histotype == 2                                     ~ "low-grade serous",
+    histotype == 3                                     ~ "endometrioid",
+    histotype == 4                                     ~ "clear cell",
+    histotype == 5                                     ~ "mucinous",
+    histotype == 6                                     ~ "carcinosarcoma",
+    histotype == 7                                     ~ "other epithelial ovarian cancer \n(e.g. Malignant Brenner, mixed, carcinoma, NOS)",
+    histotype == 9                                     ~ "serous borderline",
+    histotype == 10                                    ~ "mucinous borderline",
+    histotype == 11                                    ~ "other epithelial borderline",
+    histotype == 13                                    ~ "synchronous",
+    TRUE                                               ~ NA_character_
+  )) %>% 
   mutate(race = case_when(
     race == 1                                          ~ "White",
     race == 2                                          ~ "Black",
@@ -250,8 +255,7 @@ levels(clinical_data$refage_cat) <-
 clinical_data$BMI_recent_grp <- as.factor(findInterval(clinical_data$BMI_recent, c(0, 25, 30, 35)))
 levels(clinical_data$BMI_recent_grp) <-
   c("<25", "25-29", "30-35", ">=35")
-# levels(clinical_data$BMI_recent_grp) <-  
-#   c("21-24", "<21", "25-29", "30-35", ">35")
+
 
 clinical_data$BMI_YA_grp <- as.factor(findInterval(clinical_data$BMI_YA, c(0, 20, 25)))
 levels(clinical_data$BMI_YA_grp) <-  
@@ -1048,42 +1052,119 @@ markers <- markers %>%
   ungroup
 
 markers <- markers %>% 
-  mutate(median = median(sqrt_CD3_total.i, na.rm = TRUE)) %>% 
+  mutate(median = median(percent_CD3_total.i, na.rm = TRUE)) %>% 
   mutate(med.CD3_total.i = case_when(
-    sqrt_CD3_total.i < median ~ "Low",
-    sqrt_CD3_total.i > median ~ "High",
+    percent_CD3_total.i < median ~ "Low",
+    percent_CD3_total.i > median ~ "High",
   )) %>% 
   mutate(med.CD3_total.i = factor(.$med.CD3_total.i, levels = c("Low","High"))) %>% 
-  mutate(median = median(sqrt_CD3_CD8_total.i, na.rm = TRUE)) %>% 
+  mutate(median = median(percent_CD3_tumor.i, na.rm = TRUE)) %>% 
+  mutate(med.CD3_tumor.i = case_when(
+    percent_CD3_tumor.i < median ~ "Low",
+    percent_CD3_tumor.i > median ~ "High",
+  )) %>% 
+  mutate(med.CD3_tumor.i = factor(.$med.CD3_tumor.i, levels = c("Low","High"))) %>% 
+  mutate(median = median(percent_CD3_stroma.i, na.rm = TRUE)) %>% 
+  mutate(med.CD3_stroma.i = case_when(
+    percent_CD3_stroma.i < median ~ "Low",
+    percent_CD3_stroma.i > median ~ "High",
+  )) %>% 
+  mutate(med.CD3_stroma.i = factor(.$med.CD3_stroma.i, levels = c("Low","High"))) %>% 
+  
+  mutate(median = median(percent_CD3_CD8_total.i, na.rm = TRUE)) %>% 
   mutate(med.CD3_CD8_total.i = case_when(
-    sqrt_CD3_CD8_total.i < median ~ "Low",
-    sqrt_CD3_CD8_total.i > median ~ "High",
+    percent_CD3_CD8_total.i < median ~ "Low",
+    percent_CD3_CD8_total.i > median ~ "High",
   )) %>% 
   mutate(med.CD3_CD8_total.i = factor(.$med.CD3_CD8_total.i, levels = c("Low","High"))) %>% 
-  mutate(median = median(sqrt_CD3_FoxP3_total.i, na.rm = TRUE)) %>%
-  mutate(med.CD3_FoxP3_total.i = case_when(
-    sqrt_CD3_FoxP3_total.i < median ~ "Low",
-    sqrt_CD3_FoxP3_total.i > median ~ "High",
+  mutate(median = median(percent_CD3_CD8_tumor.i, na.rm = TRUE)) %>% 
+  mutate(med.CD3_CD8_tumor.i = case_when(
+    percent_CD3_CD8_tumor.i < median ~ "Low",
+    percent_CD3_CD8_tumor.i > median ~ "High",
   )) %>% 
-  mutate(med.CD3_FoxP3_total.i = factor(.$med.CD3_FoxP3_total.i, levels = c("Low","High"))) %>% 
-  mutate(median = median(sqrt_CD3_total_tma, na.rm = TRUE)) %>%
+  mutate(med.CD3_CD8_tumor.i = factor(.$med.CD3_CD8_tumor.i, levels = c("Low","High"))) %>% 
+  mutate(median = median(percent_CD3_CD8_stroma.i, na.rm = TRUE)) %>% 
+  mutate(med.CD3_CD8_stroma.i = case_when(
+    percent_CD3_CD8_stroma.i < median ~ "Low",
+    percent_CD3_CD8_stroma.i > median ~ "High",
+  )) %>% 
+  mutate(med.CD3_CD8_stroma.i = factor(.$med.CD3_CD8_stroma.i, levels = c("Low","High"))) %>% 
+  
+  mutate(median = median(percent_CD3_FoxP3_total.i, na.rm = TRUE)) %>%
+  mutate(med.CD3_FoxP3_total.i = case_when(
+    percent_CD3_FoxP3_total.i < median ~ "Low",
+    percent_CD3_FoxP3_total.i > median ~ "High",
+  )) %>% 
+  mutate(med.CD3_FoxP3_total.i = factor(.$med.CD3_FoxP3_total.i, levels = c("Low","High"))) %>%
+  mutate(median = median(percent_CD3_FoxP3_tumor.i, na.rm = TRUE)) %>% 
+  mutate(med.CD3_FoxP3_tumor.i = case_when(
+    percent_CD3_FoxP3_tumor.i < median ~ "Low",
+    percent_CD3_FoxP3_tumor.i > median ~ "High",
+  )) %>% 
+  mutate(med.CD3_FoxP3_tumor.i = factor(.$med.CD3_FoxP3_tumor.i, levels = c("Low","High"))) %>% 
+  mutate(median = median(percent_CD3_FoxP3_stroma.i, na.rm = TRUE)) %>% 
+  mutate(med.CD3_FoxP3_stroma.i = case_when(
+    percent_CD3_FoxP3_stroma.i < median ~ "Low",
+    percent_CD3_FoxP3_stroma.i > median ~ "High",
+  )) %>% 
+  mutate(med.CD3_FoxP3_stroma.i = factor(.$med.CD3_FoxP3_stroma.i, levels = c("Low","High"))) %>% 
+  
+  mutate(median = median(percent_CD3_total_tma, na.rm = TRUE)) %>% 
   mutate(med.CD3_total_tma = case_when(
-    sqrt_CD3_total_tma < median ~ "Low",
-    sqrt_CD3_total_tma > median ~ "High",
+    percent_CD3_total_tma < median ~ "Low",
+    percent_CD3_total_tma >= median ~ "High",
   )) %>% 
   mutate(med.CD3_total_tma = factor(.$med.CD3_total_tma, levels = c("Low","High"))) %>% 
-  mutate(median = median(sqrt_CD3_CD8_total_tma, na.rm = TRUE)) %>%
+  mutate(median = median(percent_CD3_tumor_tma, na.rm = TRUE)) %>% 
+  mutate(med.CD3_tumor_tma = case_when(
+    percent_CD3_tumor_tma < median ~ "Low",
+    percent_CD3_tumor_tma >= median ~ "High",
+  )) %>% 
+  mutate(med.CD3_tumor_tma = factor(.$med.CD3_tumor_tma, levels = c("Low","High"))) %>% 
+  mutate(median = median(percent_CD3_stroma_tma, na.rm = TRUE)) %>% 
+  mutate(med.CD3_stroma_tma = case_when(
+    percent_CD3_stroma_tma < median ~ "Low",
+    percent_CD3_stroma_tma >= median ~ "High",
+  )) %>% 
+  mutate(med.CD3_stroma_tma = factor(.$med.CD3_stroma_tma, levels = c("Low","High"))) %>% 
+  
+  mutate(median = median(percent_CD3_CD8_total_tma, na.rm = TRUE)) %>% 
   mutate(med.CD3_CD8_total_tma = case_when(
-    sqrt_CD3_CD8_total_tma < median ~ "Low",
-    sqrt_CD3_CD8_total_tma > median ~ "High",
+    percent_CD3_CD8_total_tma < median ~ "Low",
+    percent_CD3_CD8_total_tma >= median ~ "High",
   )) %>% 
   mutate(med.CD3_CD8_total_tma = factor(.$med.CD3_CD8_total_tma, levels = c("Low","High"))) %>% 
-  mutate(median = median(sqrt_CD3_FoxP3_total_tma, na.rm = TRUE)) %>% 
-  mutate(med.CD3_FoxP3_total_tma = case_when(
-    sqrt_CD3_FoxP3_total_tma < median ~ "Low",
-    sqrt_CD3_FoxP3_total_tma > median ~ "High",
+  mutate(median = median(percent_CD3_CD8_tumor_tma, na.rm = TRUE)) %>% 
+  mutate(med.CD3_CD8_tumor_tma = case_when(
+    percent_CD3_CD8_tumor_tma < median ~ "Low",
+    percent_CD3_CD8_tumor_tma >= median ~ "High",
   )) %>% 
-  mutate(med.CD3_FoxP3_total_tma = factor(.$med.CD3_FoxP3_total_tma, levels = c("Low","High"))) %>% 
+  mutate(med.CD3_CD8_tumor_tma = factor(.$med.CD3_CD8_tumor_tma, levels = c("Low","High"))) %>% 
+  mutate(median = median(percent_CD3_CD8_stroma_tma, na.rm = TRUE)) %>% 
+  mutate(med.CD3_CD8_stroma_tma = case_when(
+    percent_CD3_CD8_stroma_tma < median ~ "Low",
+    percent_CD3_CD8_stroma_tma >= median ~ "High",
+  )) %>% 
+  mutate(med.CD3_CD8_stroma_tma = factor(.$med.CD3_CD8_stroma_tma, levels = c("Low","High"))) %>% 
+  
+  mutate(median = median(percent_CD3_FoxP3_total_tma, na.rm = TRUE)) %>%
+  mutate(med.CD3_FoxP3_total_tma = case_when(
+    percent_CD3_FoxP3_total_tma < median ~ "Low",
+    percent_CD3_FoxP3_total_tma >= median ~ "High",
+  )) %>% 
+  mutate(med.CD3_FoxP3_total_tma = factor(.$med.CD3_FoxP3_total_tma, levels = c("Low","High"))) %>%
+  mutate(median = median(percent_CD3_FoxP3_tumor_tma, na.rm = TRUE)) %>% 
+  mutate(med.CD3_FoxP3_tumor_tma = case_when(
+    percent_CD3_FoxP3_tumor_tma < median ~ "Low",
+    percent_CD3_FoxP3_tumor_tma >= median ~ "High",
+  )) %>% 
+  mutate(med.CD3_FoxP3_tumor_tma = factor(.$med.CD3_FoxP3_tumor_tma, levels = c("Low","High"))) %>% 
+  mutate(median = median(percent_CD3_FoxP3_stroma_tma, na.rm = TRUE)) %>% 
+  mutate(med.CD3_FoxP3_stroma_tma = case_when(
+    percent_CD3_FoxP3_stroma_tma < median ~ "Low",
+    percent_CD3_FoxP3_stroma_tma >= median ~ "High",
+  )) %>% 
+  mutate(med.CD3_FoxP3_stroma_tma = factor(.$med.CD3_FoxP3_stroma_tma, levels = c("Low","High"))) %>% 
   
   select(-c("tertile", "median"))
 
