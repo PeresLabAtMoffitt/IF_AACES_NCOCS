@@ -1,0 +1,194 @@
+---
+title: "Immune marker data"
+author: "Christelle Colin-Leitzinger"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: false
+    theme: cerulean #darkly
+    highlight: pygments
+---
+
+<style type="text/css">
+h1.title {
+  font-size: 25px;
+}
+.figure {
+   margin-top: 25px;
+   <!-- margin-bottom: 100px; -->
+}
+
+table {
+    margin-top: 25px;
+    <!-- margin-bottom: 100px !important; -->
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE,
+                      cache = FALSE,
+                      # fig.width = 7, fig.height = 5, 
+                      fig.align='center'#, fig.show='hold'
+                      )
+options(gtsummary.print_engine = "gt")
+options(gtsummary.as_gt.addl_cmds = "gt::tab_options(table.font.size = 14, data_row.padding = gt::px(1))")
+```
+
+<style>
+div.blue { background-color:#0099CC; border-radius: 5px; padding: 20px; font-size: 38px}
+</style>
+<div class = "blue">
+
+<span style="color: white;">Immune Marker Data</span>
+
+</div>
+<br>
+
+```{r library, include=FALSE}
+# library(drake)
+library(tidyverse)
+library(data.table)
+# library(VennDiagram)
+# library(gtsummary)
+# library(survival)
+# library(survminer)
+library(psych)
+# library(corrplot)
+# library(ggcorrplot)
+# library(mclust)
+```
+
+```{r load}
+# loadd(clinical_data, ROI_tumor ,ROI_stroma ,ROI_total,
+#       cases_match)
+
+ROI_global <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/ROI_global.rds")
+clinical_data <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/clinical_data.rds")
+
+# Rewove patients not matched or lost match
+ROI_global <- left_join(ROI_global, clinical_data, by="suid") %>% drop_na(pair_id) %>% 
+  group_by(pair_id) %>% 
+  mutate(have_a_match = dense_rank(interaction(suid, pair_id))) %>% 
+  group_by(pair_id) %>% 
+  mutate(is_paired = max(have_a_match)) %>% 
+  filter(is_paired == 2) %>% 
+  select(pair_id, everything(), -c(is_paired, have_a_match)) %>% 
+  ungroup()
+
+# markers_match <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/markers_match.rds")
+path <- fs::path("","Volumes","Peres_Research","Christelle Colin-Leitzinger", "IF_AACES_NCOCS", "Figures")
+
+
+
+```
+<br>
+<br>
+
+***
+
+# I. ROIs Raw Data
+## 1. Cells Distribution
+```{r}
+p1 <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
+  mutate(Tumor = "Tumor") %>% 
+  mutate(Stroma = "Stroma") %>% 
+  ggplot()+
+  geom_violin(aes(x=Tumor, y=percent_tumor), scale = "count")+
+  geom_boxplot(aes(x=Tumor, y=percent_tumor), width=.1) +
+  geom_violin(aes(x=Stroma, y=percent_stroma), scale = "count") +
+  geom_boxplot(aes(x=Stroma, y=percent_stroma), width=.1) +
+  labs(x="Cell type", y=NULL, title="Intratumoral \nROIs")
+p2 <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
+  mutate(Tumor = "Tumor") %>% 
+  mutate(Stroma = "Stroma") %>% 
+  ggplot()+
+  geom_violin(aes(x=Tumor, y=percent_tumor), scale = "count")+
+  geom_boxplot(aes(x=Tumor, y=percent_tumor), width=.1) +
+  geom_violin(aes(x=Stroma, y=percent_stroma), scale = "count") +
+  geom_boxplot(aes(x=Stroma, y=percent_stroma), width=.1) +
+  labs(x="Cell type", y=NULL, title="Peripheral \nROIs")
+
+# tiff(paste0(path, "/violin plot distribution tumor and stroma cells in ROIs intra-periph.tiff"))
+gridExtra::grid.arrange(p1, p2, ncol = 2, 
+                        top = "% of Cells Present in", left = "% Cells per samples", 
+                        bottom = "Data on Race-Matched Patients")
+# dev.off()
+```
+
+## 2. ICC
+```{r}
+ICC_data <- data.frame(matrix(nrow=1, ncol=0))
+for(i in 1:length(colnames(features))) {
+  
+  rad <- features %>% select(patient_id, lesion_id)
+  
+  if(class(features[,i]) == "numeric" | class(features[,i]) == "integer") {
+    
+    ICC_df <- cbind(rad, value = features[,i])
+    ICC_df <- ICC_df %>%
+      mutate(Lesion = "Lesion0") %>%
+      group_by(patient_id) %>%
+      mutate(n = row_number(patient_id)) %>%
+      ungroup() %>%
+      unite(lesion_id, Lesion:n, sep = "", remove = TRUE, na.rm = TRUE) %>%
+      pivot_wider(names_from = lesion_id, values_from = value) %>%
+      select(c(starts_with("Lesion")))
+    
+    ICC <- ICC(ICC_df)$results[4,2]
+    ICC_data <- cbind(ICC_data,ICC)
+    
+  }
+  
+}
+colnames(ICC_data) <- colnames(features)[5:ncol(features)]
+rm(ICC_df, ICC, rad)
+library(plotly)
+
+plot <- ICC_data %>% 
+  pivot_longer(cols = everything()) %>% 
+  mutate(ICC = "ICC") %>% 
+  mutate(reliability = case_when(
+    value < 0.5 ~ "poor",
+    value >= 0.5 &
+      value < 0.75 ~ "moderate",
+    value >= 0.75 &
+      value < 0.9 ~ "good",
+    value >= 0.9 ~ "excellent"
+  )) %>% 
+  mutate(text = paste("Feature: ", name, "\nICC: ", round(value, 2), "\nStrict Reliability: ", reliability, sep="")) %>% 
+  ggplot(aes(x = ICC, y = value, color = reliability, text=text))+
+  labs(title = "Reliability of the radiomic features based on strict ICC value", x= NULL, y= "ICC value")+
+  scale_color_brewer(palette = "Set2") +
+  scale_x_discrete(labels = "")+
+  theme_minimal()+
+  geom_point(size = 1, position=position_jitter(w=0.8))
+plot <- ggplotly(plot, tooltip="text")
+plot
+
+plot <- ICC_data %>% 
+  pivot_longer(cols = everything()) %>% 
+  mutate(reliability = case_when(
+    value < 0.5 ~ "poor",
+    value >= 0.5 &
+      value < 0.75 ~ "moderate",
+    value >= 0.75 &
+      value < 0.9 ~ "good",
+    value >= 0.9 ~ "excellent"
+  ))
+plot
+```
+<br>
+<br>
+
+***
+
+# II. Abundance
+
+
+
