@@ -19,9 +19,8 @@ Prelim_R01.Rmd
 *.csv
 *.rds
 
-# Rmd and pptx
+# pptx
 *.pptx
-*.Rmd
 
 # Example code in progress
 *-Ex.R

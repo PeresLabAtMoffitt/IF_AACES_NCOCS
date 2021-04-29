@@ -39,6 +39,38 @@ ICC_p_ROIi <- dcast(setDT(ICC_p_ROIi), suid ~ rowid(suid),
                     value.var = c("tumor_percent_cd3_opal_650_positive_cells", 
                     "stroma_percent_cd3_opal_650_positive_cells")) %>% 
   select(c(2:4, 14:16))
+
+# function
+ICC_roi_periph <- ROI_global %>%
+  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
+  select(suid, image_tag, #tumor_total_cells, stroma_total_cells, 
+         contains("percent"))
+ICC_data <- data.frame(matrix(nrow=1, ncol=0))
+for(i in 1:length(colnames(ICC_roi_periph))) {
+  
+  rad <- ICC_roi_periph %>% select(suid, image_tag)
+
+  if(class(ICC_roi_periph[,i]) == "numeric" | class(ICC_roi_periph[,i]) == "integer") {
+
+    ICC_df <- cbind(rad, value = ICC_roi_periph[,i])
+  #   ICC_df <- ICC_df %>%
+  #     mutate(pict = "pict0") %>%
+  #     group_by(suid) %>%
+  #     mutate(n = row_number(suid)) %>%
+  #     ungroup() %>%
+  #     unite(pict, Lesion:n, sep = "", remove = TRUE, na.rm = TRUE) %>%
+  #     pivot_wider(names_from = pict, values_from = value) %>%
+  #     select(c(starts_with("Lesion")))
+  #   
+  #   ICC <- ICC(ICC_df)$results[4,2]
+  #   ICC_data <- cbind(ICC_data,ICC)
+    ICC_df
+  }
+  print(ICC_df)
+}
+colnames(ICC_data) <- colnames(features)[5:ncol(features)]
+
+
 # If test for intra-rater (because for each patient the 3 TMA/ROI was done by the same person)
 # If test for inter-rater (because not the same rater between patients)
 # Two-way mixed effect, fixed raters are defined. Each subject is measured by the k raters.

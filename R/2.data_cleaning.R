@@ -274,6 +274,7 @@ clinical_data <- full_join(cases_match,
                            clinical_data,
                            by= "suid")
 
+saveRDS(clinical_data, file = "clinical_data.rds")
 
 ######################################################################################### II ### Cleaning TMAs, ROIs data----
 # Keep the control slides for comparison?----
@@ -1285,6 +1286,8 @@ global_28 <- global_28[(grepl(uid, global_28$suid)),]
 
 
 
+saveRDS(ROI_global, file = "ROI_global.rds")
+# saveRDS(TMA_global, file = "TMA_global.rds")
 
 
 # Cleaning

@@ -14,7 +14,7 @@ source("R/plan.R")
 config <- drake_config(plan, parallelism = "future", jobs = 4, verbose = 1)
 if (!interactive()) config
 
-make(plan)
+# make(plan)
 loadd(clinical_data, ROI_tumor ,ROI_stroma ,ROI_total ,
       TMA_tumor ,TMA_stroma, TMA_total,
       TMAcases_remove,

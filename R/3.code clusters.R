@@ -545,7 +545,7 @@ markers <- left_join(markers,
                                        "clusters_CD15_tot", "clusters_CD15_tot.p", 
                                        "clusters_CD11bCD15_tot", "clusters_CD11bCD15_tot.p")], by="suid")
 
-
+saveRDS(markers, file = "markers.rds")
 
 
 
@@ -553,4 +553,5 @@ markers <- left_join(markers,
 markers_match <-  markers %>% drop_na(pair_id) %>% 
   group_by(pair_id) %>% filter(n() > 1)
 
+saveRDS(markers_match, file = "markers_match.rds")
 # End Cluster coding----
