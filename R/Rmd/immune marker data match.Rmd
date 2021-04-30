@@ -160,67 +160,73 @@ rm(ICC_df, ICC, i,  rad)
 
 ## New ICC function
 ```{r}
-icc_overall <- ROI_global %>%
-  select(suid, image_tag,
-         contains("percent"))
-class(icc_overall) <- "data.frame"
-
-icc_intrat <- ROI_global %>%
-  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
-  select(suid, image_tag, 
-         contains("percent"))
-class(icc_intrat) <- "data.frame"
-
-icc_periph <- ROI_global %>%
-  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
-  select(suid, image_tag, 
-         contains("percent"))
-class(icc_periph) <- "data.frame"
-
-fct_icc <- function(data){
-  ICC_data <- data.frame(matrix(nrow=1, ncol=0))
-  lb_data <- data.frame(matrix(nrow=1, ncol=0))
-  up_data <- data.frame(matrix(nrow=1, ncol=0))
-  for(i in 1:length(colnames(data))) {
-    
-    rad <- data %>% select(suid)
-    
-    if(class(data[,i]) == "numeric" | class(data[,i]) == "integer") {
+new_icc <- function(ROI_global) {
+  icc_overall <- ROI_global %>%
+    select(suid, image_tag,
+           contains("percent"))
+  class(icc_overall) <- "data.frame"
+  
+  icc_intrat <- ROI_global %>%
+    filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>%
+    select(suid, image_tag,
+           contains("percent"))
+  class(icc_intrat) <- "data.frame"
+  
+  icc_periph <- ROI_global %>%
+    filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>%
+    select(suid, image_tag,
+           contains("percent"))
+  class(icc_periph) <- "data.frame"
+  
+  fct_icc <- function(data) {
+    ICC_data <- data.frame(matrix(nrow = 1, ncol = 0))
+    lb_data <- data.frame(matrix(nrow = 1, ncol = 0))
+    up_data <- data.frame(matrix(nrow = 1, ncol = 0))
+    for (i in 1:length(colnames(data))) {
+      rad <- data %>% select(suid)
       
-      ICC_df <- cbind(rad, value = data[,i])
-      ICC_df <- ICC_df %>%
-        mutate(Slide = "Slide0") %>%
-        group_by(suid) %>%
-        mutate(n = row_number(suid)) %>%
-        ungroup() %>%
-        unite(slide_id, Slide:n, sep = "", remove = TRUE, na.rm = TRUE) %>%
-        pivot_wider(names_from = slide_id, values_from = value) %>%
-        select(c(starts_with("slide")))
-      
-      ICC <- ICC(ICC_df)$results[4,2]
-      ICC_data <- cbind(ICC_data,ICC)
-      ICC <- ICC(ICC_df)$results[4,7]
-      lb_data <- cbind(lb_data,ICC)
-      ICC <- ICC(ICC_df)$results[4,8]
-      up_data <- cbind(up_data,ICC)
+      if (class(data[, i]) == "numeric" |
+          class(data[, i]) == "integer") {
+        ICC_df <- cbind(rad, value = data[, i])
+        ICC_df <- ICC_df %>%
+          mutate(Slide = "Slide0") %>%
+          group_by(suid) %>%
+          mutate(n = row_number(suid)) %>%
+          ungroup() %>%
+          unite(slide_id, Slide:n, sep = "", remove = TRUE, na.rm = TRUE) %>%
+          pivot_wider(names_from = slide_id, values_from = value) %>%
+          select(c(starts_with("slide")))
+        
+        ICC <- ICC(ICC_df)$results[4, 2]
+        ICC_data <- cbind(ICC_data, ICC)
+        ICC <- ICC(ICC_df)$results[4, 7]
+        lb_data <- cbind(lb_data, ICC)
+        ICC <- ICC(ICC_df)$results[4, 8]
+        up_data <- cbind(up_data, ICC)
+        
+      }
       
     }
-    
+    ICCC_data <- bind_rows(ICC_data, lb_data, up_data)
+    colnames(ICCC_data) <- colnames(data)[3:ncol(data)]
+    ICCC_data <- as.data.frame(t(ICCC_data)) %>%
+      mutate(ICC_lb_up = paste(round(V1, 2), " (", round(V2, 2), ", ", round(V3, 2), ")", sep = "")) %>%
+      select(ICC_lb_up)
   }
-  ICCC_data <- bind_rows(ICC_data,lb_data, up_data)
-  colnames(ICCC_data) <- colnames(data)[3:ncol(data)]
-  ICCC_data <- as.data.frame(t(ICCC_data)) %>% 
-    mutate(ICC_lb_up = paste(round(V1, 2), " (", round(V2, 2), ", ", round(V3, 2), ")", sep = "")) %>% 
-    select(ICC_lb_up)
+  
+  icc_overall <-
+    fct_icc(icc_overall) %>% rename(Overall = "ICC_lb_up")
+  icc_intrat <-
+    fct_icc(icc_intrat) %>% rename(Intratumoral = "ICC_lb_up")
+  icc_periph <-
+    fct_icc(icc_periph) %>% rename(Peripheral = "ICC_lb_up")
+  
+  icc_data <- cbind(icc_overall, icc_intrat, icc_periph)
+  
 }
 
-icc_overall <- fct_icc(icc_overall) %>% rename(Overall = "ICC_lb_up")
-icc_intrat <- fct_icc(icc_intrat) %>% rename(Intratumoral = "ICC_lb_up")
-icc_periph <- fct_icc(icc_periph) %>% rename(Peripheral = "ICC_lb_up")
-
-icc_data <- cbind(icc_overall, icc_intrat, icc_periph)
-
-icc_data
+b <- new_icc(ROI_global)
+b
 ```
 <br>
 <br>
