@@ -69,7 +69,7 @@ clust_markers$clusters_Brooke <- factor(clust_markers$clusters_Brooke,
                                         labels = c("low", "mid-low", "mid", "mid-high", "high"))
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", 
+  tidyr::gather(key = "markers_cat", value = "value", 
          c("sqrt_CD3_CD8_total.i":"sqrt_CD11b_CD15_total.i")) %>% 
   select(suid, clusters_Brooke, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=markers_cat, color=markers_cat))+
@@ -87,7 +87,7 @@ clust_marker$clusters_all_IandP <- factor(clust_marker$clusters_all_IandP,
                                            labels = c("low", "mid-low", "mid", "mid-high", "high"))
 
 clust_marker %>% 
-  gather(key = "markers_cat", value = "value", 
+  tidyr::gather(key = "markers_cat", value = "value", 
          c("percent_CD3_tumor.i":"percent_CD11b_CD15_stroma.i")) %>% 
   select(suid, clusters_all_IandP, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=markers_cat,  color=markers_cat))+
@@ -95,7 +95,7 @@ clust_marker %>%
   facet_grid(.~ clusters_all_IandP)
 
 clust_marker %>% 
-  gather(key = "markers_cat", value = "value", 
+  tidyr::gather(key = "markers_cat", value = "value", 
          c("percent_CD3_tumor.p":"percent_CD11b_CD15_stroma.p")) %>% 
   select(suid, clusters_all_IandP, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=markers_cat,  color=markers_cat))+
@@ -116,7 +116,7 @@ clust_markers$dbl_pos <- factor(clust_markers$dbl_pos,
                                 labels = c("low", "mid-low", "mid", "mid-high", "high"))
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>% 
   select(suid, dbl_pos, markers_cat, value) %>% 
   ggplot(aes(x=suid, group=markers_cat, color=markers_cat))+
   geom_boxplot(aes(y=value))+
@@ -131,7 +131,7 @@ clust_markers$clusters_CD3CD8 <- factor(clust_markers$clusters_CD3CD8,
                                         labels = c("low", "mid-low", "mid", "mid-high", "high"))
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>% 
   select(suid, clusters_CD3CD8, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=markers_cat, color=markers_cat))+
   geom_boxplot()+
@@ -149,7 +149,7 @@ clust_markers$clusters_CD38 <- factor(clust_markers$clusters_CD38,
                                       labels = c("low", "high"))
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>%
+  tidyr::gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>%
   select(suid, clusters_CD38, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=markers_cat, color=markers_cat))+
   geom_boxplot()+
@@ -180,12 +180,12 @@ clust_markers <-
 
 
 low_CD38 %>% 
-  gather(key = "markers_cat", value = "value", ratio_IP) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", ratio_IP) %>% 
   select(suid, excluded_double_ratioIP, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=excluded_double_ratioIP, color=excluded_double_ratioIP))+ # Take home: bad separation, MORE outliers
   geom_boxplot()
 low_CD38 %>% 
-  gather(key = "markers_cat", value = "value", ratio_ST) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", ratio_ST) %>% 
   select(suid, excluded_double_ratioST, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=excluded_double_ratioST, color=excluded_double_ratioST))+ # Take home: bad separation, MORE outliers
   geom_boxplot()
@@ -211,13 +211,13 @@ clust_markers <- left_join(clust_markers, ratio_ST[, c("suid", "clusters_exclude
 
 
 ratio_IP %>% 
-  gather(key = "markers_cat", value = "value", ratio_IP) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", ratio_IP) %>% 
   select(suid, clusters_excluded_IP, excluded_double_ratioIP, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_excluded_IP, color=clusters_excluded_IP))+
   geom_boxplot()
 
 ratio_ST %>% 
-  gather(key = "markers_cat", value = "value", ratio_ST) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", ratio_ST) %>% 
   select(suid, clusters_excluded_ST, excluded_double_ratioST, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_excluded_ST, color=clusters_excluded_ST))+
   geom_boxplot()
@@ -302,7 +302,7 @@ high_CD38$clusters_immsuppr <- factor(high_CD38$clusters_immsuppr,
 clust_markers <- left_join(clust_markers, high_CD38[, c("suid", "clusters_immsuppr")], by= "suid")
 
 high_CD38 %>% 
-  gather(key = "markers_cat", value = "value", ratio_eff_suppr) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", ratio_eff_suppr) %>% 
   select(suid, clusters_immsuppr, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_immsuppr, color=clusters_immsuppr))+
   geom_boxplot()
@@ -318,7 +318,7 @@ high_CD38$clusters_FoxP3 <- factor(high_CD38$clusters_FoxP3,
 clust_markers <- left_join(clust_markers, high_CD38[, c("suid", "clusters_FoxP3")], by= "suid")
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", percent_CD3_FoxP3_tumor.i) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", percent_CD3_FoxP3_tumor.i) %>% 
   select(suid, markers_cat, clusters_FoxP3, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_FoxP3, color=clusters_FoxP3))+
   geom_boxplot()
@@ -333,7 +333,7 @@ high_CD38$clusters_FoxP3_ <- factor(high_CD38$clusters_FoxP3_,
 clust_markers <- left_join(clust_markers, high_CD38[, c("suid", "clusters_FoxP3_")], by= "suid")
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c(percent_FoxP3_total.i, percent_CD3_FoxP3_total.i,
+  tidyr::gather(key = "markers_cat", value = "value", c(percent_FoxP3_total.i, percent_CD3_FoxP3_total.i,
                                                  percent_CD3_CD8_tumor.i)) %>% 
   select(suid, markers_cat, clusters_FoxP3_, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_FoxP3_, color=clusters_FoxP3_))+
@@ -416,7 +416,7 @@ a$clusters_R_FoxP3_tum <- factor(a$clusters_R_FoxP3_tum,
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_R_FoxP3_tum")], by= "suid")
 
 a %>% 
-  gather(key = "markers_cat", value = "value", ratio_eff_suppr) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", ratio_eff_suppr) %>% 
   select(suid, clusters_R_FoxP3_tum, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_R_FoxP3_tum, color=clusters_R_FoxP3_tum))+
   geom_boxplot()
@@ -433,7 +433,7 @@ a$clusters_R_FoxP3_tum.p <- factor(a$clusters_R_FoxP3_tum.p,
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_R_FoxP3_tum.p")], by= "suid")
 
 a %>% 
-  gather(key = "markers_cat", value = "value", ratio_eff_suppr) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", ratio_eff_suppr) %>% 
   select(suid, clusters_R_FoxP3_tum.p, markers_cat, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_R_FoxP3_tum.p, color=clusters_R_FoxP3_tum.p))+
   geom_boxplot()
@@ -452,7 +452,7 @@ a$clusters_CD11b_tot <- factor(a$clusters_CD11b_tot,
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11b_tot")], by= "suid")
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c("percent_FoxP3_total.i", "percent_CD11b_total.i",
+  tidyr::gather(key = "markers_cat", value = "value", c("percent_FoxP3_total.i", "percent_CD11b_total.i",
                                                  "percent_CD3_CD8_total.i")) %>% 
   select(suid, markers_cat, clusters_CD11b_tot, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_CD11b_tot, color=clusters_CD11b_tot))+
@@ -468,7 +468,7 @@ a$clusters_CD11b_tot.p <- factor(a$clusters_CD11b_tot.p,
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11b_tot.p")], by= "suid")
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c("percent_FoxP3_total.p", "percent_CD11b_total.p",
+  tidyr::gather(key = "markers_cat", value = "value", c("percent_FoxP3_total.p", "percent_CD11b_total.p",
                                                  "percent_CD3_CD8_total.p")) %>% 
   select(suid, markers_cat, clusters_CD11b_tot.p, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_CD11b_tot.p, color=clusters_CD11b_tot.p))+
@@ -486,7 +486,7 @@ a$clusters_CD15_tot <- factor(a$clusters_CD15_tot,
                               labels = c("low CD15", "high CD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD15_tot")], by= "suid")
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", percent_CD11b_CD15_tumor.i) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", percent_CD11b_CD15_tumor.i) %>% 
   select(suid, markers_cat, clusters_CD15_tot, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_CD15_tot, color=clusters_CD15_tot))+
   geom_boxplot()
@@ -500,7 +500,7 @@ a$clusters_CD15_tot.p <- factor(a$clusters_CD15_tot.p,
                                 labels = c("low CD15", "high CD15"))
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD15_tot.p")], by= "suid")
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", percent_CD11b_CD15_tumor.p) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", percent_CD11b_CD15_tumor.p) %>% 
   select(suid, markers_cat, clusters_CD15_tot.p, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_CD15_tot.p, color=clusters_CD15_tot.p))+
   geom_boxplot()
@@ -517,7 +517,7 @@ a$clusters_CD11bCD15_tot <- factor(a$clusters_CD11bCD15_tot,
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11bCD15_tot")], by= "suid")
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", percent_CD11b_CD15_tumor.i) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", percent_CD11b_CD15_tumor.i) %>% 
   select(suid, markers_cat, clusters_CD11bCD15_tot, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_CD11bCD15_tot, color=clusters_CD11bCD15_tot))+
   geom_boxplot()
@@ -533,7 +533,7 @@ a$clusters_CD11bCD15_tot.p <- factor(a$clusters_CD11bCD15_tot.p,
 clust_markers <- left_join(clust_markers, a[, c("suid", "clusters_CD11bCD15_tot.p")], by= "suid")
 
 clust_markers %>% 
-  gather(key = "markers_cat", value = "value", percent_CD11b_CD15_tumor.p) %>% 
+  tidyr::gather(key = "markers_cat", value = "value", percent_CD11b_CD15_tumor.p) %>% 
   select(suid, markers_cat, clusters_CD11bCD15_tot.p, value) %>% 
   ggplot(aes(x=suid, y=value, group=clusters_CD11bCD15_tot.p, color=clusters_CD11bCD15_tot.p))+
   geom_boxplot()
