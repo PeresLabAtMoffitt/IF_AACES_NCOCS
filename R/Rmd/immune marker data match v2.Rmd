@@ -95,6 +95,7 @@ path <- fs::path("","Volumes","Peres_Research","Christelle Colin-Leitzinger", "I
 
 # I. ROIs Raw Data
 ## 1. Cells Distribution
+Here each slides are represented
 ```{r}
 p1 <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
@@ -552,297 +553,131 @@ tbl
 ```
 <br>
 
-
-## 2.What happen if we don't ask mclust for a spacific number of cluster?
-
-### Cluster for stroma/tumor in the intratumoral/peritumoral ROIs (include single and double staining, overall are excluded)
-```{r code cluster}
-set.seed(1234)
-clust_markers <- markers_ROI %>% 
-  filter(!is.na(markers_ROI$percent_CD3_CD8_tumor.i) & !is.na(markers_ROI$percent_CD3_CD8_tumor.p))
-
-clust <- Mclust(clust_markers[,c(5:20,35:50)])
-# clust <- Mclust(clust_markers[,c(21:28,51:58)])
-summary(clust)
-clust_markers$clusters_all_IandP <- clust$classification
-clust_markers$clusters_all_IandP <- factor(clust_markers$clusters_all_IandP,
-                                           levels = c(1, 3, 2),
-                                           labels = c("low", "mid", "high"))
-# clust_markers$clusters_all_IandP <- factor(clust_markers$clusters_all_IandP, 
-#                                            levels = c(6, 5, 1, 4, 3, 2),
-#                                            labels = c("sublow", "low", "mid-low", "mid", "mid-high", "high"))
-
-clust_markers %>% 
-  tidyr::gather(key = "markers_cat", value = "value", 
-         c("percent_CD3_tumor.i":"percent_CD11b_CD15_stroma.i")) %>% 
-  select(suid, clusters_all_IandP, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=markers_cat,  color=markers_cat))+
-  geom_boxplot()+
-  facet_grid(.~ clusters_all_IandP)
-
-clust_markers %>% 
-  tidyr::gather(key = "markers_cat", value = "value", 
-         c("percent_CD3_tumor.p":"percent_CD11b_CD15_stroma.p")) %>% 
-  select(suid, clusters_all_IandP, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=markers_cat,  color=markers_cat))+
-  geom_boxplot()+
-  facet_grid(.~ clusters_all_IandP)
-
-
-ggsurvplot(
-  survfit(Surv(time = clust_markers$timelastfu_new, event = clust_markers$surv_vital) ~ clust_markers$clusters_all_IandP), 
-  data = clust_markers,
-           title = "Survival analysis on match population ROIs",
-           font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", 
-           # legend.title = "clustered by dbl_pos",
-           # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
-           conf.int = FALSE,
-           # Add risk table
-           tables.height = 0.3,
-           risk.table.title = "Risk table (count(%))",
-           risk.table = "abs_pct",
-           risk.table.y.text = FALSE,
-           risk.table.fontsize = 3,
-           tables.theme = theme_survminer(font.main = c(13, "bold", "black"),
-                                          font.y = c(0, "bold", "transparent"))
-) + guides(colour = guide_legend(ncol = 2))
+the count of cells double stained (for example CD3+CD8+) are substracted fronm the single stain count (CD3 alone and CD8 alone) to avoid overlapping if we want to use them to cluster.
+```{r removing double stain from single stain count}
+markers_ROI <- markers_ROI %>% 
+  mutate(percent_CD3_total.i = percent_CD3_total.i - percent_CD3_CD8_total.i - percent_CD3_FoxP3_total.i) %>% 
+  mutate(percent_CD8_total.i = percent_CD8_total.i - percent_CD3_CD8_total.i) %>% 
+  mutate(percent_FoxP3_total.i = percent_FoxP3_total.i - percent_CD3_FoxP3_total.i) %>% 
+  mutate(percent_CD11b_total.i = percent_CD11b_total.i - percent_CD11b_CD15_total.i) %>% 
+  mutate(percent_CD15_total.i = percent_CD15_total.i - percent_CD11b_CD15_total.i) %>% 
+  
+  mutate(percent_CD3_tumor.i = percent_CD3_tumor.i - percent_CD3_CD8_tumor.i - percent_CD3_FoxP3_tumor.i) %>% 
+  mutate(percent_CD8_tumor.i = percent_CD8_tumor.i - percent_CD3_CD8_tumor.i) %>% 
+  mutate(percent_FoxP3_tumor.i = percent_FoxP3_tumor.i - percent_CD3_FoxP3_tumor.i) %>% 
+  mutate(percent_CD11b_tumor.i = percent_CD11b_tumor.i - percent_CD11b_CD15_tumor.i) %>% 
+  mutate(percent_CD15_tumor.i = percent_CD15_tumor.i - percent_CD11b_CD15_tumor.i) %>% 
+  
+  mutate(percent_CD3_stroma.i = percent_CD3_stroma.i - percent_CD3_CD8_stroma.i - percent_CD3_FoxP3_stroma.i) %>% 
+  mutate(percent_CD8_stroma.i = percent_CD8_stroma.i - percent_CD3_CD8_stroma.i) %>% 
+  mutate(percent_FoxP3_stroma.i = percent_FoxP3_stroma.i - percent_CD3_FoxP3_stroma.i) %>% 
+  mutate(percent_CD11b_stroma.i = percent_CD11b_stroma.i - percent_CD11b_CD15_stroma.i) %>% 
+  mutate(percent_CD15_stroma.i = percent_CD15_stroma.i - percent_CD11b_CD15_stroma.i) %>% 
+  
+  mutate(percent_CD3_total.p = percent_CD3_total.p - percent_CD3_CD8_total.p - percent_CD3_FoxP3_total.p) %>% 
+  mutate(percent_CD8_total.p = percent_CD8_total.p - percent_CD3_CD8_total.p) %>% 
+  mutate(percent_FoxP3_total.p = percent_FoxP3_total.p - percent_CD3_FoxP3_total.p) %>% 
+  mutate(percent_CD11b_total.p = percent_CD11b_total.p - percent_CD11b_CD15_total.p) %>% 
+  mutate(percent_CD15_total.p = percent_CD15_total.p - percent_CD11b_CD15_total.p) %>% 
+  
+  mutate(percent_CD3_tumor.p = percent_CD3_tumor.p - percent_CD3_CD8_tumor.p - percent_CD3_FoxP3_tumor.p) %>% 
+  mutate(percent_CD8_tumor.p = percent_CD8_tumor.p - percent_CD3_CD8_tumor.p) %>% 
+  mutate(percent_FoxP3_tumor.p = percent_FoxP3_tumor.p - percent_CD3_FoxP3_tumor.p) %>% 
+  mutate(percent_CD11b_tumor.p = percent_CD11b_tumor.p - percent_CD11b_CD15_tumor.p) %>% 
+  mutate(percent_CD15_tumor.p = percent_CD15_tumor.p - percent_CD11b_CD15_tumor.p) %>% 
+  
+  mutate(percent_CD3_stroma.p = percent_CD3_stroma.p - percent_CD3_CD8_stroma.p - percent_CD3_FoxP3_stroma.p) %>% 
+  mutate(percent_CD8_stroma.p = percent_CD8_stroma.p - percent_CD3_CD8_stroma.p) %>% 
+  mutate(percent_FoxP3_stroma.p = percent_FoxP3_stroma.p - percent_CD3_FoxP3_stroma.p) %>% 
+  mutate(percent_CD11b_stroma.p = percent_CD11b_stroma.p - percent_CD11b_CD15_stroma.p) %>% 
+  mutate(percent_CD15_stroma.p = percent_CD15_stroma.p - percent_CD11b_CD15_stroma.p)
 ```
-<br>
 
-### Cluster for tumor intratumoral all double positive "percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", "percent_CD11b_CD15_tumor.i"
-```{r}
-clust_markers <- markers_ROI %>% filter(!is.na(markers_ROI$percent_CD3_CD8_tumor.i ))
+## 2.Categorize absent cells
+Calculate median without the zeros cells to cat 3grp (0, <median, >median) for each cat (CD11b+CD15 are just cat in 2 gpe as 0 or >0)
+```{r new median}
+markers_ROI <- markers_ROI %>% 
+  mutate(median_CD3_total.i = median(percent_CD3_total.i[percent_CD3_total.i>0])) %>% 
+  mutate(median_CD8_total.i = median(percent_CD8_total.i[percent_CD8_total.i>0])) %>% 
+  mutate(median_FoxP3_total.i = median(percent_FoxP3_total.i[percent_FoxP3_total.i>0])) %>% 
+  mutate(median_CD11b_total.i = median(percent_CD11b_total.i[percent_CD11b_total.i>0])) %>% 
+  mutate(median_CD15_total.i = median(percent_CD15_total.i[percent_CD15_total.i>0])) %>% 
+  mutate(median_CD3_CD8_total.i = median(percent_CD3_CD8_total.i[percent_CD3_CD8_total.i>0])) %>% 
+  mutate(median_CD3_FoxP3_total.i = median(percent_CD3_FoxP3_total.i[percent_CD3_FoxP3_total.i>0])) %>% 
+  mutate(median_CD11b_CD15_tumor.i = median(percent_CD11b_CD15_tumor.i[percent_CD11b_CD15_tumor.i>0])) %>% 
+  
+  mutate(median_CD3_tumor.i = median(percent_CD3_tumor.i[percent_CD3_tumor.i>0])) %>% 
+  mutate(median_CD8_tumor.i = median(percent_CD8_tumor.i[percent_CD8_tumor.i>0])) %>% 
+  mutate(median_FoxP3_tumor.i = median(percent_FoxP3_tumor.i[percent_FoxP3_tumor.i>0])) %>% 
+  mutate(median_CD11b_tumor.i = median(percent_CD11b_tumor.i[percent_CD11b_tumor.i>0])) %>% 
+  mutate(median_CD15_tumor.i = median(percent_CD15_tumor.i[percent_CD15_tumor.i>0])) %>% 
+  mutate(median_CD3_CD8_tumor.i = median(percent_CD3_CD8_tumor.i[percent_CD3_CD8_tumor.i>0])) %>% 
+  mutate(median_CD3_FoxP3_tumor.i = median(percent_CD3_FoxP3_tumor.i[percent_CD3_FoxP3_tumor.i>0])) %>% 
+  mutate(median_CD11b_CD15_tumor.i = median(percent_CD11b_CD15_tumor.i[percent_CD11b_CD15_tumor.i>0])) %>% 
+  
+  mutate(median_CD3_stroma.i = median(percent_CD3_stroma.i[percent_CD3_stroma.i>0])) %>% 
+  mutate(median_CD8_stroma.i = median(percent_CD8_stroma.i[percent_CD8_stroma.i>0])) %>% 
+  mutate(median_FoxP3_stroma.i = median(percent_FoxP3_stroma.i[percent_FoxP3_stroma.i>0])) %>% 
+  mutate(median_CD11b_stroma.i = median(percent_CD11b_stroma.i[percent_CD11b_stroma.i>0])) %>% 
+  mutate(median_CD15_stroma.i = median(percent_CD15_stroma.i[percent_CD15_stroma.i>0])) %>% 
+  mutate(median_CD3_CD8_stroma.i = median(percent_CD3_CD8_stroma.i[percent_CD3_CD8_stroma.i>0])) %>% 
+  mutate(median_CD3_FoxP3_stroma.i = median(percent_CD3_FoxP3_stroma.i[percent_CD3_FoxP3_stroma.i>0])) %>% 
+  mutate(median_CD11b_CD15_tumor.i = median(percent_CD11b_CD15_tumor.i[percent_CD11b_CD15_tumor.i>0])) %>% 
+  
+  mutate(median_CD3_total.p = median(percent_CD3_total.p[percent_CD3_total.p>0])) %>% 
+  mutate(median_CD8_total.p = median(percent_CD8_total.p[percent_CD8_total.p>0])) %>% 
+  mutate(median_FoxP3_total.p = median(percent_FoxP3_total.p[percent_FoxP3_total.p>0])) %>% 
+  mutate(median_CD11b_total.p = median(percent_CD11b_total.p[percent_CD11b_total.p>0])) %>% 
+  mutate(median_CD15_total.p = median(percent_CD15_total.p[percent_CD15_total.p>0])) %>% 
+  mutate(median_CD3_CD8_total.p = median(percent_CD3_CD8_total.p[percent_CD3_CD8_total.p>0])) %>% 
+  mutate(median_CD3_FoxP3_total.p = median(percent_CD3_FoxP3_total.p[percent_CD3_FoxP3_total.p>0])) %>% 
+  mutate(median_CD11b_CD15_tumor.p = median(percent_CD11b_CD15_tumor.p[percent_CD11b_CD15_tumor.p>0])) %>% 
+  
+  mutate(median_CD3_tumor.p = median(percent_CD3_tumor.p[percent_CD3_tumor.p>0])) %>% 
+  mutate(median_CD8_tumor.p = median(percent_CD8_tumor.p[percent_CD8_tumor.p>0])) %>% 
+  mutate(median_FoxP3_tumor.p = median(percent_FoxP3_tumor.p[percent_FoxP3_tumor.p>0])) %>% 
+  mutate(median_CD11b_tumor.p = median(percent_CD11b_tumor.p[percent_CD11b_tumor.p>0])) %>% 
+  mutate(median_CD15_tumor.p = median(percent_CD15_tumor.p[percent_CD15_tumor.p>0])) %>% 
+  mutate(median_CD3_CD8_tumor.p = median(percent_CD3_CD8_tumor.p[percent_CD3_CD8_tumor.p>0])) %>% 
+  mutate(median_CD3_FoxP3_tumor.p = median(percent_CD3_FoxP3_tumor.p[percent_CD3_FoxP3_tumor.p>0])) %>% 
+  mutate(median_CD11b_CD15_tumor.p = median(percent_CD11b_CD15_tumor.p[percent_CD11b_CD15_tumor.p>0])) %>% 
+  
+  mutate(median_CD3_stroma.p = median(percent_CD3_stroma.p[percent_CD3_stroma.p>0])) %>% 
+  mutate(median_CD8_stroma.p = median(percent_CD8_stroma.p[percent_CD8_stroma.p>0])) %>% 
+  mutate(median_FoxP3_stroma.p = median(percent_FoxP3_stroma.p[percent_FoxP3_stroma.p>0])) %>% 
+  mutate(median_CD11b_stroma.p = median(percent_CD11b_stroma.p[percent_CD11b_stroma.p>0])) %>% 
+  mutate(median_CD15_stroma.p = median(percent_CD15_stroma.p[percent_CD15_stroma.p>0])) %>% 
+  mutate(median_CD3_CD8_stroma.p = median(percent_CD3_CD8_stroma.p[percent_CD3_CD8_stroma.p>0])) %>% 
+  mutate(median_CD3_FoxP3_stroma.p = median(percent_CD3_FoxP3_stroma.p[percent_CD3_FoxP3_stroma.p>0])) %>% 
+  mutate(median_CD11b_CD15_tumor.p = median(percent_CD11b_CD15_tumor.p[percent_CD11b_CD15_tumor.p>0])) %>% 
+  
+  mutate(CD3_total.i = case_when(
+    percent_CD3_total.i == 0       ~ "zero",
+    percent_CD3_total.i <= median(percent_CD3_total.i[percent_CD3_total.i>0])      ~ "low",
+    percent_CD3_total.i >= median(percent_CD3_total.i[percent_CD3_total.i>0])       ~ "high"
+  ))
 
-clust <- 
-  Mclust(clust_markers[,c("percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", "percent_CD11b_CD15_tumor.i")])
-summary(clust)
-clust_markers$dbl_pos <- clust$classification
-clust_markers$dbl_pos <- factor(clust_markers$dbl_pos, 
-                                levels = c(1, 2, 3),
-                                labels = c("low","high","mid"))
-
-clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>% 
-  select(suid, dbl_pos, markers_cat, value) %>% 
-  ggplot(aes(x=suid, group=markers_cat, color=markers_cat))+
-  geom_boxplot(aes(y=value))+
-  facet_grid(.~ dbl_pos)
 
 
-ggsurvplot(
-  survfit(Surv(time = clust_markers$timelastfu_new, event = clust_markers$surv_vital) ~ clust_markers$dbl_pos), 
-  data = clust_markers,
-           title = "Survival analysis on match population ROIs",
-           font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", 
-           # legend.title = "clustered by dbl_pos",
-           # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
-           conf.int = FALSE,
-           # Add risk table
-           tables.height = 0.3,
-           risk.table.title = "Risk table (count(%))",
-           risk.table = "abs_pct",
-           risk.table.y.text = FALSE,
-           risk.table.fontsize = 3,
-           tables.theme = theme_survminer(font.main = c(13, "bold", "black"),
-                                          font.y = c(0, "bold", "transparent"))
-)
+for(i in 1:length(colnames(markers_ROI))) {
+  
+  
+  if(str_detect(markers_ROI[,i]) == "percent_CD" | str_detect(markers_ROI[,i]) == "percent_Fox") {
+    
+    markers_ROI <- markers_ROI %>% 
+    
+    
+  }
+  
+}
+
+for (v in colnames(df[ ,grepl(".x",names(df))])) {
+  print(v)
+  df$v <- ifelse(is.na(df$v), ols$coefficients[1]+ols$coefficients[2]*log(df$gsub(".x",".y",v)), df$v)
+}
 ```
-<br>
 
-### Cluster for tumor intratumoral CD3-CD8
-```{r}
-clust <- Mclust(clust_markers$percent_CD3_CD8_tumor.i)
-summary(clust)
-clust_markers$clusters_CD3CD8 <- clust$classification
-# clust_markers$clusters_CD3CD8 <- factor(clust_markers$clusters_CD3CD8, 
-#                                         levels = c(1 , 2, 3, 4, 5),
-#                                         labels = c("low", "mid-low", "mid", "mid-high", "high"))
 
-clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>% 
-  select(suid, clusters_CD3CD8, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=markers_cat, color=markers_cat))+
-  geom_boxplot()+
-  facet_grid(.~ clusters_CD3CD8)
-
-ggsurvplot(
-  survfit(Surv(time = clust_markers$timelastfu_new, event = clust_markers$surv_vital) ~ clust_markers$clusters_CD3CD8), 
-  data = clust_markers,
-           title = "Survival analysis on match population ROIs",
-           font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", 
-           # legend.title = "clustered by dbl_pos",
-           # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
-           conf.int = FALSE,
-           # Add risk table
-           tables.height = 0.3,
-           risk.table.title = "Risk table (count(%))",
-           risk.table = "abs_pct",
-           risk.table.y.text = FALSE,
-           risk.table.fontsize = 3,
-           tables.theme = theme_survminer(font.main = c(13, "bold", "black"),
-                                          font.y = c(0, "bold", "transparent"))
-) + guides(colour = guide_legend(ncol = 2))
-```
-<br>
-
-### Cluster for tumor intratumoral CD3-FoxP3
-```{r}
-clust <- Mclust(clust_markers$percent_CD3_FoxP3_tumor.i)
-summary(clust)
-clust_markers$clusters_FoxP3 <- clust$classification
-# clust_markers$clusters_FoxP3 <- factor(clust_markers$clusters_FoxP3, 
-#                            levels = c(1, 2),
-#                            labels = c("hot", "immunosuppressed"))
-
-clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>% 
-  select(suid, clusters_FoxP3, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=markers_cat, color=markers_cat))+
-  geom_boxplot()+
-  facet_grid(.~ clusters_FoxP3)
-
-ggsurvplot(
-  survfit(Surv(time = clust_markers$timelastfu_new, event = clust_markers$surv_vital) ~ clust_markers$clusters_FoxP3), 
-  data = clust_markers,
-           title = "Survival analysis on match population ROIs",
-           font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", 
-           # legend.title = "clustered by dbl_pos",
-           # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
-           conf.int = FALSE,
-           # Add risk table
-           tables.height = 0.3,
-           risk.table.title = "Risk table (count(%))",
-           risk.table = "abs_pct",
-           risk.table.y.text = FALSE,
-           risk.table.fontsize = 3,
-           tables.theme = theme_survminer(font.main = c(13, "bold", "black"),
-                                          font.y = c(0, "bold", "transparent"))
-)
-```
-<br>
-
-### Cluster for tumor intratumoral CD3-FoxP3
-```{r}
-clust <- Mclust(clust_markers$percent_CD3_FoxP3_tumor.i)
-summary(clust)
-clust_markers$clusters_FoxP3 <- clust$classification
-# clust_markers$clusters_FoxP3 <- factor(clust_markers$clusters_FoxP3, 
-#                            levels = c(1, 2),
-#                            labels = c("hot", "immunosuppressed"))
-
-clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>% 
-  select(suid, clusters_FoxP3, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=markers_cat, color=markers_cat))+
-  geom_boxplot()+
-  facet_grid(.~ clusters_FoxP3)
-
-ggsurvplot(
-  survfit(Surv(time = clust_markers$timelastfu_new, event = clust_markers$surv_vital) ~ clust_markers$clusters_FoxP3), 
-  data = clust_markers,
-           title = "Survival analysis on match population ROIs",
-           font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", 
-           # legend.title = "clustered by dbl_pos",
-           # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
-           conf.int = FALSE,
-           # Add risk table
-           tables.height = 0.3,
-           risk.table.title = "Risk table (count(%))",
-           risk.table = "abs_pct",
-           risk.table.y.text = FALSE,
-           risk.table.fontsize = 3,
-           tables.theme = theme_survminer(font.main = c(13, "bold", "black"),
-                                          font.y = c(0, "bold", "transparent"))
-)
-```
-<br>
-
-### Cluster for tumor intratumoral FoxP3 because it can be expressed by tumor cell
-```{r}
-clust <- Mclust(clust_markers$percent_FoxP3_tumor.i)
-summary(clust)
-clust_markers$clusters_FoxP3_ <- clust$classification
-# clust_markers$clusters_FoxP3_ <- factor(clust_markers$clusters_FoxP3_, 
-#                            levels = c(1, 2),
-#                            labels = c("hot", "immunosuppressed"))
-
-clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>% 
-  select(suid, clusters_FoxP3_, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=markers_cat, color=markers_cat))+
-  geom_boxplot()+
-  facet_grid(.~ clusters_FoxP3_)
-
-ggsurvplot(
-  survfit(Surv(time = clust_markers$timelastfu_new, event = clust_markers$surv_vital) ~ clust_markers$clusters_FoxP3_), 
-  data = clust_markers,
-           title = "Survival analysis on match population ROIs",
-           font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", 
-           # legend.title = "clustered by dbl_pos",
-           # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
-           conf.int = FALSE,
-           # Add risk table
-           tables.height = 0.3,
-           risk.table.title = "Risk table (count(%))",
-           risk.table = "abs_pct",
-           risk.table.y.text = FALSE,
-           risk.table.fontsize = 3,
-           tables.theme = theme_survminer(font.main = c(13, "bold", "black"),
-                                          font.y = c(0, "bold", "transparent"))
-) + guides(colour = guide_legend(ncol = 2))
-```
-I don't like that one because we know that FoxP3 usually has a negative effect. But this cluster grouped high FoxP3 with high+low CD8 which at the end bias the survivals.
-<br>
-
-### Cluster for tumor intratumoral CD11b/CD15 
-```{r}
-clust <- Mclust(clust_markers$percent_CD11b_CD15_tumor.i)
-summary(clust)
-clust_markers$clusters_CD11bCD15 <- clust$classification
-# clust_markers$clusters_CD11bCD15 <- factor(clust_markers$clusters_CD11bCD15, 
-#                            levels = c(1, 2),
-#                            labels = c("hot", "immunosuppressed"))
-
-clust_markers %>% 
-  gather(key = "markers_cat", value = "value", c("percent_CD3_tumor.i":"percent_CD11b_CD15_tumor.i")) %>% 
-  select(suid, clusters_CD11bCD15, markers_cat, value) %>% 
-  ggplot(aes(x=suid, y=value, group=markers_cat, color=markers_cat))+
-  geom_boxplot()+
-  facet_grid(.~ clusters_CD11bCD15)
-
-ggsurvplot(
-  survfit(Surv(time = clust_markers$timelastfu_new, event = clust_markers$surv_vital) ~ clust_markers$clusters_CD11bCD15), 
-  data = clust_markers,
-           title = "Survival analysis on match population ROIs",
-           font.main = c(16, "bold", "black"),
-           xlab = "Time (days)", 
-           # legend.title = "clustered by dbl_pos",
-           # legend.labs = c("high", "low", "mid", "mid-high", "mid-low"),
-           pval = TRUE, # pval.coord = c(2100,.53),
-           conf.int = FALSE,
-           # Add risk table
-           tables.height = 0.3,
-           risk.table.title = "Risk table (count(%))",
-           risk.table = "abs_pct",
-           risk.table.y.text = FALSE,
-           risk.table.fontsize = 3,
-           tables.theme = theme_survminer(font.main = c(13, "bold", "black"),
-                                          font.y = c(0, "bold", "transparent"))
-)
-```
-<br>
 
 
 

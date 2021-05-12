@@ -1,0 +1,326 @@
+---
+title: "Immune marker data"
+author: "Christelle Colin-Leitzinger"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: false
+    theme: cerulean #darkly
+    highlight: pygments
+    df_print: paged
+editor_options: 
+  chunk_output_type: console
+---
+
+<style type="text/css">
+h1.title {
+  font-size: 25px;
+}
+.figure {
+   margin-top: 25px;
+   <!-- margin-bottom: 100px; -->
+}
+
+table {
+    margin-top: 25px;
+    <!-- margin-bottom: 100px !important; -->
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE,
+                      cache = FALSE,
+                      # fig.width = 7, fig.height = 5, 
+                      fig.align='center'#, fig.show='hold'
+                      )
+options(gtsummary.print_engine = "gt")
+options(gtsummary.as_gt.addl_cmds = "gt::tab_options(table.font.size = 14, data_row.padding = gt::px(1))")
+```
+
+<style>
+div.blue { background-color:#0099CC; border-radius: 5px; padding: 20px; font-size: 38px}
+</style>
+<div class = "blue">
+
+<span style="color: white;">Immune Marker Data</span>
+
+</div>
+<br>
+
+```{r library, include=FALSE}
+# library(drake)
+library(tidyverse)
+library(data.table)
+# library(VennDiagram)
+library(gtsummary)
+library(survival)
+library(survminer)
+library(psych)
+# library(corrplot)
+# library(ggcorrplot)
+library(mclust)
+```
+
+```{r load}
+# loadd(clinical_data, ROI_tumor ,ROI_stroma ,ROI_total,
+#       cases_match)
+
+ROI_global <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/ROI_global.rds")
+clinical_data <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/clinical_data.rds")
+
+# Rewove patients not matched or lost match
+ROI_global <- left_join(ROI_global, clinical_data, by="suid") %>% drop_na(pair_id) %>% 
+  group_by(pair_id) %>% 
+  mutate(have_a_match = dense_rank(interaction(suid, pair_id))) %>% 
+  group_by(pair_id) %>% 
+  mutate(is_paired = max(have_a_match)) %>% 
+  filter(is_paired == 2) %>% 
+  select(pair_id, everything(), -c(is_paired, have_a_match)) %>% 
+  ungroup()
+
+# markers_match <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/markers_match.rds")
+path <- fs::path("","Volumes","Peres_Research","Christelle Colin-Leitzinger", "IF_AACES_NCOCS", "Figures")
+
+
+
+```
+<br>
+<br>
+
+***
+
+# Left is immunoscore per slide, right is immunoscore per patient
+```{r immunoscore per slide}
+ROI_global <- ROI_global %>% 
+  mutate(percentile_score_CD3_i = ifelse(intratumoral_i_vs_peripheral_p_ == "Intratumoral", ntile(tumor_percent_cd3_opal_650_positive_cells, 100), NA_real_ )) %>% 
+  mutate(percentile_score_CD3_p = ifelse(intratumoral_i_vs_peripheral_p_ == "Peripheral", ntile(tumor_percent_cd3_opal_650_positive_cells, 100), NA_real_ )) %>% 
+  mutate(percentile_score_CD8_i = ifelse(intratumoral_i_vs_peripheral_p_ == "Intratumoral", ntile(tumor_percent_cd8_opal_570_positive_cells, 100), NA_real_ )) %>% 
+  mutate(percentile_score_CD8_p = ifelse(intratumoral_i_vs_peripheral_p_ == "Peripheral", ntile(tumor_percent_cd8_opal_570_positive_cells, 100), NA_real_ ))
+
+ROI_global <- ROI_global %>%
+  mutate(percentile_score_mean = rowMeans( ROI_global[c("percentile_score_CD3_i", "percentile_score_CD3_p", 
+                                                    "percentile_score_CD8_i", "percentile_score_CD8_p")], na.rm = TRUE ))
+ROI_global <- ROI_global %>%
+  mutate(immunoscore_ = case_when(
+    percentile_score_mean <= 10        ~ 0,
+    percentile_score_mean <= 25        ~ 1,
+    percentile_score_mean <= 70        ~ 2,
+    percentile_score_mean <= 95        ~ 3,
+    percentile_score_mean > 95         ~ 4 
+  )) %>% 
+  mutate(immunoscore_ = factor(immunoscore_)) %>% 
+  mutate(immunoscore_2018lancet = case_when(
+    percentile_score_mean <= 25        ~ "Low",
+    percentile_score_mean <= 70        ~ "Intermediate",
+    percentile_score_mean > 70         ~ "High"
+    )) %>% 
+  mutate(immunoscore_2018lancet = factor(immunoscore_2018lancet, levels = c("Low", "Intermediate", "High"))) 
+```
+
+
+
+```{r summarize mean}
+markers_ROIi <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
+  group_by(suid) %>% 
+  summarize(
+    mean_tumor = mean(percent_tumor),
+    mean_stroma = mean(percent_stroma),
+    mean_total = mean(percent_total),
+    # variance_tumor = var(percent_tumor),
+    # variance_stroma = var(percent_stroma),
+    percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells),
+    percent_CD8_tumor = mean(tumor_percent_cd8_opal_570_positive_cells),
+    percent_CD3_CD8_tumor = mean(tumor_percent_cd3plus_cd8plus_positive_cells),
+    percent_FoxP3_tumor = mean(tumor_percent_foxp3_opal_540_positive_cells),
+    percent_CD3_FoxP3_tumor = mean(tumor_percent_cd3plus_foxp3plus_positive_cells),
+    percent_CD11b_tumor = mean(tumor_percent_cd11b_opal_620_positive_cells),
+    percent_CD15_tumor = mean(tumor_percent_cd15_opal_520_positive_cells),
+    percent_CD11b_CD15_tumor = mean(tumor_percent_cd11bplus_cd15plus_positive_cells),
+    percent_CD3_stroma = mean(stroma_percent_cd3_opal_650_positive_cells),
+    percent_CD8_stroma = mean(stroma_percent_cd8_opal_570_positive_cells),
+    percent_CD3_CD8_stroma = mean(stroma_percent_cd3plus_cd8plus_positive_cells),
+    percent_FoxP3_stroma = mean(stroma_percent_foxp3_opal_540_positive_cells),
+    percent_CD3_FoxP3_stroma = mean(stroma_percent_cd3plus_foxp3plus_positive_cells),
+    percent_CD11b_stroma = mean(stroma_percent_cd11b_opal_620_positive_cells),
+    percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
+    percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells),
+    
+    percent_CD3_total = mean(percent_cd3_opal_650_positive_cells),
+    percent_CD8_total = mean(percent_cd8_opal_570_positive_cells),
+    percent_CD3_CD8_total = mean(percent_cd3plus_cd8plus_positive_cells),
+    percent_FoxP3_total = mean(percent_foxp3_opal_540_positive_cells),
+    percent_CD3_FoxP3_total = mean(percent_cd3plus_foxp3plus_positive_cells),
+    percent_CD11b_total = mean(percent_cd11b_opal_620_positive_cells),
+    percent_CD15_total = mean(percent_cd15_opal_520_positive_cells),
+    percent_CD11b_CD15_total = mean(percent_cd11bplus_cd15plus_positive_cells)
+  )
+markers_ROIi$tumor_variation <- markers_ROIi$mean_tumor - mean(ROI_global$percent_tumor)
+markers_ROIi$stroma_variation <- markers_ROIi$mean_stroma - mean(ROI_global$percent_stroma)
+markers_ROIi$total_variation <- markers_ROIi$mean_stroma - mean(ROI_global$percent_stroma)
+#
+markers_ROIp <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
+  group_by(suid) %>% 
+  summarize(
+    mean_tumor = mean(percent_tumor),
+    mean_stroma = mean(percent_stroma),
+    mean_total = mean(percent_total),
+    # variance_tumor = var(percent_tumor),
+    # variance_stroma = var(percent_stroma),
+    percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells),
+    percent_CD8_tumor = mean(tumor_percent_cd8_opal_570_positive_cells),
+    percent_CD3_CD8_tumor = mean(tumor_percent_cd3plus_cd8plus_positive_cells),
+    percent_FoxP3_tumor = mean(tumor_percent_foxp3_opal_540_positive_cells),
+    percent_CD3_FoxP3_tumor = mean(tumor_percent_cd3plus_foxp3plus_positive_cells),
+    percent_CD11b_tumor = mean(tumor_percent_cd11b_opal_620_positive_cells),
+    percent_CD15_tumor = mean(tumor_percent_cd15_opal_520_positive_cells),
+    percent_CD11b_CD15_tumor = mean(tumor_percent_cd11bplus_cd15plus_positive_cells),
+    percent_CD3_stroma = mean(stroma_percent_cd3_opal_650_positive_cells),
+    percent_CD8_stroma = mean(stroma_percent_cd8_opal_570_positive_cells),
+    percent_CD3_CD8_stroma = mean(stroma_percent_cd3plus_cd8plus_positive_cells),
+    percent_FoxP3_stroma = mean(stroma_percent_foxp3_opal_540_positive_cells),
+    percent_CD3_FoxP3_stroma = mean(stroma_percent_cd3plus_foxp3plus_positive_cells),
+    percent_CD11b_stroma = mean(stroma_percent_cd11b_opal_620_positive_cells),
+    percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
+    percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells),
+    percent_CD3_total = mean(percent_cd3_opal_650_positive_cells),
+    percent_CD8_total = mean(percent_cd8_opal_570_positive_cells),
+    percent_CD3_CD8_total = mean(percent_cd3plus_cd8plus_positive_cells),
+    percent_FoxP3_total = mean(percent_foxp3_opal_540_positive_cells),
+    percent_CD3_FoxP3_total = mean(percent_cd3plus_foxp3plus_positive_cells),
+    percent_CD11b_total = mean(percent_cd11b_opal_620_positive_cells),
+    percent_CD15_total = mean(percent_cd15_opal_520_positive_cells),
+    percent_CD11b_CD15_total = mean(percent_cd11bplus_cd15plus_positive_cells)
+  )
+markers_ROIp$tumor_variation <- markers_ROIp$mean_tumor - mean(ROI_global$percent_tumor)
+markers_ROIp$stroma_variation <- markers_ROIp$mean_stroma - mean(ROI_global$percent_stroma)
+markers_ROIp$total_variation <- markers_ROIp$mean_total - mean(ROI_global$percent_total)
+
+# Join Intratumoral and Peropheral ROI
+markers_ROI <- full_join(markers_ROIi, markers_ROIp,
+                         by= "suid", suffix= c(".i", ".p"))
+markers_ROI <- left_join(markers_ROI, clinical_data, by="suid")
+```
+
+
+```{r immunoscore per patients mean}
+markers_ROI <- markers_ROI %>% 
+  mutate(percentile_score_CD3_i = ntile(percent_CD3_total.i, 100) ) %>% 
+  mutate(percentile_score_CD3_p = ntile(percent_CD3_total.p, 100) ) %>% 
+  mutate(percentile_score_CD8_i = ntile(percent_CD8_total.i, 100) ) %>% 
+  mutate(percentile_score_CD8_p = ntile(percent_CD8_total.p, 100) ) 
+
+markers_ROI <- markers_ROI %>%
+  mutate(percentile_score_mean = rowMeans( markers_ROI[c("percentile_score_CD3_i", "percentile_score_CD3_p", 
+                                                    "percentile_score_CD8_i", "percentile_score_CD8_p")] ))
+markers_ROI <- markers_ROI %>%
+  mutate(immunoscore_patients = case_when(
+    percentile_score_mean <= 10        ~ 0,
+    percentile_score_mean <= 25        ~ 1,
+    percentile_score_mean <= 70        ~ 2,
+    percentile_score_mean <= 95        ~ 3,
+    percentile_score_mean > 95         ~ 4 
+  )) %>% 
+  mutate(immunoscore_patients = factor(immunoscore_patients)) %>% 
+  mutate(immunoscore_2018lancet_patients = case_when(
+    percentile_score_mean <= 25        ~ "Low",
+    percentile_score_mean <= 70        ~ "Intermediate",
+    percentile_score_mean > 70         ~ "High"
+    )) %>% 
+  mutate(immunoscore_2018lancet_patients = factor(immunoscore_2018lancet_patients, levels = c("Low", "Intermediate", "High"))) 
+
+
+```
+
+<div class = "row">
+<div class = "col-md-6">
+```{r, fig.height=8}
+clin_surv <- ROI_global
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
+myplot <- survfit(mysurv~clin_surv$immunoscore_)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "Immunoscore", 
+           legend.labs = c("0", "1", "2", "3", "4"),
+           pval = TRUE, pval.coord = c(1000,.25),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.25,
+           risk.table.title = "Risk table",
+           conf_tmant = FALSE
+)
+
+coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_ + refage + stage, data = clin_surv) %>%
+  tbl_regression(exponentiate = TRUE) %>% bold_p(t = .05)
+
+myplot <- survfit(mysurv~clin_surv$immunoscore_2018lancet)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "Immunoscore", 
+           legend.labs = c("High", "Intermediate", "Low"),
+           pval = TRUE, pval.coord = c(1000,.25),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf_tmant = FALSE
+)
+
+coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_2018lancet + refage + stage, data = clin_surv) %>%
+  tbl_regression(exponentiate = TRUE) %>% bold_p(t = .05)
+
+```
+</div>
+
+<div class = "col-md-6">
+```{r, fig.height=8}
+clin_surv <- markers_ROI
+mysurv <- Surv(time = clin_surv$timelastfu_new, event = clin_surv$surv_vital)
+myplot <- survfit(mysurv~clin_surv$immunoscore_patients)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "Immunoscore_patients", 
+           legend.labs = c("0", "1", "2", "3", "4"),
+           pval = TRUE, pval.coord = c(1000,.25),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.25,
+           risk.table.title = "Risk table",
+           conf_tmant = FALSE
+)
+
+coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_patients + refage + stage, data = clin_surv) %>%
+  tbl_regression(exponentiate = TRUE) %>% bold_p(t = .05)
+
+myplot <- survfit(mysurv~clin_surv$immunoscore_2018lancet_patients)
+ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis",
+           font.main = c(16, "bold", "black"),
+           xlab = "Time (days)", legend.title = "Immunoscore_patients", 
+           legend.labs = c("High", "Intermediate", "Low"),
+           pval = TRUE, pval.coord = c(1000,.25),
+           surv.median.line = c("hv"),
+           risk.table = TRUE,
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           conf_tmant = FALSE
+)
+
+coxph(Surv(time = timelastfu_new, event = surv_vital)~immunoscore_2018lancet_patients + refage + stage, data = clin_surv) %>%
+  tbl_regression(exponentiate = TRUE) %>% bold_p(t = .05)
+
+```
+</div>
+</div>
+
+<br>
+
+
