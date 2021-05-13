@@ -1,6 +1,7 @@
 plan <- drake_plan(
 
   clinical_data = data_import(fs::path("","Volumes","Peres_Research")),
+  tx_data = tx_import(fs::path("","Volumes","Peres_Research")),
   #-----------------------------------------------------------------------------------------------------------------
   ROI_tumor_ = roit_import(fs::path("","Volumes","Peres_Research")),
   

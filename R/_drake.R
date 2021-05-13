@@ -15,14 +15,16 @@ config <- drake_config(plan, parallelism = "future", jobs = 4, verbose = 1)
 if (!interactive()) config
 
 # make(plan)
-loadd(clinical_data, ROI_tumor ,ROI_stroma ,ROI_total ,
+loadd(clinical_data, tx_data,
+      ROI_tumor ,ROI_stroma ,ROI_total ,
       TMA_tumor ,TMA_stroma, TMA_total,
       TMAcases_remove,
       common_ROITMA_IDs, cases_match)
 
 # Cleaning
 rm(fct_name_repair, var_names, # roir_import,
-   data_import, roit_import, rois_import, roi_import, 
+   data_import, tx_import,
+   roit_import, rois_import, roi_import, 
    tmat_import, tmas_import, tma17_import, tma18_import,
    tma2t_import, tma2s_import, common_ROITMA_import, # tmar_import, 
    case_remove_import, binding, match_cases_import,

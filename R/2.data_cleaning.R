@@ -268,6 +268,15 @@ clinical_data$BMI_YA_grp <- factor(clinical_data$BMI_YA_grp, levels = c("20-24",
 
 
 ######################################################################################## Ia ### Add paired_id to clinical----
+tx_data <- tx_data %>% mutate(suid = as.character(suid)) %>% 
+  mutate(across(.cols = where(is.numeric), .fns = ~ na_if(., 88))) %>% 
+  mutate(across(.cols = where(is.numeric), .fns = ~ na_if(., 99)))
+
+clinical_data <- clinical_data %>% 
+  left_join(., tx_data, by = "suid")
+
+
+######################################################################################## Ib ### Add paired_id to clinical----
 # Add paired_id to clinical----
 cases_match <- cases_match %>% mutate(suid = as.character(suid))
 clinical_data <- full_join(cases_match, 
@@ -275,6 +284,7 @@ clinical_data <- full_join(cases_match,
                            by= "suid")
 
 saveRDS(clinical_data, file = "clinical_data.rds")
+
 
 ######################################################################################### II ### Cleaning TMAs, ROIs data----
 # Keep the control slides for comparison?----

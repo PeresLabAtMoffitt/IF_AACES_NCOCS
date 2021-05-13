@@ -15,6 +15,9 @@ clinical_data <-
   read_csv(paste0(path,
       "/K99_R00/Image analysis data/AACES and NCOCS data/aaces_ncocs_08142020.csv"
     ))
+tx_data <- readxl::read_xlsx(paste0(path,
+                           "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/data/AACES_tx_12082020.xlsx"
+))
 #-----------------------------------------------------------------------------------------------------------------
 ROI_tumor <-
   readxl::read_xlsx(paste0(path,
