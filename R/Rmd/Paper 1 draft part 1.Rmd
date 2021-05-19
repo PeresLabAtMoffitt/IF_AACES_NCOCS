@@ -93,7 +93,7 @@ path <- fs::path("","Volumes","Peres_Research","Christelle Colin-Leitzinger", "I
 
 ***
 
-# Table 1.   Patient characteristics overall and by race/ethnicity -- **Not updated yet (BMI, drugs-I may have the wrong file...I saw I am missing some patients+I have other patients that I don't have clinical-need to investigate that)...I actually never worked on the treatment yet so I didn't recode it-on the to do list**
+# Table 1.   Patient characteristics overall and by race/ethnicity
 
 Please double check the BMI classification  
 mutate(BMI_classification = case_when(
@@ -105,9 +105,6 @@ mutate(BMI_classification = case_when(
     BMI_recent >= 40.0 ~ "obesity III"
   ))  
 
-smoking status smokcurrent == smoker  
-
-You don't want suurgery or neo?
 ```{r}
 ROI_global %>% 
   distinct(suid, .keep_all = TRUE) %>% 
@@ -123,6 +120,10 @@ ROI_global %>%
               digits = list(all_continuous() ~ 1)) %>%
       modify_header(list(label ~ "**Patient characteristics**", all_stat_cols() ~ "{level}")) %>% 
   add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
+ROI_i <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral")
+ROI_p <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral")
 ```
 <br>
 
@@ -131,7 +132,7 @@ ROI_global %>%
 
 # Figure 1
 Here each slide is represented (feed 3 values for intratumoral ROI and 3 values for peripheral ROI per patient)  
-Which theme do you prefer? **Changed-You and Nancy prefer that one...I kinda don't! `r emo::ji("joy")` ** 
+The average % tumor in the intratumoral ROIs is `r round(mean(ROI_i$percent_tumor),2)`% and `r round(mean(ROI_i$percent_stroma),2)`% stroma, while for the peripheral ROIs, the average% tumor is `r round(mean(ROI_p$percent_tumor),2)`% and `r round(mean(ROI_p$percent_stroma),2)`% for stroma** 
 
 ```{r}
 p1 <- ROI_global %>% 
@@ -383,59 +384,6 @@ That is done without removing double stained from single.
 
 ```{r new median}
 markers_ROI <- markers_ROI %>% 
-  # mutate(median_CD3_total.i = median(percent_CD3_total.i[percent_CD3_total.i>0])) %>% 
-  # mutate(median_CD8_total.i = median(percent_CD8_total.i[percent_CD8_total.i>0])) %>% 
-  # mutate(median_FoxP3_total.i = median(percent_FoxP3_total.i[percent_FoxP3_total.i>0])) %>% 
-  # mutate(median_CD11b_total.i = median(percent_CD11b_total.i[percent_CD11b_total.i>0])) %>% 
-  # mutate(median_CD15_total.i = median(percent_CD15_total.i[percent_CD15_total.i>0])) %>% 
-  # mutate(median_CD3_CD8_total.i = median(percent_CD3_CD8_total.i[percent_CD3_CD8_total.i>0])) %>% 
-  # mutate(median_CD3_FoxP3_total.i = median(percent_CD3_FoxP3_total.i[percent_CD3_FoxP3_total.i>0])) %>% 
-  # mutate(median_CD11b_CD15_tumor.i = median(percent_CD11b_CD15_tumor.i[percent_CD11b_CD15_tumor.i>0])) %>% 
-  # 
-  # mutate(median_CD3_tumor.i = median(percent_CD3_tumor.i[percent_CD3_tumor.i>0])) %>% 
-  # mutate(median_CD8_tumor.i = median(percent_CD8_tumor.i[percent_CD8_tumor.i>0])) %>% 
-  # mutate(median_FoxP3_tumor.i = median(percent_FoxP3_tumor.i[percent_FoxP3_tumor.i>0])) %>% 
-  # mutate(median_CD11b_tumor.i = median(percent_CD11b_tumor.i[percent_CD11b_tumor.i>0])) %>% 
-  # mutate(median_CD15_tumor.i = median(percent_CD15_tumor.i[percent_CD15_tumor.i>0])) %>% 
-  # mutate(median_CD3_CD8_tumor.i = median(percent_CD3_CD8_tumor.i[percent_CD3_CD8_tumor.i>0])) %>% 
-  # mutate(median_CD3_FoxP3_tumor.i = median(percent_CD3_FoxP3_tumor.i[percent_CD3_FoxP3_tumor.i>0])) %>% 
-  # mutate(median_CD11b_CD15_tumor.i = median(percent_CD11b_CD15_tumor.i[percent_CD11b_CD15_tumor.i>0])) %>% 
-  # 
-  # mutate(median_CD3_stroma.i = median(percent_CD3_stroma.i[percent_CD3_stroma.i>0])) %>% 
-  # mutate(median_CD8_stroma.i = median(percent_CD8_stroma.i[percent_CD8_stroma.i>0])) %>% 
-  # mutate(median_FoxP3_stroma.i = median(percent_FoxP3_stroma.i[percent_FoxP3_stroma.i>0])) %>% 
-  # mutate(median_CD11b_stroma.i = median(percent_CD11b_stroma.i[percent_CD11b_stroma.i>0])) %>% 
-  # mutate(median_CD15_stroma.i = median(percent_CD15_stroma.i[percent_CD15_stroma.i>0])) %>% 
-  # mutate(median_CD3_CD8_stroma.i = median(percent_CD3_CD8_stroma.i[percent_CD3_CD8_stroma.i>0])) %>% 
-  # mutate(median_CD3_FoxP3_stroma.i = median(percent_CD3_FoxP3_stroma.i[percent_CD3_FoxP3_stroma.i>0])) %>% 
-  # mutate(median_CD11b_CD15_tumor.i = median(percent_CD11b_CD15_tumor.i[percent_CD11b_CD15_tumor.i>0])) %>% 
-  # 
-  # mutate(median_CD3_total.p = median(percent_CD3_total.p[percent_CD3_total.p>0])) %>% 
-  # mutate(median_CD8_total.p = median(percent_CD8_total.p[percent_CD8_total.p>0])) %>% 
-  # mutate(median_FoxP3_total.p = median(percent_FoxP3_total.p[percent_FoxP3_total.p>0])) %>% 
-  # mutate(median_CD11b_total.p = median(percent_CD11b_total.p[percent_CD11b_total.p>0])) %>% 
-  # mutate(median_CD15_total.p = median(percent_CD15_total.p[percent_CD15_total.p>0])) %>% 
-  # mutate(median_CD3_CD8_total.p = median(percent_CD3_CD8_total.p[percent_CD3_CD8_total.p>0])) %>% 
-  # mutate(median_CD3_FoxP3_total.p = median(percent_CD3_FoxP3_total.p[percent_CD3_FoxP3_total.p>0])) %>% 
-  # mutate(median_CD11b_CD15_tumor.p = median(percent_CD11b_CD15_tumor.p[percent_CD11b_CD15_tumor.p>0])) %>% 
-  # 
-  # mutate(median_CD3_tumor.p = median(percent_CD3_tumor.p[percent_CD3_tumor.p>0])) %>% 
-  # mutate(median_CD8_tumor.p = median(percent_CD8_tumor.p[percent_CD8_tumor.p>0])) %>% 
-  # mutate(median_FoxP3_tumor.p = median(percent_FoxP3_tumor.p[percent_FoxP3_tumor.p>0])) %>% 
-  # mutate(median_CD11b_tumor.p = median(percent_CD11b_tumor.p[percent_CD11b_tumor.p>0])) %>% 
-  # mutate(median_CD15_tumor.p = median(percent_CD15_tumor.p[percent_CD15_tumor.p>0])) %>% 
-  # mutate(median_CD3_CD8_tumor.p = median(percent_CD3_CD8_tumor.p[percent_CD3_CD8_tumor.p>0])) %>% 
-  # mutate(median_CD3_FoxP3_tumor.p = median(percent_CD3_FoxP3_tumor.p[percent_CD3_FoxP3_tumor.p>0])) %>% 
-  # mutate(median_CD11b_CD15_tumor.p = median(percent_CD11b_CD15_tumor.p[percent_CD11b_CD15_tumor.p>0])) %>% 
-  # 
-  # mutate(median_CD3_stroma.p = median(percent_CD3_stroma.p[percent_CD3_stroma.p>0])) %>% 
-  # mutate(median_CD8_stroma.p = median(percent_CD8_stroma.p[percent_CD8_stroma.p>0])) %>% 
-  # mutate(median_FoxP3_stroma.p = median(percent_FoxP3_stroma.p[percent_FoxP3_stroma.p>0])) %>% 
-  # mutate(median_CD11b_stroma.p = median(percent_CD11b_stroma.p[percent_CD11b_stroma.p>0])) %>% 
-  # mutate(median_CD15_stroma.p = median(percent_CD15_stroma.p[percent_CD15_stroma.p>0])) %>% 
-  # mutate(median_CD3_CD8_stroma.p = median(percent_CD3_CD8_stroma.p[percent_CD3_CD8_stroma.p>0])) %>% 
-  # mutate(median_CD3_FoxP3_stroma.p = median(percent_CD3_FoxP3_stroma.p[percent_CD3_FoxP3_stroma.p>0])) %>% 
-  # mutate(median_CD11b_CD15_tumor.p = median(percent_CD11b_CD15_tumor.p[percent_CD11b_CD15_tumor.p>0])) %>% 
   
   mutate(CD3_tumor.i = case_when(
     percent_CD3_tumor.i == 0       ~ "zero",
@@ -462,6 +410,16 @@ markers_ROI <- markers_ROI %>%
     percent_CD11b_CD15_tumor.i == 0      ~ "Absence",
     percent_CD11b_CD15_tumor.i > 0       ~ "Presence"
   )) %>% 
+  mutate(CD11b_tumor.i3 = case_when(
+    percent_CD11b_tumor.i == 0       ~ "zero",
+    percent_CD11b_tumor.i == 0      ~ "low",
+    percent_CD11b_tumor.i > 0       ~ "high"
+  )) %>% 
+  mutate(CD11b_CD15_tumor.i3 = case_when(
+    percent_CD11b_CD15_tumor.i == 0       ~ "zero",
+    percent_CD11b_CD15_tumor.i == 0      ~ "low",
+    percent_CD11b_CD15_tumor.i > 0       ~ "high"
+  )) %>% 
   mutate(CD3_stroma.i = case_when(
     percent_CD3_stroma.i == 0       ~ "zero",
     percent_CD3_stroma.i <= median(percent_CD3_stroma.i[percent_CD3_stroma.i>0])      ~ "low",
@@ -487,6 +445,16 @@ markers_ROI <- markers_ROI %>%
     percent_CD11b_CD15_stroma.i == 0      ~ "Absence",
     percent_CD11b_CD15_stroma.i > 0       ~ "Presence"
   )) %>% 
+  mutate(CD11b_stroma.i3 = case_when(
+    percent_CD11b_stroma.i == 0       ~ "zero",
+    percent_CD11b_stroma.i == 0      ~ "low",
+    percent_CD11b_stroma.i > 0       ~ "high"
+  )) %>%
+  mutate(CD11b_CD15_stroma.i3 = case_when(
+    percent_CD11b_CD15_stroma.i == 0       ~ "zero",
+    percent_CD11b_CD15_stroma.i == 0      ~ "low",
+    percent_CD11b_CD15_stroma.i > 0       ~ "high"
+  )) %>% 
   mutate(CD3_total.i = case_when(
     percent_CD3_total.i == 0       ~ "zero",
     percent_CD3_total.i <= median(percent_CD3_total.i[percent_CD3_total.i>0])      ~ "low",
@@ -511,6 +479,16 @@ markers_ROI <- markers_ROI %>%
     # percent_CD11b_CD15_total.i == 0       ~ "zero",
     percent_CD11b_CD15_total.i == 0      ~ "Absence",
     percent_CD11b_CD15_total.i > 0       ~ "Presence"
+  )) %>% 
+  mutate(CD11b_total.i3 = case_when(
+    percent_CD11b_total.i == 0       ~ "zero",
+    percent_CD11b_total.i == 0      ~ "low",
+    percent_CD11b_total.i > 0       ~ "high"
+  )) %>% 
+  mutate(CD11b_CD15_total.i3 = case_when(
+    percent_CD11b_CD15_total.i == 0       ~ "zero",
+    percent_CD11b_CD15_total.i == 0      ~ "low",
+    percent_CD11b_CD15_total.i > 0       ~ "high"
   )) %>% 
   
   
@@ -539,6 +517,16 @@ markers_ROI <- markers_ROI %>%
     percent_CD11b_CD15_tumor.p == 0      ~ "Absence",
     percent_CD11b_CD15_tumor.p > 0       ~ "Presence"
   )) %>% 
+  mutate(CD11b_tumor.p3 = case_when(
+    percent_CD11b_tumor.p == 0       ~ "zero",
+    percent_CD11b_tumor.p == 0      ~ "low",
+    percent_CD11b_tumor.p > 0       ~ "high"
+  )) %>% 
+  mutate(CD11b_CD15_tumor.p3 = case_when(
+    percent_CD11b_CD15_tumor.p == 0       ~ "zero",
+    percent_CD11b_CD15_tumor.p == 0      ~ "low",
+    percent_CD11b_CD15_tumor.p > 0       ~ "high"
+  )) %>% 
   mutate(CD3_stroma.p = case_when(
     percent_CD3_stroma.p == 0       ~ "zero",
     percent_CD3_stroma.p <= median(percent_CD3_stroma.p[percent_CD3_stroma.p>0], na.rm = TRUE)      ~ "low",
@@ -564,6 +552,16 @@ markers_ROI <- markers_ROI %>%
     percent_CD11b_CD15_stroma.p == 0      ~ "Absence",
     percent_CD11b_CD15_stroma.p > 0       ~ "Presence"
   )) %>% 
+    mutate(CD11b_stroma.p3 = case_when(
+    percent_CD11b_stroma.p == 0       ~ "zero",
+    percent_CD11b_stroma.p == 0      ~ "low",
+    percent_CD11b_stroma.p > 0       ~ "high"
+  )) %>% 
+  mutate(CD11b_CD15_stroma.p3 = case_when(
+    percent_CD11b_CD15_stroma.p == 0       ~ "zero",
+    percent_CD11b_CD15_stroma.p == 0      ~ "low",
+    percent_CD11b_CD15_stroma.p > 0       ~ "high"
+  )) %>% 
   mutate(CD3_total.p = case_when(
     percent_CD3_total.p == 0       ~ "zero",
     percent_CD3_total.p <= median(percent_CD3_total.p[percent_CD3_total.p>0], na.rm = TRUE)      ~ "low",
@@ -588,6 +586,16 @@ markers_ROI <- markers_ROI %>%
     # percent_CD11b_CD15_total.p == 0       ~ "zero",
     percent_CD11b_CD15_total.p == 0      ~ "Absence",
     percent_CD11b_CD15_total.p > 0       ~ "Presence"
+  )) %>% 
+  mutate(CD11b_total.p3 = case_when(
+    percent_CD11b_total.p == 0       ~ "zero",
+    percent_CD11b_total.p == 0      ~ "low",
+    percent_CD11b_total.p > 0       ~ "high"
+  )) %>% 
+  mutate(CD11b_CD15_total.p3 = case_when(
+    percent_CD11b_CD15_total.p == 0       ~ "zero",
+    percent_CD11b_CD15_total.p == 0      ~ "low",
+    percent_CD11b_CD15_total.p > 0       ~ "high"
   )) 
 
 
@@ -621,9 +629,11 @@ tbl1 <-
   markers_ROI %>% 
   select(CD3_tumor.i, CD3_CD8_tumor.i, CD3_FoxP3_tumor.i, 
               CD11b_tumor.i, CD11b_CD15_tumor.i,
+         CD11b_tumor.i3, CD11b_CD15_tumor.i3,
          race) %>% 
   rename(CD3_tumor = CD3_tumor.i, CD3_CD8_tumor = CD3_CD8_tumor.i,
          CD3_FoxP3_tumor = CD3_FoxP3_tumor.i, 
+         CD11b_tumor3 = CD11b_tumor.i3, CD11b_CD15_tumor3 = CD11b_CD15_tumor.i3,
          CD11b_tumor = CD11b_tumor.i, CD11b_CD15_tumor = CD11b_CD15_tumor.i) %>% 
   tbl_summary(by = race,
               statistic = list(all_continuous() ~ "{mean} ({sd})"),
@@ -636,10 +646,12 @@ tbl2 <-
   markers_ROI %>% 
   select(CD3_stroma.i, CD3_CD8_stroma.i, CD3_FoxP3_stroma.i, 
               CD11b_stroma.i, CD11b_CD15_stroma.i,
-         race) %>% 
+                  CD11b_stroma.i3, CD11b_CD15_stroma.i3,
+race) %>% 
   rename(CD3_stroma = CD3_stroma.i, CD3_CD8_stroma = CD3_CD8_stroma.i,
          CD3_FoxP3_stroma = CD3_FoxP3_stroma.i, 
-         CD11b_stroma = CD11b_stroma.i, CD11b_CD15_stroma = CD11b_CD15_stroma.i) %>% 
+                  CD11b_stroma3 = CD11b_stroma.i3, CD11b_CD15_stroma3 = CD11b_CD15_stroma.i3,
+CD11b_stroma = CD11b_stroma.i, CD11b_CD15_stroma = CD11b_CD15_stroma.i) %>% 
   tbl_summary(by = race,
               statistic = list(all_continuous() ~ "{mean} ({sd})"),
                            label = list(CD3_stroma ~ "percent CD3+", CD3_CD8_stroma ~ "percent CD3+/CD8+",
@@ -651,10 +663,12 @@ tbl3 <-
   markers_ROI %>% 
   select(CD3_total.i, CD3_CD8_total.i, CD3_FoxP3_total.i, 
               CD11b_total.i, CD11b_CD15_total.i,
-         race) %>% 
+                  CD11b_total.i3, CD11b_CD15_total.i3,
+race) %>% 
   rename(CD3_total = CD3_total.i, CD3_CD8_total = CD3_CD8_total.i,
          CD3_FoxP3_total = CD3_FoxP3_total.i, 
-         CD11b_total = CD11b_total.i, CD11b_CD15_total = CD11b_CD15_total.i) %>% 
+                  CD11b_total3 = CD11b_total.i3, CD11b_CD15_total3 = CD11b_CD15_total.i3,
+CD11b_total = CD11b_total.i, CD11b_CD15_total = CD11b_CD15_total.i) %>% 
   tbl_summary(by = race,
               statistic = list(all_continuous() ~ "{mean} ({sd})"),
                            label = list(CD3_total ~ "percent CD3+", CD3_CD8_total ~ "percent CD3+/CD8+",
@@ -668,10 +682,12 @@ tbl5 <-
   markers_ROI %>% 
   select(CD3_tumor.p, CD3_CD8_tumor.p, CD3_FoxP3_tumor.p, 
               CD11b_tumor.p, CD11b_CD15_tumor.p,
-         race) %>% 
+                  CD11b_tumor.p3, CD11b_CD15_tumor.p3,
+race) %>% 
   rename(CD3_tumor = CD3_tumor.p, CD3_CD8_tumor = CD3_CD8_tumor.p,
          CD3_FoxP3_tumor = CD3_FoxP3_tumor.p, 
-         CD11b_tumor = CD11b_tumor.p, CD11b_CD15_tumor = CD11b_CD15_tumor.p) %>% 
+                  CD11b_tumor3 = CD11b_tumor.p3, CD11b_CD15_tumor3 = CD11b_CD15_tumor.p3,
+CD11b_tumor = CD11b_tumor.p, CD11b_CD15_tumor = CD11b_CD15_tumor.p) %>% 
   tbl_summary(by = race,
               statistic = list(all_continuous() ~ "{mean} ({sd})"),
                             label = list(CD3_tumor ~ "percent CD3+", CD3_CD8_tumor ~ "percent CD3+/CD8+",
@@ -683,10 +699,12 @@ tbl6 <-
   markers_ROI %>% 
   select(CD3_stroma.p, CD3_CD8_stroma.p, CD3_FoxP3_stroma.p, 
               CD11b_stroma.p, CD11b_CD15_stroma.p,
-         race) %>% 
+                  CD11b_stroma.p3, CD11b_CD15_stroma.p3,
+race) %>% 
   rename(CD3_stroma = CD3_stroma.p, CD3_CD8_stroma = CD3_CD8_stroma.p,
          CD3_FoxP3_stroma = CD3_FoxP3_stroma.p, 
-         CD11b_stroma = CD11b_stroma.p, CD11b_CD15_stroma = CD11b_CD15_stroma.p) %>% 
+                  CD11b_stroma3 = CD11b_stroma.p3, CD11b_CD15_stroma3 = CD11b_CD15_stroma.p3,
+CD11b_stroma = CD11b_stroma.p, CD11b_CD15_stroma = CD11b_CD15_stroma.p) %>% 
   tbl_summary(by = race,
               statistic = list(all_continuous() ~ "{mean} ({sd})"),
                             label = list(CD3_stroma ~ "percent CD3+", CD3_CD8_stroma ~ "percent CD3+/CD8+",
@@ -698,10 +716,12 @@ tbl7 <-
   markers_ROI %>% 
   select(CD3_total.p, CD3_CD8_total.p, CD3_FoxP3_total.p, 
               CD11b_total.p, CD11b_CD15_total.p,
-         race) %>% 
+                  CD11b_total.p3, CD11b_CD15_total.p3,
+race) %>% 
   rename(CD3_total = CD3_total.p, CD3_CD8_total = CD3_CD8_total.p,
          CD3_FoxP3_total = CD3_FoxP3_total.p, 
-         CD11b_total = CD11b_total.p, CD11b_CD15_total = CD11b_CD15_total.p) %>% 
+                  CD11b_total3 = CD11b_total.p3, CD11b_CD15_total3 = CD11b_CD15_total.p3,
+CD11b_total = CD11b_total.p, CD11b_CD15_total = CD11b_CD15_total.p) %>% 
   tbl_summary(by = race,
               statistic = list(all_continuous() ~ "{mean} ({sd})"),
                             label = list(CD3_total ~ "percent CD3+", CD3_CD8_total ~ "percent CD3+/CD8+",
@@ -771,7 +791,7 @@ markers_ROI <- markers_ROI %>%
 ```
 <br>
 
-## 2.Cluster with a non-defined number of cluster
+## 2.Cluster with a non-defined number of cluster **Yes 5 is the best for when looking at all intra/periph + tumor/stroma**
 
 ```{r clustering}
 set.seed(1234)
