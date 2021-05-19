@@ -10,9 +10,13 @@ data_import <- function(data_path){
   read_csv(paste0(data_path,
               "/K99_R00/Image analysis data/AACES and NCOCS data/aaces_ncocs_08142020.csv"))
 }
-tx_import <- function(data_path){
+tx_import1 <- function(data_path){
   readxl::read_xlsx(paste0(data_path,
                   "/Christelle Colin-Leitzinger/IF_AACES_NCOCS/data/AACES_tx_12082020.xlsx"))
+}
+tx_import2 <- function(data_path){
+  read_csv(paste0(data_path,
+                  "/K99_R00/Image analysis data/AACES and NCOCS data/ncocstreat.csv"))
 }
 #-----------------------------------------------------------------------------------------------------------------
 roit_import <- function(path){
