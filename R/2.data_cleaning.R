@@ -268,13 +268,24 @@ clinical_data$BMI_YA_grp <- factor(clinical_data$BMI_YA_grp, levels = c("20-24",
 
 
 ######################################################################################## Ia ### Add paired_id to clinical----
-tx_data <- tx_data %>% mutate(suid = as.character(suid)) %>% 
-  mutate(across(.cols = where(is.numeric), .fns = ~ na_if(., 88))) %>% 
-  mutate(across(.cols = where(is.numeric), .fns = ~ na_if(., 99)))
+tx_data <- tx_data_aaces %>% mutate(suid = as.character(suid)) #%>% 
+  # mutate(across(.cols = where(is.numeric), .fns = ~ na_if(., 88))) %>% 
+  # mutate(across(.cols = where(is.numeric), .fns = ~ na_if(., 99)))
 
-clinical_data <- clinical_data %>% 
-  left_join(., tx_data, by = "suid")
-
+clinical_data <- right_join(tx_data, clinical_data, by = "suid") %>% 
+  mutate(dblkstat_CA125 = case_when(
+    dblkstat_CA125 == 1                  ~ "optimal debulking",
+    dblkstat_CA125 == 2                  ~ "suboptimal debulking",
+    dblkstat_CA125 == 99                 ~ "unknown",
+    is.na(dblkstat_CA125)                ~ "unknown"
+  )) %>% 
+  mutate(adj = case_when(
+    adj == 1                             ~ "adjuvant chemotherapy",
+    adj == 2                             ~ "no adjuvant chemotherapy",
+    adj %in% c(99, 88)                   ~ "unknown",
+    is.na(adj)                           ~ "unknown"
+  ))
+  
 
 ######################################################################################## Ib ### Add paired_id to clinical----
 # Add paired_id to clinical----
