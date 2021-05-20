@@ -389,17 +389,17 @@ markers_ROI <- markers_ROI %>%
     percent_CD3_tumor.i == 0       ~ "zero",
     percent_CD3_tumor.i <= median(percent_CD3_tumor.i[percent_CD3_tumor.i>0])      ~ "low",
     percent_CD3_tumor.i > median(percent_CD3_tumor.i[percent_CD3_tumor.i>0])       ~ "high > 1.11%"
-  )) %>% 
+  ), CD3_tumor.i = factor(CD3_tumor.i, levels = c("zero","low","high > 1.11%"))) %>% 
   mutate(CD3_CD8_tumor.i = case_when(
     percent_CD3_CD8_tumor.i == 0       ~ "zero",
     percent_CD3_CD8_tumor.i <= median(percent_CD3_CD8_tumor.i[percent_CD3_CD8_tumor.i>0])      ~ "low",
     percent_CD3_CD8_tumor.i > median(percent_CD3_CD8_tumor.i[percent_CD3_CD8_tumor.i>0])       ~ "high > 0.46%"
-  )) %>% 
+  ), CD3_CD8_tumor.i = factor(CD3_CD8_tumor.i, levels = c("zero","low","high > 0.46%"))) %>% 
   mutate(CD3_FoxP3_tumor.i = case_when(
     percent_CD3_FoxP3_tumor.i == 0       ~ "zero",
     percent_CD3_FoxP3_tumor.i <= median(percent_CD3_FoxP3_tumor.i[percent_CD3_FoxP3_tumor.i>0])      ~ "low",
     percent_CD3_FoxP3_tumor.i > median(percent_CD3_FoxP3_tumor.i[percent_CD3_FoxP3_tumor.i>0])       ~ "high > 0.19%"
-  )) %>% 
+  ), CD3_FoxP3_tumor.i = factor(CD3_FoxP3_tumor.i, levels = c("zero","low","high > 0.19%"))) %>% 
   mutate(CD11b_tumor.i = case_when(
     # percent_CD11b_tumor.i == 0       ~ "zero",
     percent_CD11b_tumor.i == 0      ~ "Absence",
@@ -412,29 +412,29 @@ markers_ROI <- markers_ROI %>%
   )) %>% 
   mutate(CD11b_tumor.i3 = case_when(
     percent_CD11b_tumor.i == 0       ~ "zero",
-    percent_CD11b_tumor.i == 0      ~ "low",
-    percent_CD11b_tumor.i > 0       ~ "high"
-  )) %>% 
+    percent_CD11b_tumor.i <= median(percent_CD11b_tumor.i[percent_CD11b_tumor.i>0])      ~ "low",
+    percent_CD11b_tumor.i > median(percent_CD11b_tumor.i[percent_CD11b_tumor.i>0])       ~ "high"
+  ), CD11b_tumor.i3 = factor(CD11b_tumor.i3, levels = c("zero","low","high"))) %>% 
   mutate(CD11b_CD15_tumor.i3 = case_when(
     percent_CD11b_CD15_tumor.i == 0       ~ "zero",
-    percent_CD11b_CD15_tumor.i == 0      ~ "low",
-    percent_CD11b_CD15_tumor.i > 0       ~ "high"
-  )) %>% 
+    percent_CD11b_CD15_tumor.i <= median(percent_CD11b_CD15_tumor.i[percent_CD11b_CD15_tumor.i>0])      ~ "low",
+    percent_CD11b_CD15_tumor.i > median(percent_CD11b_CD15_tumor.i[percent_CD11b_CD15_tumor.i>0])       ~ "high"
+  ), CD11b_CD15_tumor.i3 = factor(CD11b_CD15_tumor.i3, levels = c("zero","low","high"))) %>% 
   mutate(CD3_stroma.i = case_when(
     percent_CD3_stroma.i == 0       ~ "zero",
     percent_CD3_stroma.i <= median(percent_CD3_stroma.i[percent_CD3_stroma.i>0])      ~ "low",
     percent_CD3_stroma.i > median(percent_CD3_stroma.i[percent_CD3_stroma.i>0])       ~ "high > 4.17%"
-  )) %>% 
+  ), CD3_stroma.i = factor(CD3_stroma.i, levels = c("zero","low","high > 4.17%"))) %>% 
   mutate(CD3_CD8_stroma.i = case_when(
     percent_CD3_CD8_stroma.i == 0       ~ "zero",
     percent_CD3_CD8_stroma.i <= median(percent_CD3_CD8_stroma.i[percent_CD3_CD8_stroma.i>0])      ~ "low",
     percent_CD3_CD8_stroma.i > median(percent_CD3_CD8_stroma.i[percent_CD3_CD8_stroma.i>0])       ~ "high > 1.46%"
-  )) %>% 
+  ), CD3_CD8_stroma.i = factor(CD3_CD8_stroma.i, levels = c("zero","low","high > 1.46%"))) %>% 
   mutate(CD3_FoxP3_stroma.i = case_when(
     percent_CD3_FoxP3_stroma.i == 0       ~ "zero",
     percent_CD3_FoxP3_stroma.i <= median(percent_CD3_FoxP3_stroma.i[percent_CD3_FoxP3_stroma.i>0])      ~ "low",
     percent_CD3_FoxP3_stroma.i > median(percent_CD3_FoxP3_stroma.i[percent_CD3_FoxP3_stroma.i>0])       ~ "high > 0.78%"
-  )) %>% 
+  ), CD3_FoxP3_stroma.i = factor(CD3_FoxP3_stroma.i, levels = c("zero","low","high > 0.78%"))) %>% 
   mutate(CD11b_stroma.i = case_when(
     # percent_CD11b_stroma.i == 0       ~ "zero",
     percent_CD11b_stroma.i == 0      ~ "Absence",
@@ -447,29 +447,29 @@ markers_ROI <- markers_ROI %>%
   )) %>% 
   mutate(CD11b_stroma.i3 = case_when(
     percent_CD11b_stroma.i == 0       ~ "zero",
-    percent_CD11b_stroma.i == 0      ~ "low",
-    percent_CD11b_stroma.i > 0       ~ "high"
-  )) %>%
+    percent_CD11b_stroma.i <= median(percent_CD11b_stroma.i[percent_CD11b_stroma.i>0])      ~ "low",
+    percent_CD11b_stroma.i > median(percent_CD11b_stroma.i[percent_CD11b_stroma.i>0])       ~ "high"
+  ), CD11b_stroma.i3 = factor(CD11b_stroma.i3, levels = c("zero","low","high"))) %>%
   mutate(CD11b_CD15_stroma.i3 = case_when(
     percent_CD11b_CD15_stroma.i == 0       ~ "zero",
-    percent_CD11b_CD15_stroma.i == 0      ~ "low",
-    percent_CD11b_CD15_stroma.i > 0       ~ "high"
-  )) %>% 
+    percent_CD11b_CD15_stroma.i <= median(percent_CD11b_CD15_stroma.i[percent_CD11b_CD15_stroma.i>0])      ~ "low",
+    percent_CD11b_CD15_stroma.i > median(percent_CD11b_CD15_stroma.i[percent_CD11b_CD15_stroma.i>0])       ~ "high"
+  ), CD11b_CD15_stroma.i3 = factor(CD11b_CD15_stroma.i3, levels = c("zero","low","high"))) %>% 
   mutate(CD3_total.i = case_when(
     percent_CD3_total.i == 0       ~ "zero",
     percent_CD3_total.i <= median(percent_CD3_total.i[percent_CD3_total.i>0])      ~ "low",
     percent_CD3_total.i > median(percent_CD3_total.i[percent_CD3_total.i>0])       ~ "high > 1.46%"
-  )) %>% 
+  ), CD3_total.i = factor(CD3_total.i, levels = c("zero","low","high > 1.46%"))) %>% 
   mutate(CD3_CD8_total.i = case_when(
     percent_CD3_CD8_total.i == 0       ~ "zero",
     percent_CD3_CD8_total.i <= median(percent_CD3_CD8_total.i[percent_CD3_CD8_total.i>0])      ~ "low",
     percent_CD3_CD8_total.i > median(percent_CD3_CD8_total.i[percent_CD3_CD8_total.i>0])       ~ "high > 0.56%"
-  )) %>% 
+  ), CD3_CD8_total.i = factor(CD3_CD8_total.i, levels = c("zero","low","high > 0.56%"))) %>% 
   mutate(CD3_FoxP3_total.i = case_when(
     percent_CD3_FoxP3_total.i == 0       ~ "zero",
     percent_CD3_FoxP3_total.i <= median(percent_CD3_FoxP3_total.i[percent_CD3_FoxP3_total.i>0])      ~ "low",
     percent_CD3_FoxP3_total.i > median(percent_CD3_FoxP3_total.i[percent_CD3_FoxP3_total.i>0])       ~ "high > 0.23%"
-  )) %>% 
+  ), CD3_FoxP3_total.i = factor(CD3_FoxP3_total.i, levels = c("zero","low","high > 0.23%"))) %>% 
   mutate(CD11b_total.i = case_when(
     # percent_CD11b_total.i == 0       ~ "zero",
     percent_CD11b_total.i == 0      ~ "Absence",
@@ -482,31 +482,31 @@ markers_ROI <- markers_ROI %>%
   )) %>% 
   mutate(CD11b_total.i3 = case_when(
     percent_CD11b_total.i == 0       ~ "zero",
-    percent_CD11b_total.i == 0      ~ "low",
-    percent_CD11b_total.i > 0       ~ "high"
-  )) %>% 
+    percent_CD11b_total.i <= median(percent_CD11b_total.i[percent_CD11b_total.i>0])      ~ "low",
+    percent_CD11b_total.i > median(percent_CD11b_total.i[percent_CD11b_total.i>0])       ~ "high"
+  ), CD11b_total.i3 = factor(CD11b_total.i3, levels = c("zero","low","high"))) %>% 
   mutate(CD11b_CD15_total.i3 = case_when(
     percent_CD11b_CD15_total.i == 0       ~ "zero",
-    percent_CD11b_CD15_total.i == 0      ~ "low",
-    percent_CD11b_CD15_total.i > 0       ~ "high"
-  )) %>% 
+    percent_CD11b_CD15_total.i <= median(percent_CD11b_CD15_total.i[percent_CD11b_CD15_total.i>0])      ~ "low",
+    percent_CD11b_CD15_total.i > median(percent_CD11b_CD15_total.i[percent_CD11b_CD15_total.i>0])       ~ "high"
+  ), CD11b_CD15_total.i3 = factor(CD11b_CD15_total.i3, levels = c("zero","low","high"))) %>% 
   
   
   mutate(CD3_tumor.p = case_when(
     percent_CD3_tumor.p == 0       ~ "zero",
     percent_CD3_tumor.p <= median(percent_CD3_tumor.p[percent_CD3_tumor.p>0], na.rm = TRUE)      ~ "low",
     percent_CD3_tumor.p > median(percent_CD3_tumor.p[percent_CD3_tumor.p>0], na.rm = TRUE)       ~ "high > 1.98%"
-  )) %>% 
+  ), CD3_tumor.p = factor(CD3_tumor.p, levels = c("zero","low","high > 1.98%"))) %>% 
   mutate(CD3_CD8_tumor.p = case_when(
     percent_CD3_CD8_tumor.p == 0       ~ "zero",
     percent_CD3_CD8_tumor.p <= median(percent_CD3_CD8_tumor.p[percent_CD3_CD8_tumor.p>0], na.rm = TRUE)      ~ "low",
     percent_CD3_CD8_tumor.p > median(percent_CD3_CD8_tumor.p[percent_CD3_CD8_tumor.p>0], na.rm = TRUE)       ~ "high > 0.94%"
-  )) %>% 
+  ), CD3_CD8_tumor.p = factor(CD3_CD8_tumor.p, levels = c("zero","low","high > 0.94%"))) %>% 
   mutate(CD3_FoxP3_tumor.p = case_when(
     percent_CD3_FoxP3_tumor.p == 0       ~ "zero",
     percent_CD3_FoxP3_tumor.p <= median(percent_CD3_FoxP3_tumor.p[percent_CD3_FoxP3_tumor.p>0], na.rm = TRUE)      ~ "low",
     percent_CD3_FoxP3_tumor.p > median(percent_CD3_FoxP3_tumor.p[percent_CD3_FoxP3_tumor.p>0], na.rm = TRUE)       ~ "high > 0.35%"
-  )) %>% 
+  ), CD3_FoxP3_tumor.p = factor(CD3_FoxP3_tumor.p, levels = c("zero","low","high > 0.35%"))) %>% 
   mutate(CD11b_tumor.p = case_when(
     # percent_CD11b_tumor.p == 0       ~ "zero",
     percent_CD11b_tumor.p == 0      ~ "Absence",
@@ -519,29 +519,29 @@ markers_ROI <- markers_ROI %>%
   )) %>% 
   mutate(CD11b_tumor.p3 = case_when(
     percent_CD11b_tumor.p == 0       ~ "zero",
-    percent_CD11b_tumor.p == 0      ~ "low",
-    percent_CD11b_tumor.p > 0       ~ "high"
-  )) %>% 
+    percent_CD11b_tumor.p <= median(percent_CD11b_tumor.p[percent_CD11b_tumor.p>0])      ~ "low",
+    percent_CD11b_tumor.p > median(percent_CD11b_tumor.p[percent_CD11b_tumor.p>0])         ~ "high"
+  ), CD11b_tumor.p3 = factor(CD11b_tumor.p3, levels = c("zero","low","high"))) %>% 
   mutate(CD11b_CD15_tumor.p3 = case_when(
     percent_CD11b_CD15_tumor.p == 0       ~ "zero",
-    percent_CD11b_CD15_tumor.p == 0      ~ "low",
-    percent_CD11b_CD15_tumor.p > 0       ~ "high"
-  )) %>% 
+    percent_CD11b_CD15_tumor.p <= median(percent_CD11b_CD15_tumor.p[percent_CD11b_CD15_tumor.p>0])      ~ "low",
+    percent_CD11b_CD15_tumor.p > median(percent_CD11b_CD15_tumor.p[percent_CD11b_CD15_tumor.p>0])       ~ "high"
+  ), CD11b_CD15_tumor.p3 = factor(CD11b_CD15_tumor.p3, levels = c("zero","low","high"))) %>% 
   mutate(CD3_stroma.p = case_when(
     percent_CD3_stroma.p == 0       ~ "zero",
     percent_CD3_stroma.p <= median(percent_CD3_stroma.p[percent_CD3_stroma.p>0], na.rm = TRUE)      ~ "low",
     percent_CD3_stroma.p > median(percent_CD3_stroma.p[percent_CD3_stroma.p>0], na.rm = TRUE)       ~ "high > 8.31%"
-  )) %>% 
+  ), CD3_stroma.p = factor(CD3_stroma.p, levels = c("zero","low","high > 8.31%"))) %>% 
   mutate(CD3_CD8_stroma.p = case_when(
     percent_CD3_CD8_stroma.p == 0       ~ "zero",
     percent_CD3_CD8_stroma.p <= median(percent_CD3_CD8_stroma.p[percent_CD3_CD8_stroma.p>0], na.rm = TRUE)      ~ "low",
     percent_CD3_CD8_stroma.p > median(percent_CD3_CD8_stroma.p[percent_CD3_CD8_stroma.p>0], na.rm = TRUE)       ~ "high > 2.85%"
-  )) %>% 
+  ), CD3_CD8_stroma.p = factor(CD3_CD8_stroma.p, levels = c("zero","low","high > 2.85%"))) %>% 
   mutate(CD3_FoxP3_stroma.p = case_when(
     percent_CD3_FoxP3_stroma.p == 0       ~ "zero",
     percent_CD3_FoxP3_stroma.p <= median(percent_CD3_FoxP3_stroma.p[percent_CD3_FoxP3_stroma.p>0], na.rm = TRUE)      ~ "low",
     percent_CD3_FoxP3_stroma.p > median(percent_CD3_FoxP3_stroma.p[percent_CD3_FoxP3_stroma.p>0], na.rm = TRUE)       ~ "high > 0.60%"
-  )) %>% 
+  ), CD3_FoxP3_stroma.p = factor(CD3_FoxP3_stroma.p, levels = c("zero","low","high > 0.60%"))) %>% 
   mutate(CD11b_stroma.p = case_when(
     # percent_CD11b_stroma.p == 0       ~ "zero",
     percent_CD11b_stroma.p == 0      ~ "Absence",
@@ -554,29 +554,29 @@ markers_ROI <- markers_ROI %>%
   )) %>% 
     mutate(CD11b_stroma.p3 = case_when(
     percent_CD11b_stroma.p == 0       ~ "zero",
-    percent_CD11b_stroma.p == 0      ~ "low",
-    percent_CD11b_stroma.p > 0       ~ "high"
-  )) %>% 
+    percent_CD11b_stroma.p <= median(percent_CD11b_stroma.p[percent_CD11b_stroma.p>0])      ~ "low",
+    percent_CD11b_stroma.p > median(percent_CD11b_stroma.p[percent_CD11b_stroma.p>0])       ~ "high"
+  ), CD11b_stroma.p3 = factor(CD11b_stroma.p3, levels = c("zero","low","high"))) %>% 
   mutate(CD11b_CD15_stroma.p3 = case_when(
     percent_CD11b_CD15_stroma.p == 0       ~ "zero",
-    percent_CD11b_CD15_stroma.p == 0      ~ "low",
-    percent_CD11b_CD15_stroma.p > 0       ~ "high"
-  )) %>% 
+    percent_CD11b_CD15_stroma.p <= median(percent_CD11b_CD15_stroma.p[percent_CD11b_CD15_stroma.p>0])      ~ "low",
+    percent_CD11b_CD15_stroma.p > median(percent_CD11b_CD15_stroma.p[percent_CD11b_CD15_stroma.p>0])       ~ "high"
+  ), CD11b_CD15_stroma.p3 = factor(CD11b_CD15_stroma.p3, levels = c("zero","low","high"))) %>% 
   mutate(CD3_total.p = case_when(
     percent_CD3_total.p == 0       ~ "zero",
     percent_CD3_total.p <= median(percent_CD3_total.p[percent_CD3_total.p>0], na.rm = TRUE)      ~ "low",
     percent_CD3_total.p > median(percent_CD3_total.p[percent_CD3_total.p>0], na.rm = TRUE)       ~ "high > 5.64%"
-  )) %>% 
+  ), CD3_total.p = factor(CD3_total.p, levels = c("zero","low","high > 5.64%"))) %>% 
   mutate(CD3_CD8_total.p = case_when(
     percent_CD3_CD8_total.p == 0       ~ "zero",
     percent_CD3_CD8_total.p <= median(percent_CD3_CD8_total.p[percent_CD3_CD8_total.p>0], na.rm = TRUE)      ~ "low",
     percent_CD3_CD8_total.p > median(percent_CD3_CD8_total.p[percent_CD3_CD8_total.p>0], na.rm = TRUE)       ~ "high > 2.03%"
-  )) %>% 
+  ), CD3_CD8_total.p = factor(CD3_CD8_total.p, levels = c("zero","low","high > 2.03%"))) %>% 
   mutate(CD3_FoxP3_total.p = case_when(
     percent_CD3_FoxP3_total.p == 0       ~ "zero",
     percent_CD3_FoxP3_total.p <= median(percent_CD3_FoxP3_total.p[percent_CD3_FoxP3_total.p>0], na.rm = TRUE)      ~ "low",
     percent_CD3_FoxP3_total.p > median(percent_CD3_FoxP3_total.p[percent_CD3_FoxP3_total.p>0], na.rm = TRUE)       ~ "high > 0.47%"
-  )) %>% 
+  ), CD3_FoxP3_total.p = factor(CD3_FoxP3_total.p, levels = c("zero","low","high > 0.47%"))) %>% 
   mutate(CD11b_total.p = case_when(
     # percent_CD11b_total.p == 0       ~ "zero",
     percent_CD11b_total.p == 0      ~ "Absence",
@@ -589,15 +589,14 @@ markers_ROI <- markers_ROI %>%
   )) %>% 
   mutate(CD11b_total.p3 = case_when(
     percent_CD11b_total.p == 0       ~ "zero",
-    percent_CD11b_total.p == 0      ~ "low",
-    percent_CD11b_total.p > 0       ~ "high"
-  )) %>% 
+    percent_CD11b_total.p <= median(percent_CD11b_total.p[percent_CD11b_total.p>0])      ~ "low",
+    percent_CD11b_total.p > median(percent_CD11b_total.p[percent_CD11b_total.p>0])       ~ "high"
+  ), CD11b_total.p3 = factor(CD11b_total.p3, levels = c("zero","low","high"))) %>% 
   mutate(CD11b_CD15_total.p3 = case_when(
     percent_CD11b_CD15_total.p == 0       ~ "zero",
-    percent_CD11b_CD15_total.p == 0      ~ "low",
-    percent_CD11b_CD15_total.p > 0       ~ "high"
-  )) 
-
+    percent_CD11b_CD15_total.p <= median(percent_CD11b_CD15_total.p[percent_CD11b_CD15_total.p>0])      ~ "low",
+    percent_CD11b_CD15_total.p > median(percent_CD11b_CD15_total.p[percent_CD11b_CD15_total.p>0])       ~ "high"
+  ), CD11b_CD15_total.p3 = factor(CD11b_CD15_total.p3, levels = c("zero","low","high"))) 
 
 
 
@@ -745,6 +744,51 @@ NB: I did the 3 grp for CD11 and CD11/CD15 and I had a significative difference 
 
 ***
 
+# Immunoscore
+When we decided for every group I can put cluster and immunoscore together in the same table.
+I took the immunoscore calculated on the mean of the 3 value per patient.
+```{r immunoscore per patients mean}
+markers_ROI <- markers_ROI %>% 
+  mutate(percentile_score_CD3_i = ntile(percent_CD3_total.i, 100) ) %>% 
+  mutate(percentile_score_CD3_p = ntile(percent_CD3_total.p, 100) ) %>% 
+  mutate(percentile_score_CD8_i = ntile(percent_CD8_total.i, 100) ) %>% 
+  mutate(percentile_score_CD8_p = ntile(percent_CD8_total.p, 100) ) 
+
+markers_ROI <- markers_ROI %>%
+  mutate(percentile_score_mean = rowMeans( markers_ROI[c("percentile_score_CD3_i", "percentile_score_CD3_p", 
+                                                    "percentile_score_CD8_i", "percentile_score_CD8_p")] ))
+markers_ROI <- markers_ROI %>%
+  mutate(immunoscore_patients = case_when(
+    percentile_score_mean <= 10        ~ 0,
+    percentile_score_mean <= 25        ~ 1,
+    percentile_score_mean <= 70        ~ 2,
+    percentile_score_mean <= 95        ~ 3,
+    percentile_score_mean > 95         ~ 4 
+  )) %>% 
+  mutate(immunoscore_patients = factor(immunoscore_patients)) %>% 
+  mutate(immunoscore_2018lancet_patients = case_when(
+    percentile_score_mean <= 25        ~ "Low",
+    percentile_score_mean <= 70        ~ "Intermediate",
+    percentile_score_mean > 70         ~ "High"
+    )) %>% 
+  mutate(immunoscore_2018lancet_patients = factor(immunoscore_2018lancet_patients, levels = c("Low", "Intermediate", "High"))) 
+```
+
+```{r Table immunoscore}
+markers_ROI %>% 
+  select(immunoscore_patients, immunoscore_2018lancet_patients,
+         race) %>% 
+  tbl_summary(by = race,
+              label = list(immunoscore_patients ~ "classic immunoscore", 
+                           immunoscore_2018lancet_patients ~ "immunoscore lancet"),
+              missing = "no") %>% 
+  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
+```
+<b>
+
+***
+<br>
+
 # Cluster
 
 The count of cells double stained (for example CD3+CD8+) **ARE** substracted fronm the single stain count (CD3 alone and CD8 alone) to avoid overlapping if we want to use them to cluster.  
@@ -791,7 +835,7 @@ markers_ROI <- markers_ROI %>%
 ```
 <br>
 
-## 2.Cluster with a non-defined number of cluster **Yes 5 is the best for when looking at all intra/periph + tumor/stroma**
+## 2.Cluster with a non-defined number of cluster **Yes 5 is the best for when looking at all intra/periph + tumor/stroma (CD3, CD8, CD3/8, FoxP3, CD3/FoxP3, CD11b, CD15, CD11b/15)**
 
 ```{r clustering}
 set.seed(1234)
@@ -863,54 +907,15 @@ markers_ROI %>%
   add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
 ```
 
-# Immunoscore
-When we decided for every group I can put cluster and immunoscore together in the same table.
-I took the immunoscore calculated on the mean of the 3 value per patient.
-```{r immunoscore per patients mean}
-markers_ROI <- markers_ROI %>% 
-  mutate(percentile_score_CD3_i = ntile(percent_CD3_total.i, 100) ) %>% 
-  mutate(percentile_score_CD3_p = ntile(percent_CD3_total.p, 100) ) %>% 
-  mutate(percentile_score_CD8_i = ntile(percent_CD8_total.i, 100) ) %>% 
-  mutate(percentile_score_CD8_p = ntile(percent_CD8_total.p, 100) ) 
 
-markers_ROI <- markers_ROI %>%
-  mutate(percentile_score_mean = rowMeans( markers_ROI[c("percentile_score_CD3_i", "percentile_score_CD3_p", 
-                                                    "percentile_score_CD8_i", "percentile_score_CD8_p")] ))
-markers_ROI <- markers_ROI %>%
-  mutate(immunoscore_patients = case_when(
-    percentile_score_mean <= 10        ~ 0,
-    percentile_score_mean <= 25        ~ 1,
-    percentile_score_mean <= 70        ~ 2,
-    percentile_score_mean <= 95        ~ 3,
-    percentile_score_mean > 95         ~ 4 
-  )) %>% 
-  mutate(immunoscore_patients = factor(immunoscore_patients)) %>% 
-  mutate(immunoscore_2018lancet_patients = case_when(
-    percentile_score_mean <= 25        ~ "Low",
-    percentile_score_mean <= 70        ~ "Intermediate",
-    percentile_score_mean > 70         ~ "High"
-    )) %>% 
-  mutate(immunoscore_2018lancet_patients = factor(immunoscore_2018lancet_patients, levels = c("Low", "Intermediate", "High"))) 
-```
-
-```{r Table immunoscore}
-markers_ROI %>% 
-  select(immunoscore_patients, immunoscore_2018lancet_patients,
-         race) %>% 
-  tbl_summary(by = race,
-              label = list(immunoscore_patients ~ "classic immunoscore", 
-                           immunoscore_2018lancet_patients ~ "immunoscore lancet"),
-              missing = "no") %>% 
-  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
-```
-
-# Table 3. Adjusted hazard ratios1 and 95% confidence intervals
+# Table 3. Adjusted hazard ratios and 95% confidence intervals
 
 ```{r}
 markers_ROI_o <- markers_ROI %>% 
   rename(CD3 = CD3_total.i, CD3_CD8 = CD3_CD8_total.i,
          CD3_FoxP3 = CD3_FoxP3_total.i, 
-         CD11b = CD11b_total.i, CD11b_CD15 = CD11b_CD15_total.i)
+         CD11b = CD11b_total.i, CD11b_CD15 = CD11b_CD15_total.i,
+         CD11b_3 = CD11b_total.i3, CD11b_CD15_3 = CD11b_CD15_total.i3)
   
 tbl1 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
                    event = markers_ROI$surv_vital) ~ CD3 + stage + refage + race, data =  markers_ROI_o)  %>% 
@@ -932,12 +937,21 @@ tbl5 <- coxph(Surv(time = markers_ROI$timelastfu_new,
                    event = markers_ROI$surv_vital) ~ CD11b_CD15 + stage + refage + race, data =  markers_ROI_o) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level")
-tbl10 <- tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5))
+tbl6 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
+                   event = markers_ROI$surv_vital) ~ CD11b_3 + stage + refage + race, data =  markers_ROI_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_3) %>% bold_p(t = .05) %>% add_nevent(location = "level")
+tbl7 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
+                   event = markers_ROI$surv_vital) ~ CD11b_CD15_3 + stage + refage + race, data =  markers_ROI_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15_3) %>% bold_p(t = .05) %>% add_nevent(location = "level")
+tbl10 <- tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5, tbl6, tbl7))
 
 markers_ROI_t <- markers_ROI %>% 
   rename(CD3 = CD3_tumor.i, CD3_CD8 = CD3_CD8_tumor.i,
          CD3_FoxP3 = CD3_FoxP3_tumor.i, 
-         CD11b = CD11b_tumor.i, CD11b_CD15 = CD11b_CD15_tumor.i)
+         CD11b = CD11b_tumor.i, CD11b_CD15 = CD11b_CD15_tumor.i,
+         CD11b_3 = CD11b_tumor.i3, CD11b_CD15_3 = CD11b_CD15_tumor.i3)
   
 tbl1 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
                    event = markers_ROI$surv_vital) ~ CD3 + stage + refage + race, data =  markers_ROI_t)  %>% 
@@ -959,12 +973,21 @@ tbl5 <- coxph(Surv(time = markers_ROI$timelastfu_new,
                    event = markers_ROI$surv_vital) ~ CD11b_CD15 + stage + refage + race, data =  markers_ROI_t) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level")
-tbl11 <- tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5))
+tbl6 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
+                   event = markers_ROI$surv_vital) ~ CD11b_3 + stage + refage + race, data =  markers_ROI_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_3) %>% bold_p(t = .05) %>% add_nevent(location = "level")
+tbl7 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
+                   event = markers_ROI$surv_vital) ~ CD11b_CD15_3 + stage + refage + race, data =  markers_ROI_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15_3) %>% bold_p(t = .05) %>% add_nevent(location = "level")
+tbl11 <- tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5, tbl6, tbl7))
 
 markers_ROI_s <- markers_ROI %>% 
   rename(CD3 = CD3_stroma.i, CD3_CD8 = CD3_CD8_stroma.i,
          CD3_FoxP3 = CD3_FoxP3_stroma.i, 
-         CD11b = CD11b_stroma.i, CD11b_CD15 = CD11b_CD15_stroma.i)
+         CD11b = CD11b_stroma.i, CD11b_CD15 = CD11b_CD15_stroma.i,
+         CD11b_3 = CD11b_stroma.i3, CD11b_CD15_3 = CD11b_CD15_stroma.i3)
 
 tbl1 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
                    event = markers_ROI$surv_vital) ~ CD3 + stage + refage + race, data =  markers_ROI_s) %>%
@@ -986,15 +1009,24 @@ tbl5 <- coxph(Surv(time = markers_ROI$timelastfu_new,
                    event = markers_ROI$surv_vital) ~ CD11b_CD15 + stage + refage + race, data =  markers_ROI_s) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level")
-tbl12 <- tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5))
-tbl13 <- tbl_merge(list(tbl10, tbl11, tbl12), tab_spanner = c("**Overall**", "**Tumor**", "**Stroma**"))
+tbl6 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
+                   event = markers_ROI$surv_vital) ~ CD11b_3 + stage + refage + race, data =  markers_ROI_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_3) %>% bold_p(t = .05) %>% add_nevent(location = "level")
+tbl7 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
+                   event = markers_ROI$surv_vital) ~ CD11b_CD15_3 + stage + refage + race, data =  markers_ROI_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15_3) %>% bold_p(t = .05) %>% add_nevent(location = "level")
+tbl12 <- tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5, tbl6, tbl7))
+# tbl13 <- tbl_merge(list(tbl10, tbl11, tbl12), tab_spanner = c("**Overall**", "**Tumor**", "**Stroma**"))
 
 
 
 markers_ROI_o <- markers_ROI %>% 
   rename(CD3 = CD3_total.p, CD3_CD8 = CD3_CD8_total.p,
          CD3_FoxP3 = CD3_FoxP3_total.p, 
-         CD11b = CD11b_total.p, CD11b_CD15 = CD11b_CD15_total.p)
+         CD11b = CD11b_total.p, CD11b_CD15 = CD11b_CD15_total.p,
+         CD11b_3 = CD11b_total.p3, CD11b_CD15_3 = CD11b_CD15_total.p3)
   
 tbl1 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
                    event = markers_ROI$surv_vital) ~ CD3 + stage + refage + race, data =  markers_ROI_o)  %>% 
@@ -1016,12 +1048,21 @@ tbl5 <- coxph(Surv(time = markers_ROI$timelastfu_new,
                    event = markers_ROI$surv_vital) ~ CD11b_CD15 + stage + refage + race, data =  markers_ROI_o) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level")
-tbl10 <- tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5))
+tbl6 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
+                   event = markers_ROI$surv_vital) ~ CD11b_3 + stage + refage + race, data =  markers_ROI_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_3) %>% bold_p(t = .05) %>% add_nevent(location = "level")
+tbl7 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
+                   event = markers_ROI$surv_vital) ~ CD11b_CD15_3 + stage + refage + race, data =  markers_ROI_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15_3) %>% bold_p(t = .05) %>% add_nevent(location = "level")
+tbl13 <- tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5, tbl6, tbl7))
 
 markers_ROI_t <- markers_ROI %>% 
   rename(CD3 = CD3_tumor.p, CD3_CD8 = CD3_CD8_tumor.p,
          CD3_FoxP3 = CD3_FoxP3_tumor.p, 
-         CD11b = CD11b_tumor.p, CD11b_CD15 = CD11b_CD15_tumor.p)
+         CD11b = CD11b_tumor.p, CD11b_CD15 = CD11b_CD15_tumor.p,
+         CD11b_3 = CD11b_tumor.p3, CD11b_CD15_3 = CD11b_CD15_tumor.p3)
   
 tbl1 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
                    event = markers_ROI$surv_vital) ~ CD3 + stage + refage + race, data =  markers_ROI_t)  %>% 
@@ -1043,12 +1084,21 @@ tbl5 <- coxph(Surv(time = markers_ROI$timelastfu_new,
                    event = markers_ROI$surv_vital) ~ CD11b_CD15 + stage + refage + race, data =  markers_ROI_t) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level")
-tbl11 <- tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5))
+tbl6 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
+                   event = markers_ROI$surv_vital) ~ CD11b_3 + stage + refage + race, data =  markers_ROI_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_3) %>% bold_p(t = .05) %>% add_nevent(location = "level")
+tbl7 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
+                   event = markers_ROI$surv_vital) ~ CD11b_CD15_3 + stage + refage + race, data =  markers_ROI_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15_3) %>% bold_p(t = .05) %>% add_nevent(location = "level")
+tbl14 <- tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5, tbl6, tbl7))
 
 markers_ROI_s <- markers_ROI %>% 
   rename(CD3 = CD3_stroma.p, CD3_CD8 = CD3_CD8_stroma.p,
          CD3_FoxP3 = CD3_FoxP3_stroma.p, 
-         CD11b = CD11b_stroma.p, CD11b_CD15 = CD11b_CD15_stroma.p)
+         CD11b = CD11b_stroma.p, CD11b_CD15 = CD11b_CD15_stroma.p,
+         CD11b_3 = CD11b_stroma.p3, CD11b_CD15_3 = CD11b_CD15_stroma.p3)
 
 tbl1 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
                    event = markers_ROI$surv_vital) ~ CD3 + stage + refage + race, data =  markers_ROI_s) %>%
@@ -1070,11 +1120,34 @@ tbl5 <- coxph(Surv(time = markers_ROI$timelastfu_new,
                    event = markers_ROI$surv_vital) ~ CD11b_CD15 + stage + refage + race, data =  markers_ROI_s) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level")
-tbl12 <- tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5))
-tbl14 <- tbl_merge(list(tbl10, tbl11, tbl12), tab_spanner = c("**Overall**", "**Tumor**", "**Stroma**"))
+tbl6 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
+                   event = markers_ROI$surv_vital) ~ CD11b_3 + stage + refage + race, data =  markers_ROI_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_3) %>% bold_p(t = .05) %>% add_nevent(location = "level")
+tbl7 <- coxph(Surv(time = markers_ROI$timelastfu_new, 
+                   event = markers_ROI$surv_vital) ~ CD11b_CD15_3 + stage + refage + race, data =  markers_ROI_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15_3) %>% bold_p(t = .05) %>% add_nevent(location = "level")
+tbl15 <- tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5, tbl6, tbl7))
+# tbl14 <- tbl_merge(list(tbl13, tbl14, tbl15), tab_spanner = c("**Overall**", "**Tumor**", "**Stroma**"))
+```
 
-tbl15 <- tbl_stack(list(tbl13, tbl14), group_header = c("Intratumoral", "Peripheral"))
-tbl15
+## Overall
+```{r}
+tbl16 <- tbl_stack(list(tbl10, tbl13), group_header = c("Intratumoral", "Peripheral"))
+tbl16
+```
+
+## Tumor
+```{r}
+tbl17 <- tbl_stack(list(tbl11, tbl14), group_header = c("Intratumoral", "Peripheral"))
+tbl17
+```
+
+# Stroma
+```{r}
+tbl17 <- tbl_stack(list(tbl12, tbl15), group_header = c("Intratumoral", "Peripheral"))
+tbl17
 
 ```
 
