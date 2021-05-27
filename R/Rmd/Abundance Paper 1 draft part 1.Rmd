@@ -63,6 +63,7 @@ library(psych)
 # library(corrplot)
 # library(ggcorrplot)
 library(mclust)
+library(sensemakr)
 ```
 
 ```{r load}
@@ -1648,18 +1649,18 @@ tbl18
 
 
 # Sensitivity analysis
-The regression relies on the assumption of no unobserved confounders.
-
-```{r}
-library(sensemakr)
-
-model <- coxph(Surv(time = markers_ROIclust_o$timelastfu_new,
-                   event = markers_ROIclust_o$surv_vital) ~ CD3 + stage + refage + race + CD3*race, cluster = suid, 
-               data =  markers_ROIclust_o)
+The regression relies on the assumption of no unobserved confounders.  
+Here I am just trying things. I needed to play around because got errors and discovered that:  
+covar must be numeric  
+Can only do lm?  
+```{r, include=TRUE}
+# model <- coxph(Surv(time = markers_ROIclust_o$timelastfu_new,
+#                    event = markers_ROIclust_o$surv_vital) ~ CD3 + stage + refage + race + CD3*race, cluster = suid, 
+#                data =  markers_ROIclust_o)
 
 model_s <- lm(tumor_total_cells ~ surv_vital+CD3 + stage + refage + race, 
             data =  markers_ROIclust_o)
-
+model_s
 model_sens <- sensemakr(model = model_s, 
                         treatment = "surv_vital",
                         benchmark_covariates = "refage", # names of covariates that will be used to bound the plausible strength of the unobserved confounders - the strongest covariate that we know of
@@ -1667,19 +1668,21 @@ model_sens <- sensemakr(model = model_s,
 
 print(model_sens)
 summary(model_sens)
-print(model_sens)
-
+plot(model_sens)
+# Need covar must be numeric
 markers_ROIclust_o$race <- ifelse(markers_ROIclust_o$race == "White", 0, 1)
 markers_ROIclust_o$CD3 <- ifelse(markers_ROIclust_o$CD3 == "low", 0, 1)
 
 model_s <- lm(surv_vital ~ CD3 + stage + refage + race, 
             data =  markers_ROIclust_o)
-
+model_s
 model_sens <- sensemakr(model = model_s, 
                         treatment = "CD3",
                         benchmark_covariates = "race",
                         kd = 1:3)
-
+print(model_sens)
+summary(model_sens)
+plot(model_sens)
 ```
 
 
