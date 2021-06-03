@@ -1727,7 +1727,7 @@ tbl10 <- markers_ROI_o %>%
   select(CD3, CD3_CD8,
          CD3_FoxP3, 
          CD11b, CD11b_CD15, vitalstatus) %>% 
-  tbl_summary(by= vitalstatus) %>% 
+  tbl_summary(by= vitalstatus, statistic = list(all_categorical() ~ "{n}")) %>% 
       add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) 
 
 markers_ROI_t <- markers_ROI %>%
@@ -1738,7 +1738,7 @@ tbl11 <- markers_ROI_t %>%
   select(CD3, CD3_CD8,
          CD3_FoxP3, 
          CD11b, CD11b_CD15, vitalstatus) %>% 
-  tbl_summary(by= vitalstatus) %>% 
+  tbl_summary(by= vitalstatus, statistic = list(all_categorical() ~ "{n}")) %>% 
       add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) 
 
 markers_ROI_s <- markers_ROI %>%
@@ -1749,7 +1749,7 @@ tbl12 <- markers_ROI_s %>%
   select(CD3, CD3_CD8,
          CD3_FoxP3, 
          CD11b, CD11b_CD15, vitalstatus) %>% 
-  tbl_summary(by= vitalstatus) %>% 
+  tbl_summary(by= vitalstatus, statistic = list(all_categorical() ~ "{n}")) %>% 
       add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) 
 # tbl13 <- tbl_merge(list(tbl10, tbl11, tbl12), tab_spanner = c("**Overall**", "**Tumor**", "**Stroma**"))
 
@@ -1761,7 +1761,7 @@ tbl13 <- markers_ROI_o %>%
   select(CD3, CD3_CD8,
          CD3_FoxP3, 
          CD11b, CD11b_CD15, vitalstatus) %>% 
-  tbl_summary(by= vitalstatus) %>% 
+  tbl_summary(by= vitalstatus, statistic = list(all_categorical() ~ "{n}")) %>% 
       add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
 
 markers_ROI_t <- markers_ROI %>%
@@ -1772,7 +1772,7 @@ tbl14 <- markers_ROI_t %>%
   select(CD3, CD3_CD8,
          CD3_FoxP3, 
          CD11b, CD11b_CD15, vitalstatus) %>% 
-  tbl_summary(by= vitalstatus) %>% 
+  tbl_summary(by= vitalstatus, statistic = list(all_categorical() ~ "{n}")) %>% 
       add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
 
 markers_ROI_s <- markers_ROI %>%
@@ -1783,7 +1783,7 @@ tbl15 <- markers_ROI_s %>%
   select(CD3, CD3_CD8,
          CD3_FoxP3, 
          CD11b, CD11b_CD15, vitalstatus) %>% 
-  tbl_summary(by= vitalstatus) %>% 
+  tbl_summary(by= vitalstatus, statistic = list(all_categorical() ~ "{n}")) %>% 
       add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
 
 # tbl14 <- tbl_merge(list(tbl13, tbl14, tbl15), tab_spanner = c("**Overall**", "**Tumor**", "**Stroma**"))
@@ -3557,7 +3557,7 @@ tbl10 <- markers_ROI_o %>%
   select(CD3, CD3_CD8,
          CD3_FoxP3, 
          CD11b, CD11b_CD15, vitalstatus) %>% 
-  tbl_summary(by= vitalstatus) %>% 
+  tbl_summary(by= vitalstatus, statistic = list(all_categorical() ~ "{n}")) %>% 
       add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) 
 
 markers_ROI_t <- markers_ROI %>%
@@ -3568,7 +3568,7 @@ tbl11 <- markers_ROI_t %>%
   select(CD3, CD3_CD8,
          CD3_FoxP3, 
          CD11b, CD11b_CD15, vitalstatus) %>% 
-  tbl_summary(by= vitalstatus) %>% 
+  tbl_summary(by= vitalstatus, statistic = list(all_categorical() ~ "{n}")) %>% 
       add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) 
 
 markers_ROI_s <- markers_ROI %>%
@@ -3579,7 +3579,7 @@ tbl12 <- markers_ROI_s %>%
   select(CD3, CD3_CD8,
          CD3_FoxP3, 
          CD11b, CD11b_CD15, vitalstatus) %>% 
-  tbl_summary(by= vitalstatus) %>% 
+  tbl_summary(by= vitalstatus, statistic = list(all_categorical() ~ "{n}")) %>% 
       add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) 
 # tbl13 <- tbl_merge(list(tbl10, tbl11, tbl12), tab_spanner = c("**Overall**", "**Tumor**", "**Stroma**"))
 
@@ -3591,7 +3591,7 @@ tbl13 <- markers_ROI_o %>%
   select(CD3, CD3_CD8,
          CD3_FoxP3, 
          CD11b, CD11b_CD15, vitalstatus) %>% 
-  tbl_summary(by= vitalstatus) %>% 
+  tbl_summary(by= vitalstatus, statistic = list(all_categorical() ~ "{n}")) %>% 
       add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
 
 markers_ROI_t <- markers_ROI %>%
@@ -3602,7 +3602,7 @@ tbl14 <- markers_ROI_t %>%
   select(CD3, CD3_CD8,
          CD3_FoxP3, 
          CD11b, CD11b_CD15, vitalstatus) %>% 
-  tbl_summary(by= vitalstatus) %>% 
+  tbl_summary(by= vitalstatus, statistic = list(all_categorical() ~ "{n}")) %>% 
       add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
 
 markers_ROI_s <- markers_ROI %>%
@@ -3613,7 +3613,7 @@ tbl15 <- markers_ROI_s %>%
   select(CD3, CD3_CD8,
          CD3_FoxP3, 
          CD11b, CD11b_CD15, vitalstatus) %>% 
-  tbl_summary(by= vitalstatus) %>% 
+  tbl_summary(by= vitalstatus, statistic = list(all_categorical() ~ "{n}")) %>% 
       add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
 
 # tbl14 <- tbl_merge(list(tbl13, tbl14, tbl15), tab_spanner = c("**Overall**", "**Tumor**", "**Stroma**"))
