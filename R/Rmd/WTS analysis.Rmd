@@ -233,19 +233,20 @@ Look at the correlation between each patients (using only the % variables).
 I simplified the plot to find this correlation within patient on the diagonal.  
 ```{r}
 wts_datas1 <- wts_datas %>% 
-  filter(!is.na(tumor_percent_cd3_opal_650_positive_cells)) %>% 
+  drop_na() %>% 
   arrange(suid) %>% 
   group_by(suid) %>% 
   mutate(n= n()) %>% 
   filter(!n == 1) %>% 
   mutate(n = row_number()) %>% 
   mutate(wts = ifelse(n == 2, "wts_", "ini_")) %>% 
-  unite(suid, c("wts", "suid"), sep = "") %>% 
-  select(-n)
+  unite(suid, c("wts", "suid"), sep = "", remove = FALSE) %>% 
+  select(-n) %>% 
+  ungroup()
 
 ids <- paste(paste0(" ",wts_datas1$suid, sep = ""))
 
-a <- t(wts_datas1 %>% select(-suid)) %>% `row.names<-`(NULL)
+a <- t(wts_datas1 %>% select(-suid, -wts)) %>% `row.names<-`(NULL)
 colnames(a) <- (ids)
 
 mat <- cor(a, use = "pairwise.complete.obs")
@@ -268,14 +269,89 @@ ggcorrplot(upper_gamb, hc.order = FALSE, method = "square",
 )
 ```
 
-# Cluster
+# Compare general %
+Look at the abundance of cells comparing the 19 slides.  
 
 ```{r}
-
+wts_datas1 %>% 
+  select(-suid) %>% 
+  tbl_summary(by = wts, statistic = list(all_continuous() ~ "{mean} ({sd})"),
+              missing = "no", digits = list(all_continuous() ~ 2)) %>%
+  add_p()
 ```
 
+# Patients Group category
+Each patient is categories to be low (<1%) or high (>1%)
 
 
+```{r}
+cold_hot <- function(data){
+  data <- data %>% 
+  mutate(CD3_tumor = case_when(
+    tumor_percent_cd3_opal_650_positive_cells <= 1      ~ "low",
+    tumor_percent_cd3_opal_650_positive_cells > 1       ~ "high"
+  ), CD3_tumor = factor(CD3_tumor, levels = c("low","high"))) %>% 
+  mutate(CD8_tumor = case_when(
+    tumor_percent_cd8_opal_570_positive_cells <= 1      ~ "low",
+    tumor_percent_cd8_opal_570_positive_cells > 1       ~ "high"
+  ), CD8_tumor = factor(CD8_tumor, levels = c("low","high"))) %>% 
+  mutate(CD3_CD8_tumor = case_when(
+    tumor_percent_cd3plus_cd8plus_positive_cells <= 1      ~ "low",
+    tumor_percent_cd3plus_cd8plus_positive_cells > 1       ~ "high"
+  ), CD3_CD8_tumor = factor(CD3_CD8_tumor, levels = c("low","high"))) %>% 
+  
+  mutate(CD3_stroma = case_when(
+    stroma_percent_cd3_opal_650_positive_cells <= 1      ~ "low",
+    stroma_percent_cd3_opal_650_positive_cells > 1       ~ "high"
+  ), CD3_stroma = factor(CD3_stroma, levels = c("low","high"))) %>% 
+  mutate(CD8_stroma = case_when(
+    stroma_percent_cd8_opal_570_positive_cells <= 1      ~ "low",
+    stroma_percent_cd8_opal_570_positive_cells > 1       ~ "high"
+  ), CD8_stroma = factor(CD8_stroma, levels = c("low","high"))) %>% 
+  mutate(CD3_CD8_stroma = case_when(
+    stroma_percent_cd3plus_cd8plus_positive_cells <= 1      ~ "low",
+    stroma_percent_cd3plus_cd8plus_positive_cells > 1       ~ "high"
+  ), CD3_CD8_stroma = factor(CD3_CD8_stroma, levels = c("low","high"))) %>% 
+  
+  mutate(CD3_total = case_when(
+    percent_cd3_opal_650_positive_cells <= 1      ~ "low",
+    percent_cd3_opal_650_positive_cells > 1       ~ "high"
+  ), CD3_total = factor(CD3_total, levels = c("low","high"))) %>% 
+  mutate(CD8_total = case_when(
+    percent_cd8_opal_570_positive_cells <= 1      ~ "low",
+    percent_cd8_opal_570_positive_cells > 1       ~ "high"
+  ), CD8_total = factor(CD8_total, levels = c("low","high"))) %>% 
+  mutate(CD3_CD8_total = case_when(
+    percent_cd3plus_cd8plus_positive_cells <= 1      ~ "low",
+    percent_cd3plus_cd8plus_positive_cells > 1       ~ "high"
+  ), CD3_CD8_total = factor(CD3_CD8_total, levels = c("low","high")))
+}
+
+markers_ROI <- cold_hot(markers_ROI)
+wts_data <- cold_hot(wts_data)
+wts_datas1 <- cold_hot(wts_datas1)
+# wts_datas <- bind_rows(wts_data, markers_ROI)
+
+
+# wts_datas1 <- left_join(wts_data, markers_ROI, by = "suid", suffix = c("", "_wts")) %>%
+#   select("suid", starts_with("tumor_percent_cd3_opal_650_positive_cells"),
+#          starts_with("tumor_percent_cd8_opal_570_positive_cells"),
+#          starts_with("tumor_percent_cd3plus_cd8plus_positive_cells"),
+#          starts_with("stroma_percent_cd3_opal_650_positive_cells"),
+#          starts_with("stroma_percent_cd8_opal_570_positive_cells"),
+#          starts_with("stroma_percent_cd3plus_cd8plus_positive_cells"),
+#          starts_with("percent_cd3_opal_650_positive_cells"),
+#          starts_with("percent_cd8_opal_570_positive_cells"),
+#          starts_with("percent_cd3plus_cd8plus_positive_cells")) %>%
+#   drop_na()
+
+wts_datas1 %>% 
+  select(CD3_tumor, CD8_tumor, wts) %>% 
+  tbl_summary(by = wts, statistic = list(all_continuous() ~ "{mean} ({sd})"),
+              missing = "no", digits = list(all_continuous() ~ 2)) %>% add_p()
+```
+
+6 patient were "low" for CD3 in initial slides, 7 are now "low" in the wts. etc
 
 
 
