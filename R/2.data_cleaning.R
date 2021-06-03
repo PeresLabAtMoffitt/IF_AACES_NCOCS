@@ -1307,7 +1307,7 @@ global_28 <- global_28[(grepl(uid, global_28$suid)),]
 
 saveRDS(ROI_global, file = "ROI_global.rds")
 # saveRDS(TMA_global, file = "TMA_global.rds")
-
+saveRDS(markers_ROI, file = "markers_ROI.rds")
 
 # Cleaning
 rm(uid, TMAcases_remove, TMA_tumor, TMA_stroma, TMA_total,

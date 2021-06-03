@@ -1,0 +1,283 @@
+---
+title: "WTS analysis"
+author: "Christelle Colin-Leitzinger"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: false
+    theme: cerulean
+    highlight: pygments
+    df_print: paged
+editor_options: 
+  chunk_output_type: console
+---
+
+<style type="text/css">
+h1.title {
+  font-size: 25px;
+}
+.figure {
+   margin-top: 25px;
+   <!-- margin-bottom: 100px; -->
+}
+
+table {
+    margin-top: 25px;
+    <!-- margin-bottom: 100px !important; -->
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE,
+                      cache = FALSE,
+                      fig.align='center'
+                      )
+options(gtsummary.print_engine = "gt")
+options(gtsummary.as_gt.addl_cmds = "gt::tab_options(table.font.size = 14, data_row.padding = gt::px(1))")
+```
+
+<style>
+div.blue { background-color:#0099CC; border-radius: 5px; padding: 20px; font-size: 38px}
+</style>
+<div class = "blue">
+
+<span style="color: white;">WTS analysis</span>
+
+</div>
+<br>
+
+```{r library, include=FALSE}
+library(tidyverse)
+library(data.table)
+library(gtsummary)
+library(survival)
+library(survminer)
+library(psych)
+# library(corrplot)
+library(ggcorrplot)
+library(mclust)
+```
+
+```{r load}
+# loadd(clinical_data, ROI_tumor ,ROI_stroma ,ROI_total,
+#       cases_match)
+
+ROI_global <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/ROI_global.rds")
+markers_ROI <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/markers_ROI.rds")
+# clinical_data <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/clinical_data.rds")
+
+# Rewove patients not matched or lost match
+# ROI_global <- left_join(ROI_global, clinical_data, by="suid") %>% drop_na(pair_id) %>% 
+#   group_by(pair_id) %>% 
+#   mutate(have_a_match = dense_rank(interaction(suid, pair_id))) %>% 
+#   group_by(pair_id) %>% 
+#   mutate(is_paired = max(have_a_match)) %>% 
+#   filter(is_paired == 2) %>% 
+#   select(pair_id, everything(), -c(is_paired, have_a_match)) %>% 
+#   ungroup()
+
+# markers_match <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/markers_match.rds")
+path <- fs::path("","Volumes","Peres_Research","K99_R00", "Image analysis data", "WTS Margins Analysis 20 Slides Peres_P1 May 2021")
+
+# CODE TO CLEAN AND SAVE WTS DATA
+
+# fct_name_repair <- function(colnms) {
+#   tolower(gsub("[ ():]", "_", colnms))
+# }
+# 
+# wts_total <-
+#   readxl::read_xlsx(paste0(path,
+#       "/Peres_P1_20WTS_Margins_CD3_CD8_Analysis.xlsx"
+#     ), .name_repair = fct_name_repair)
+# wts_tumor <-
+#   readxl::read_xlsx(paste0(path,
+#       "/Peres_P1_20WTS_Margins_CD3_CD8_Analysis.xlsx"
+#     ), sheet = "Tumor", .name_repair = fct_name_repair)
+# wts_stroma <-
+#   readxl::read_xlsx(paste0(path,
+#       "/Peres_P1_20WTS_Margins_CD3_CD8_Analysis.xlsx"
+#     ), sheet = "Stroma", .name_repair = fct_name_repair)
+# 
+# fct_name_repair2 <- function(data) {
+#   data <- data %>%
+#   rename_all(.  %>%
+#                # paste(colnames(.), "wts", sep = "_") %>%
+#                gsub("__", "_", .) %>%
+#                gsub("%", "percent", .) %>%
+#                gsub("²", "2", .) %>%
+#                gsub("\\+", "plus", .))
+# }
+# wts_total <- fct_name_repair2(wts_total)
+# wts_tumor <- fct_name_repair2(wts_tumor)
+# wts_stroma <- fct_name_repair2(wts_stroma)
+# 
+# wts_data <-
+#   full_join(wts_tumor, wts_stroma, by = "image_tag", suffix = c("_tumor", "_stroma")) %>%
+#   full_join(., wts_total, by = "image_tag") %>%
+#   mutate(suid = str_match(image_tag,
+#                             "(Peres_P1_AACES.|Peres_P1_AACEES.|Peres_P1_OV|Peres_P1.|)([:digit:]*)")[,3]) %>%
+#   mutate(suid = as.character(suid)) %>%
+#   select(suid, everything())
+# write_rds(wts_data, "wts_data.rds")
+
+wts_data <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/wts_data.rds")
+
+```
+
+```{r merging}
+# wts_datas <- left_join(wts_data, markers_ROI, by = "suid")
+uid <- paste0(wts_data$suid, collapse = "|")
+
+markers_ROI <- markers_ROI[(grepl(uid, markers_ROI$suid)),] %>% 
+  rename("tumor_percent_cd3_opal_650_positive_cells" = percent_CD3_tumor.p,
+         "tumor_percent_cd8_opal_570_positive_cells" = percent_CD8_tumor.p,
+         "tumor_percent_cd3plus_cd8plus_positive_cells" = percent_CD3_CD8_tumor.p,
+         "stroma_percent_cd3_opal_650_positive_cells" = percent_CD3_stroma.p, 
+         "stroma_percent_cd8_opal_570_positive_cells" = percent_CD8_stroma.p,
+         "stroma_percent_cd3plus_cd8plus_positive_cells" = percent_CD3_CD8_stroma.p,
+         "percent_cd3_opal_650_positive_cells" = percent_CD3_total.p,
+         "percent_cd8_opal_570_positive_cells" = percent_CD8_total.p,
+         "percent_cd3plus_cd8plus_positive_cells" = percent_CD3_CD8_total.p
+)
+wts_datas <- bind_rows(wts_data, markers_ROI) %>% 
+  select("suid", "tumor_percent_cd3_opal_650_positive_cells", 
+         "tumor_percent_cd8_opal_570_positive_cells",
+         "tumor_percent_cd3plus_cd8plus_positive_cells",
+         "stroma_percent_cd3_opal_650_positive_cells",
+         "stroma_percent_cd8_opal_570_positive_cells",
+         "stroma_percent_cd3plus_cd8plus_positive_cells",
+         "percent_cd3_opal_650_positive_cells",
+         "percent_cd8_opal_570_positive_cells",
+         "percent_cd3plus_cd8plus_positive_cells")
+
+wts_datas <- as.data.frame(wts_datas)
+```
+
+# Overall ICC
+
+I am comparing the new wts data (1 slide) with the ROI peripheral data (average of 3ish slide).  
+I selected only the % as I am working more with that and the cell numbers or density will obviously be different.  
+```{r}
+ICC_data <- data.frame(matrix(nrow=1, ncol=0))
+
+for(i in 1:length(colnames(wts_datas))) {
+  
+  ids <- wts_datas %>% select(suid)
+
+  if(class(wts_datas[,i]) == "numeric" | class(wts_datas[,i]) == "integer") {
+    
+    ICC_df <- cbind(ids, value = wts_datas[,i])
+    ICC_df <- ICC_df %>%
+      mutate(iteration = "iteration0") %>%
+      group_by(suid) %>%
+      mutate(n = row_number(suid)) %>%
+      ungroup() %>%
+      unite(iteration, iteration:n, sep = "", remove = TRUE, na.rm = TRUE) %>%
+      pivot_wider(names_from = iteration, values_from = value) %>%
+      select(c(starts_with("iteration")))
+
+    ICC <- ICC(ICC_df)$results[4,2]
+    ICC_data <- cbind(ICC_data,ICC)
+    
+  }
+  
+}
+
+rm(ICC_df, ICC, ids)
+colnames(ICC_data) <- colnames(wts_datas)[2:ncol(wts_datas)]
+
+library(plotly)
+plot <- ICC_data %>% 
+  pivot_longer(cols = everything()) %>% 
+  mutate(ICC = "ICC") %>% 
+  mutate(reliability = case_when(
+    value < 0.5 ~ "poor",
+    value >= 0.5 &
+      value < 0.75 ~ "moderate",
+    value >= 0.75 &
+      value < 0.9 ~ "good",
+    value >= 0.9 ~ "excellent"
+  )) %>% 
+  mutate(text = paste("Measurement: ", name, "\nICC: ", round(value, 2), "\nStrict Reliability: ", reliability, sep="")) %>% 
+  ggplot(aes(x = ICC, y = value, color = reliability, text=text))+
+  labs(title = "General Reliability of the measurement iteration value", x= NULL, y= "ICC value")+
+  scale_color_brewer(palette = "Set2") +
+  scale_x_discrete(labels = "")+
+  theme_minimal()+
+  geom_point(size = 1, position=position_jitter(w=0.8))
+plot <- ggplotly(plot, tooltip="text")
+plot
+plot <- ICC_data %>% 
+  pivot_longer(cols = everything()) %>% 
+  mutate(reliability = case_when(
+    value < 0.5 ~ "poor",
+    value >= 0.5 &
+      value < 0.75 ~ "moderate",
+    value >= 0.75 &
+      value < 0.9 ~ "good",
+    value >= 0.9 ~ "excellent"
+  ))
+plot
+```
+<br>
+<br>
+
+***
+
+# Correlation per patient
+Look at the correlation between each patients (using only the % variables).  
+I simplified the plot to find this correlation within patient on the diagonal.  
+```{r}
+wts_datas1 <- wts_datas %>% 
+  filter(!is.na(tumor_percent_cd3_opal_650_positive_cells)) %>% 
+  arrange(suid) %>% 
+  group_by(suid) %>% 
+  mutate(n= n()) %>% 
+  filter(!n == 1) %>% 
+  mutate(n = row_number()) %>% 
+  mutate(wts = ifelse(n == 2, "wts_", "ini_")) %>% 
+  unite(suid, c("wts", "suid"), sep = "") %>% 
+  select(-n)
+
+ids <- paste(paste0(" ",wts_datas1$suid, sep = ""))
+
+a <- t(wts_datas1 %>% select(-suid)) %>% `row.names<-`(NULL)
+colnames(a) <- (ids)
+
+mat <- cor(a, use = "pairwise.complete.obs")
+
+mat1 <- as.data.frame(mat) %>% select(contains("wts")) %>% t() %>% 
+  as.data.frame(., row.names = NULL) %>% select(contains("ini")) %>% as.matrix()
+
+upper_gamb <- mat1
+upper_gamb[lower.tri(upper_gamb)] <- NA
+
+ggcorrplot(upper_gamb, hc.order = FALSE, method = "square", 
+           type = "lower", 
+           lab = TRUE, 
+           title = "Correlation between radiomics features",
+           show.legend = TRUE, legend.title = "Correlation", show.diag = TRUE,
+           lab_col = "darkblue", lab_size = 3, 
+           sig.level = 0.05, insig = c("pch", "blank"), pch = 4, pch.col = "black", pch.cex = 10, 
+           tl.cex = 10, tl.col = "red", tl.srt = 40,
+           digits = 2
+)
+```
+
+# Cluster
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
