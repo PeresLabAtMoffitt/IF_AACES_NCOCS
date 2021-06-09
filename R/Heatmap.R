@@ -59,6 +59,58 @@ heatmap.2(df2, trace="none", density="none", col=heat.colors(250),
 dev.off()
 
 
-heatplot
-complexheatmap
+# Heatmap abundance W/B
+
+# Intratumoral
+
+df1 <- features %>% select(-date, -segmented_by) %>% 
+  unite(patient_id, c(patient_id, lesion_id), sep = "_", remove = TRUE) %>% 
+  `row.names<-`(.$patient_id) %>% 
+  select(-patient_id) 
+df1 <- as.matrix(df1)
+df2 <- t(df1)
+
+heatmap.2(df2, main = "",
+          
+          trace = "none", density="none", col=bluered(20), cexRow=.5, cexCol = .8, 
+          lwid=c(1.1, 10), lhei=c(1.1, 10), 
+          margins = c(8,10), # bottom, right
+          RowSideColors = condition_colors,
+          scale = "column")
+
+
+
+
+df1 <- as.data.frame(markers_ROI[,c("percent_CD3_tumor.i", "percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", "percent_CD11b_tumor.i", "percent_CD11b_CD15_tumor.i",
+                                    "percent_CD3_stroma.i", "percent_CD3_CD8_stroma.i", "percent_CD3_FoxP3_stroma.i", "percent_CD11b_stroma.i", "percent_CD11b_CD15_stroma.i",
+                                    "suid")]) %>% 
+  # drop_na(percent_CD3_tumor.i) %>% 
+  # unite(suid, c(suid, CD11b_CD15_grp_tma), sep = "_", remove = TRUE) %>% 
+  `row.names<-`(.$suid) %>% 
+  select(-suid) 
+df1 <- as.matrix(df1)
+df2 <- t(df1)
+
+heatmap.2(df2, main = "",
+          
+          trace = "none", density="none", col=bluered(20), cexRow=.5, cexCol = .8, 
+          lwid=c(1.1, 10), lhei=c(1.1, 10), 
+          margins = c(8,10), # bottom, right
+          RowSideColors = ,
+          scale = "column")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
