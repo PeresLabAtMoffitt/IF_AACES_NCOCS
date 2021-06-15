@@ -86,7 +86,8 @@ ROI_global <- left_join(ROI_global, clinical_data, by="suid") %>% drop_na(pair_i
 # markers_match <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/markers_match.rds")
 path <- fs::path("","Volumes","Peres_Research","Christelle Colin-Leitzinger", "IF_AACES_NCOCS", "Disparities manuscript", "Figures")
 
-
+110318, 43220, 42774, 46619
+rmove these patients only in ROI periph
 
 ```
 <br>
