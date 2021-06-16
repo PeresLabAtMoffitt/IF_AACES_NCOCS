@@ -246,7 +246,10 @@ clinical_data <- clinical_data %>%
     mdvisitrsn == 3                                     ~ "Both female and partner problem",
     mdvisitrsn == 4                                     ~ "No problem was found",
     TRUE                                                ~ NA_character_
-  )) 
+  )) %>% 
+  # Calculate follow up time as time from interview to follow up
+  mutate(timeint_fu = timelastfu_new - timeint)
+
 
 clinical_data$refage_cat <- as.factor(findInterval(clinical_data$refage, c(0,50,60,70,80)))
 levels(clinical_data$refage_cat) <-  
