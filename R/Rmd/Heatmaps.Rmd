@@ -603,10 +603,13 @@ ROI_global <- ROI_global %>%
 
 # Intratumoral (pink = White, need to add leg)
 ```{r}
-df1 <- as.data.frame(markers_ROI[,c("percent_CD3_tumor.i", "percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", "percent_CD11b_tumor.i", "percent_CD11b_CD15_tumor.i",
-                                    "percent_CD3_stroma.i", "percent_CD3_CD8_stroma.i", "percent_CD3_FoxP3_stroma.i", "percent_CD11b_stroma.i", "percent_CD11b_CD15_stroma.i",
+df1 <- as.data.frame(markers_ROI[,c("percent_CD3_stroma.i", "percent_CD3_tumor.i", 
+                                    "percent_CD3_CD8_stroma.i", "percent_CD3_CD8_tumor.i", 
+                                    "percent_CD3_FoxP3_stroma.i", "percent_CD3_FoxP3_tumor.i", 
+                                    "percent_CD11b_stroma.i", "percent_CD11b_tumor.i", 
+                                    "percent_CD11b_CD15_stroma.i", "percent_CD11b_CD15_tumor.i",
                                     "suid", "race")]) %>% 
-  arrange(race) %>% 
+  arrange(race, percent_CD3_stroma.i, percent_CD3_CD8_stroma.i) %>% 
   # drop_na(percent_CD3_tumor.i) %>% 
   unite(suid, c(suid, race), sep = "_", remove = TRUE) %>% 
   `row.names<-`(.$suid) %>% 
@@ -670,7 +673,7 @@ heatmap.2(df2, #main = "kjh",
           margins = c(1,13), # bottom, right
           ColSideColors = condition_colors,
           scale = "none",
-          Colv = FALSE,
+          Colv = FALSE, Rowv = FALSE,
           key.par=list(mgp=c(1.5, 0.5, 0), # pos for value, number, axes
                        mar=c(3.5, 1, 2.5, 1) # color key pos down, left, top, right
                        )
