@@ -119,7 +119,7 @@ tbl <- ROI_global %>%
                            dblkstat_CA125 ~ "Debulking Status", adj ~ "Adjuvant chemotherapy",
                            smoker ~ "Smoking status"),
               digits = list(all_continuous() ~ 1)) %>%
-      modify_header(list(label ~ "**Patient characteristics**", all_stat_cols() ~ "{level}")) %>% 
+      modify_header(list(label ~ "**Patient characteristics**", all_stat_cols() ~ "**{level}**, N = {n}")) %>% 
   add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) %>% as_gt()
 tbl
 # gt::gtsave(tbl, paste0(path, "/Table 1 Patient characteristics overall and by race_ethnicity.pdf"))
