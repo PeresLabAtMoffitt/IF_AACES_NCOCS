@@ -1,5 +1,5 @@
 ---
-title: "Immune marker data"
+title: "Immune marker from diagnosis"
 author: "Christelle Colin-Leitzinger"
 date: "`r Sys.Date()`"
 output: 
@@ -740,7 +740,7 @@ tbl
 
 # Cluster
 
-<!-- The count of cells double stained (for example CD3+CD8+) **ARE** subtracted from the single stain count (CD3 alone and CD8 alone) to avoid overlapping if we want to use them to cluster.   -->
+The count of cells double stained (for example CD3+CD8+) **ARE NOT** subtracted from the single stain count (CD3 alone and CD8 alone) to avoid overlapping if we want to use them to cluster.
 
 ```{r removing double stain from single stain count}
 # markers_ROI <- markers_ROI %>% 
@@ -783,11 +783,12 @@ tbl
 <br>
 
 ## Cluster with a non-defined number of cluster **when looking at all intra/periph + tumor/stroma (CD3, CD3/8, CD3/FoxP3, CD11b, CD11b/15)**
+**Each markers are scaled, default method is center**
 
 ```{r clustering}
 set.seed(1234)
 
-### Cluster for stroma/tumor in the intratumoral/peritumoral ROIs (include single and double staining, overall are excluded)
+### Cluster for stroma/tumor in the intratumoral/peritumoral ROIs 
 clust_markers <- markers_ROI %>% 
   filter(!is.na(markers_ROI$percent_CD3_CD8_tumor.i) & !is.na(markers_ROI$percent_CD3_CD8_tumor.p)) %>% 
   select(suid, c("percent_CD3_tumor.i", "percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", "percent_CD11b_tumor.i", "percent_CD11b_CD15_tumor.i",
