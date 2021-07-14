@@ -247,6 +247,7 @@ clinical_data <- clinical_data %>%
     mdvisitrsn == 4                                     ~ "No problem was found",
     TRUE                                                ~ NA_character_
   )) %>% 
+  mutate(diab = factor(diab, levels = c("no", "yes"))) %>% 
   # Calculate follow up time as time from interview to follow up
   mutate(timeint_fu = timelastfu_new - timeint)
 
