@@ -16,7 +16,7 @@ if (!interactive()) config
 
 # make(plan)
 loadd(clinical_data, tx_data,
-      ROI_tumor ,ROI_stroma ,ROI_total ,
+      ROI_tumor ,ROI_stroma ,ROI_total,
       TMA_tumor ,TMA_stroma, TMA_total,
       TMAcases_remove,
       common_ROITMA_IDs, cases_match)
