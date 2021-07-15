@@ -374,6 +374,10 @@ ROI_global <-
   # mutate(CD11b_CD15perc_tumor_mm2 = (tumor_percent_cd11bplus_cd15plus_positive_cells/tumor_area_analyzed_mm2_)) %>%
   # mutate(CD11b_CD15perc_stroma_mm2 = stroma_percent_cd11bplus_cd15plus_positive_cells/stroma_area_analyzed_mm2_)
 
+# Some slides have no cells (NA) in stroma and cells in tumor. Change them to 0.
+
+ROI_global <- ROI_global %>% 
+  mutate(across(everything(), .fns = ~ replace_na(., 0)))
 
 TMA_global <- 
   full_join(TMA_tumor, TMA_stroma %>% select(-suid),

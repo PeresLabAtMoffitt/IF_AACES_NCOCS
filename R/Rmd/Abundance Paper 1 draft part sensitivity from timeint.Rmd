@@ -76,7 +76,9 @@ ROI_global <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/ROI
 clinical_data <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/clinical_data.rds")
 
 # Rewove patients not matched or lost match
-ROI_global <- left_join(ROI_global, clinical_data, by="suid") %>% drop_na(pair_id) %>% 
+ROI_global <- left_join(ROI_global, clinical_data, by="suid") %>% 
+  select(suid, pair_id, everything()) %>% 
+  drop_na(pair_id) %>% 
   group_by(pair_id) %>% 
   mutate(have_a_match = dense_rank(interaction(suid, pair_id))) %>% 
   group_by(pair_id) %>% 

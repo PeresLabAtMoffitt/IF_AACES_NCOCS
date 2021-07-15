@@ -77,7 +77,9 @@ ROI_global <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/ROI
 clinical_data <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/clinical_data.rds")
 
 # Rewove patients not matched or lost match
-ROI_global <- left_join(ROI_global, clinical_data, by="suid") %>% drop_na(pair_id) %>% 
+ROI_global <- left_join(ROI_global, clinical_data, by="suid") %>%
+  select(suid, pair_id, everything()) %>% 
+  drop_na(pair_id) %>% 
   group_by(pair_id) %>% 
   mutate(have_a_match = dense_rank(interaction(suid, pair_id))) %>% 
   group_by(pair_id) %>% 
@@ -1115,24 +1117,24 @@ markers_ROI_o <- markers_ROI %>%
          CD3_FoxP3 = CD3_FoxP3_total.i, 
          CD11b = CD11b_total.i, CD11b_CD15 = CD11b_CD15_total.i)
   
-tbl1 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o)  %>% 
+tbl1 <- coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o)  %>% 
   tbl_regression(exponentiate = TRUE,
                  include = CD3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl2 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3_CD8 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
+tbl2 <- coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD3_CD8 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3_CD8) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl3 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3_FoxP3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
+tbl3 <- coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD3_FoxP3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3_FoxP3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl4 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD11b + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
+tbl4 <- coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD11b + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl5 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD11b_CD15 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
+tbl5 <- coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD11b_CD15 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
 
@@ -1144,24 +1146,24 @@ markers_ROI_t <- markers_ROI %>%
          CD3_FoxP3 = CD3_FoxP3_tumor.i, 
          CD11b = CD11b_tumor.i, CD11b_CD15 = CD11b_CD15_tumor.i)
   
-tbl1 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t)  %>% 
+tbl1 <- coxph(Surv(time = markers_ROI_t$timeint_fu, 
+                   event = markers_ROI_t$surv_vital) ~ CD3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t)  %>% 
   tbl_regression(exponentiate = TRUE,
                  include = CD3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl2 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3_CD8 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
+tbl2 <- coxph(Surv(time = markers_ROI_t$timeint_fu, 
+                   event = markers_ROI_t$surv_vital) ~ CD3_CD8 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3_CD8) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl3 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3_FoxP3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
+tbl3 <- coxph(Surv(time = markers_ROI_t$timeint_fu, 
+                   event = markers_ROI_t$surv_vital) ~ CD3_FoxP3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3_FoxP3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl4 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD11b + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
+tbl4 <- coxph(Surv(time = markers_ROI_t$timeint_fu, 
+                   event = markers_ROI_t$surv_vital) ~ CD11b + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl5 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD11b_CD15 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
+tbl5 <- coxph(Surv(time = markers_ROI_t$timeint_fu, 
+                   event = markers_ROI_t$surv_vital) ~ CD11b_CD15 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
 
@@ -1173,24 +1175,24 @@ markers_ROI_s <- markers_ROI %>%
          CD3_FoxP3 = CD3_FoxP3_stroma.i, 
          CD11b = CD11b_stroma.i, CD11b_CD15 = CD11b_CD15_stroma.i)
 
-tbl1 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
+tbl1 <- coxph(Surv(time = markers_ROI_s$timeint_fu, 
+                   event = markers_ROI_s$surv_vital) ~ CD3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl2 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3_CD8 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
+tbl2 <- coxph(Surv(time = markers_ROI_s$timeint_fu, 
+                   event = markers_ROI_s$surv_vital) ~ CD3_CD8 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3_CD8) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl3 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3_FoxP3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
+tbl3 <- coxph(Surv(time = markers_ROI_s$timeint_fu, 
+                   event = markers_ROI_s$surv_vital) ~ CD3_FoxP3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3_FoxP3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl4 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD11b + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
+tbl4 <- coxph(Surv(time = markers_ROI_s$timeint_fu, 
+                   event = markers_ROI_s$surv_vital) ~ CD11b + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl5 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD11b_CD15 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
+tbl5 <- coxph(Surv(time = markers_ROI_s$timeint_fu, 
+                   event = markers_ROI_s$surv_vital) ~ CD11b_CD15 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
 
@@ -1205,24 +1207,24 @@ markers_ROI_o <- markers_ROI %>%
          CD3_FoxP3 = CD3_FoxP3_total.p, 
          CD11b = CD11b_total.p, CD11b_CD15 = CD11b_CD15_total.p)
   
-tbl1 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o)  %>% 
+tbl1 <- coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o)  %>% 
   tbl_regression(exponentiate = TRUE,
                  include = CD3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl2 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3_CD8 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
+tbl2 <- coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD3_CD8 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3_CD8) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl3 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3_FoxP3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
+tbl3 <- coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD3_FoxP3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3_FoxP3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl4 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD11b + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
+tbl4 <- coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD11b + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl5 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD11b_CD15 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
+tbl5 <- coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD11b_CD15 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_o) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
 
@@ -1234,24 +1236,24 @@ markers_ROI_t <- markers_ROI %>%
          CD3_FoxP3 = CD3_FoxP3_tumor.p, 
          CD11b = CD11b_tumor.p, CD11b_CD15 = CD11b_CD15_tumor.p)
   
-tbl1 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t)  %>% 
+tbl1 <- coxph(Surv(time = markers_ROI_t$timeint_fu, 
+                   event = markers_ROI_t$surv_vital) ~ CD3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t)  %>% 
   tbl_regression(exponentiate = TRUE,
                  include = CD3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl2 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3_CD8 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
+tbl2 <- coxph(Surv(time = markers_ROI_t$timeint_fu, 
+                   event = markers_ROI_t$surv_vital) ~ CD3_CD8 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3_CD8) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl3 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3_FoxP3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
+tbl3 <- coxph(Surv(time = markers_ROI_t$timeint_fu, 
+                   event = markers_ROI_t$surv_vital) ~ CD3_FoxP3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3_FoxP3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl4 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD11b + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
+tbl4 <- coxph(Surv(time = markers_ROI_t$timeint_fu, 
+                   event = markers_ROI_t$surv_vital) ~ CD11b + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl5 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD11b_CD15 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
+tbl5 <- coxph(Surv(time = markers_ROI_t$timeint_fu, 
+                   event = markers_ROI_t$surv_vital) ~ CD11b_CD15 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_t) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
 
@@ -1263,24 +1265,24 @@ markers_ROI_s <- markers_ROI %>%
          CD3_FoxP3 = CD3_FoxP3_stroma.p, 
          CD11b = CD11b_stroma.p, CD11b_CD15 = CD11b_CD15_stroma.p)
 
-tbl1 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
+tbl1 <- coxph(Surv(time = markers_ROI_s$timeint_fu, 
+                   event = markers_ROI_s$surv_vital) ~ CD3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl2 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3_CD8 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
+tbl2 <- coxph(Surv(time = markers_ROI_s$timeint_fu, 
+                   event = markers_ROI_s$surv_vital) ~ CD3_CD8 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3_CD8) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl3 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD3_FoxP3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
+tbl3 <- coxph(Surv(time = markers_ROI_s$timeint_fu, 
+                   event = markers_ROI_s$surv_vital) ~ CD3_FoxP3 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD3_FoxP3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl4 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD11b + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
+tbl4 <- coxph(Surv(time = markers_ROI_s$timeint_fu, 
+                   event = markers_ROI_s$surv_vital) ~ CD11b + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
-tbl5 <- coxph(Surv(time = markers_ROI$timeint_fu, 
-                   event = markers_ROI$surv_vital) ~ CD11b_CD15 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
+tbl5 <- coxph(Surv(time = markers_ROI_s$timeint_fu, 
+                   event = markers_ROI_s$surv_vital) ~ CD11b_CD15 + stage + refage + race + BMI_recent_grp + diab + smoker, data =  markers_ROI_s) %>%
   tbl_regression(exponentiate = TRUE,
                  include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
 
