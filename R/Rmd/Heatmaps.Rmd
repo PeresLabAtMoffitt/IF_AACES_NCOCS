@@ -616,11 +616,10 @@ ROI_global <- ROI_global %>%
 
 # Intratumoral (pink = White, need to add leg)
 ```{r}
-df1 <- as.data.frame(markers_ROI[,c("percent_CD3_stroma.i", "percent_CD3_tumor.i", 
-                                    "percent_CD3_CD8_stroma.i", "percent_CD3_CD8_tumor.i", 
-                                    "percent_CD3_FoxP3_stroma.i", "percent_CD3_FoxP3_tumor.i", 
-                                    "percent_CD11b_stroma.i", "percent_CD11b_tumor.i", 
-                                    "percent_CD11b_CD15_stroma.i", "percent_CD11b_CD15_tumor.i",
+df1 <- as.data.frame(markers_ROI[,c("percent_CD3_tumor.i", "percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", 
+                                    "percent_CD11b_tumor.i", "percent_CD11b_CD15_tumor.i",
+                                    "percent_CD3_stroma.i", "percent_CD3_CD8_stroma.i", "percent_CD3_FoxP3_stroma.i",
+                                    "percent_CD11b_stroma.i", "percent_CD11b_CD15_stroma.i",
                                     "suid", "race")]) %>% 
   arrange(race, percent_CD3_stroma.i, percent_CD3_CD8_stroma.i) %>% 
   # drop_na(percent_CD3_tumor.i) %>% 
@@ -714,6 +713,7 @@ heatmap.2(df2, #main = "kjh",
           margins = c(1,13), # bottom, right
           ColSideColors = condition_colors,
           scale = "none",
+          Rowv = FALSE,
           hclustfun = function(x) hclust(x, method="ward.D2"),
           key.par=list(mgp=c(1.5, 0.5, 0), # pos for value, number, axes
                        mar=c(3.5, 1, 2.5, 1) # color key pos down, left, top, right
@@ -735,6 +735,7 @@ heatmap.2(df2, #main = "kjh",
           margins = c(1,13), # bottom, right
           ColSideColors = condition_colors,
           scale = "none",
+          Rowv = FALSE,
           hclustfun = function(x) hclust(x,method = 'centroid'),
           key.par=list(mgp=c(1.5, 0.5, 0), # pos for value, number, axes
                        mar=c(3.5, 1, 2.5, 1) # color key pos down, left, top, right
@@ -756,6 +757,7 @@ heatmap.2(df2, #main = "kjh",
           margins = c(1,13), # bottom, right
           ColSideColors = condition_colors,
           scale = "none",
+          Rowv = FALSE,
           distfun = function(x) as.dist(1-cor(t(x))), # 1 minus Pearson correlation distance with average linkage
           hclustfun = function(x) hclust(x, method="average"),
           key.par=list(mgp=c(1.5, 0.5, 0), # pos for value, number, axes
@@ -924,6 +926,7 @@ heatmap.2(df4, #main = "kjh",
           margins = c(1,13), # bottom, right
           ColSideColors = condition_colors,
           scale = "none",
+          Rowv = FALSE,
           hclustfun = function(x) hclust(x, method="ward.D2"),
           key.par=list(mgp=c(1.5, 0.5, 0), # pos for value, number, axes
                        mar=c(3.5, 1, 2.5, 1) # color key pos down, left, top, right
@@ -945,6 +948,7 @@ heatmap.2(df4, #main = "kjh",
           margins = c(1,13), # bottom, right
           ColSideColors = condition_colors,
           scale = "none",
+          Rowv = FALSE,
           hclustfun = function(x) hclust(x,method = 'centroid'),
           key.par=list(mgp=c(1.5, 0.5, 0), # pos for value, number, axes
                        mar=c(3.5, 1, 2.5, 1) # color key pos down, left, top, right
@@ -966,6 +970,7 @@ heatmap.2(df4, #main = "kjh",
           margins = c(1,13), # bottom, right
           ColSideColors = condition_colors,
           scale = "none",
+          Rowv = FALSE,
           distfun = function(x) as.dist(1-cor(t(x))), # 1 minus Pearson correlation distance with average linkage
           hclustfun = function(x) hclust(x, method="average"),
           key.par=list(mgp=c(1.5, 0.5, 0), # pos for value, number, axes
@@ -1018,8 +1023,56 @@ legend(0.83, 0.95, # right, up
 ```
 
 
-# visualize the differences in the clusters
-could you create the heatmaps just as you did before but put the legend as the five immune signatures that you found using mclust - and then sort the heatmap according to the signatures
+<!-- # visualize the differences in the clusters -->
+<!-- could you create the heatmaps just as you did before but put the legend as the five immune signatures that you found using mclust - and then sort the heatmap according to the signatures -->
+
+# Tables
+```{r}
+markers_ROI %>% 
+  select(percent_CD11b_total.i, percent_CD11b_tumor.i, percent_CD11b_stroma.i,
+         percent_CD11b_total.p, percent_CD11b_tumor.p, percent_CD11b_stroma.p#,
+         # race
+         ) %>% 
+  tbl_summary(#by = race,
+              statistic = list(all_continuous() ~ "{mean} ({sd})"),
+              # missing = "no", 
+              digits = list(all_continuous() ~ 2)) %>% 
+  bold_labels()# %>% add_overall() %>% add_p() %>% bold_p(t = .05)
+
+markers_ROI %>% 
+  select(percent_CD11b_total.i, percent_CD11b_tumor.i, percent_CD11b_stroma.i,
+         percent_CD11b_total.p, percent_CD11b_tumor.p, percent_CD11b_stroma.p#,
+         # race
+  ) %>% 
+  tbl_summary(#by = race,
+    # statistic = list(all_continuous() ~ "{median} ({sd})"),
+    # missing = "no", 
+    digits = list(all_continuous() ~ 2)) %>% 
+  bold_labels()
+
+markers_ROI %>% 
+  select(percent_CD11b_total.i, percent_CD11b_tumor.i, percent_CD11b_stroma.i,
+         percent_CD11b_total.p, percent_CD11b_tumor.p, percent_CD11b_stroma.p#,
+         # race
+  ) %>% 
+  tbl_summary(#by = race,
+    statistic = list(all_continuous() ~ "{min} - {max}"),
+    # missing = "no", 
+    digits = list(all_continuous() ~ 2)) %>% 
+  bold_labels()
 
 
+
+markers_ROI %>% 
+  select(
+         CD11b_total.i, CD11b_tumor.i, CD11b_stroma.i, 
+         CD11b_total.p, CD11b_tumor.p, CD11b_stroma.p#, 
+         # race
+         ) %>% 
+
+  tbl_summary(#by = race,
+              statistic = list(all_continuous() ~ "{mean} ({sd})"),
+              missing = "no")
+
+```
 
