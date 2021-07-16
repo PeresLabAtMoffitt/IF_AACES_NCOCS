@@ -78,6 +78,12 @@ clinical_data <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/
 
 # Rewove patients not matched or lost match
 ROI_global <- left_join(ROI_global, clinical_data, by="suid") %>%
+  filter(!image_tag %in% c("Peres_P1_150163  3D_[44113,18531].tif", 
+                           "Peres_P1_43004 A2_[45654,5840].tif",
+                           "Peres_P1_43773 D2_[60849,15244].tif", 
+                         "Peres_P1_AACES 130033_[37754,17929].tif",
+                         "Peres_P1_AACES 130033_[38351,13944].tif"
+                           )) %>% 
   select(suid, pair_id, everything()) %>% 
   drop_na(pair_id) %>% 
   group_by(pair_id) %>% 
@@ -177,7 +183,7 @@ b
 
 # Table 1.   Patient characteristics overall and by race/ethnicity
 
-**Leave 4 patients no BMI for whole html**  
+**Leave in the 4 patients no BMI for whole html**  
 **All model are NOT adjusted for bmi, smoker and diab**
 
 ```{r}
@@ -462,7 +468,7 @@ tbl10
 
 ## 2.Category with absent cells
 
-That is done without removing double stained from single.
+Again, that is done without removing double stained from single.
 
 ```{r new median}
 markers_ROI <- markers_ROI %>% 
@@ -814,7 +820,8 @@ tbl
 ***
 <br>
 
-# Cluster
+# Cluster  
+
 
 The count of cells double stained (for example CD3+CD8+) **ARE NOT** subtracted from the single stain count (CD3 alone and CD8 alone).  
 
@@ -2899,6 +2906,7 @@ tbl10
 
 # HR immunoscore
 `r emo::ji("pad")` Note to remember. The immunoscore were built on the data with the averaged measurement. I am not using the cluster option in the coxph even though I saw a really slight change in CI and p value.  
+
 ## Overall
 ```{r Table HR Immunoscore}
   
