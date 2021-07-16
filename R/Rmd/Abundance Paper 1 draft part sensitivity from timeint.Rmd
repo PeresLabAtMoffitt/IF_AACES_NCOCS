@@ -1,5 +1,5 @@
 ---
-title: "Immune marker data"
+title: "Abundance manuscript Sensitivity / interview"
 author: "Christelle Colin-Leitzinger"
 date: "`r Sys.Date()`"
 output: 
@@ -767,7 +767,7 @@ clust_markers$clusters_all_IandP <- clust$classification
 #                                            labels = c("low", "mid", "high"))
 clust_markers$clusters_all_IandP <- factor(clust_markers$clusters_all_IandP,
                                            levels = c(1, 2, 3, 4, 5),
-                                           labels = c("high", "mid", "mid-low", "mid-high", "low"))
+                                           labels = c("mid", "high", "mid-high", "mid-low", "low"))
 clust_markers <- clust_markers %>% mutate(clusters_all_IandP = factor(clusters_all_IandP, levels = c("low", "mid-low", "mid", "mid-high", "high")))
 
 clust_markers %>% 
