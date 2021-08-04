@@ -124,7 +124,11 @@ path <- fs::path("","Volumes","Peres_Research","K99_R00", "Image analysis data",
 #   select(suid, everything())
 # write_rds(wts_data, "wts_data.rds")
 
-wts_data <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/wts_data.rds")
+wts_data <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/wts_data.rds") %>% 
+  mutate(percent_tumor = round((tumor_total_cells / total_cells)*100, 2)
+         ) %>% 
+  mutate(percent_stroma = round((stroma_total_cells / total_cells)*100, 2)
+         )
 
 ```
 
@@ -156,6 +160,105 @@ wts_datas <- bind_rows(wts_data, markers_ROI) %>%
 
 wts_datas <- as.data.frame(wts_datas)
 ```
+
+# Average % tumor and stroma for the WTS
+
+```{r}
+average_wts <- wts_data %>% 
+  select("tumor_percent_cd3_opal_650_positive_cells", 
+         "tumor_percent_cd8_opal_570_positive_cells",
+         "tumor_percent_cd3plus_cd8plus_positive_cells",
+         "stroma_percent_cd3_opal_650_positive_cells",
+         "stroma_percent_cd8_opal_570_positive_cells",
+         "stroma_percent_cd3plus_cd8plus_positive_cells") %>% 
+  summarise(across(where(is.numeric), mean)) %>% 
+  t() %>% 
+  `colnames<-`(c("wts"))
+
+average_ <- markers_ROI %>% 
+  select("tumor_percent_cd3_opal_650_positive_cells", 
+         "tumor_percent_cd8_opal_570_positive_cells",
+         "tumor_percent_cd3plus_cd8plus_positive_cells",
+         "stroma_percent_cd3_opal_650_positive_cells",
+         "stroma_percent_cd8_opal_570_positive_cells",
+         "stroma_percent_cd3plus_cd8plus_positive_cells") %>% 
+  summarise(across(where(is.numeric), mean, na.rm = TRUE)) %>% 
+  t() %>% 
+  `colnames<-`(c("roi")) %>% 
+  bind_cols(., average_wts, .id = c("tumor_percent_cd3", 
+         "tumor_percent_cd8",
+         "tumor_percent_cd3plus_cd8plus",
+         "stroma_percent_cd3",
+         "stroma_percent_cd8",
+         "stroma_percent_cd3plus_cd8plus")) %>% 
+  select(marker = .id, everything())
+average_
+
+markers_ROI %>%
+  select(suid, percent_tumor_roi.periph = mean_tumor.p, percent_stroma_roi.periph = mean_stroma.p) %>% 
+  full_join(., wts_data %>% select(suid, percent_tumor_wts = percent_tumor, percent_stroma_wts = percent_stroma), by = "suid") %>% 
+  select(-suid) %>% 
+  tbl_summary(digits = list(everything() ~  2),
+              statistic = list(everything() ~ "{mean} ({min}, {max})")
+              )
+  
+```
+
+# Correlations between the % positivity of CD3 and CD8 between the WTS and peritumoral region ROIs
+
+```{r}
+cor_wts <- wts_data %>% 
+  select(suid, "tumor_percent_cd3_opal_650_positive_cells", 
+         "tumor_percent_cd8_opal_570_positive_cells",
+         "tumor_percent_cd3plus_cd8plus_positive_cells",
+         "stroma_percent_cd3_opal_650_positive_cells",
+         "stroma_percent_cd8_opal_570_positive_cells",
+         "stroma_percent_cd3plus_cd8plus_positive_cells") %>% 
+  mutate(slide = "wts")
+
+cor_roi <- markers_ROI %>% 
+  select(suid, "tumor_percent_cd3_opal_650_positive_cells", 
+         "tumor_percent_cd8_opal_570_positive_cells",
+         "tumor_percent_cd3plus_cd8plus_positive_cells",
+         "stroma_percent_cd3_opal_650_positive_cells",
+         "stroma_percent_cd8_opal_570_positive_cells",
+         "stroma_percent_cd3plus_cd8plus_positive_cells") %>% 
+  mutate(slide = "roi") %>% 
+  bind_rows(., cor_wts)
+cor_roi
+
+cor_data <- data.frame(matrix(nrow=1, ncol=0))
+
+for(i in 1:length(colnames(wts_datas))) {
+  
+  ids <- wts_datas %>% select(suid)
+
+  if(class(wts_datas[,i]) == "numeric" | class(wts_datas[,i]) == "integer") {
+    
+    cor_df <- cbind(ids, value = wts_datas[,i])
+    cor_df <- cor_df %>%
+      mutate(iteration = "iteration0") %>%
+      group_by(suid) %>%
+      mutate(n = row_number(suid)) %>%
+      ungroup() %>%
+      unite(iteration, iteration:n, sep = "", remove = TRUE, na.rm = TRUE) %>%
+      pivot_wider(names_from = iteration, values_from = value) %>%
+      select(c(starts_with("iteration")))
+
+    cor <- cor(cor_df, use = "complete.obs")[1,2]
+    cor_data <- cbind(cor_data,cor)
+    
+  }
+  
+}
+
+colnames(cor_data) <- colnames(wts_datas)[2:ncol(wts_datas)]
+cor_data
+
+rm(cor_df, cor, ids)
+
+```
+
 
 # Overall ICC
 
@@ -260,7 +363,7 @@ upper_gamb[lower.tri(upper_gamb)] <- NA
 ggcorrplot(upper_gamb, hc.order = FALSE, method = "square", 
            type = "lower", 
            lab = TRUE, 
-           title = "Correlation between radiomics features",
+           title = "Correlation between slides",
            show.legend = TRUE, legend.title = "Correlation", show.diag = TRUE,
            lab_col = "darkblue", lab_size = 3, 
            sig.level = 0.05, insig = c("pch", "blank"), pch = 4, pch.col = "black", pch.cex = 10, 
@@ -327,8 +430,8 @@ cold_hot <- function(data){
   ), CD3_CD8_total = factor(CD3_CD8_total, levels = c("low","high")))
 }
 
-markers_ROI <- cold_hot(markers_ROI)
-wts_data <- cold_hot(wts_data)
+# markers_ROI <- cold_hot(markers_ROI)
+# wts_data <- cold_hot(wts_data)
 wts_datas1 <- cold_hot(wts_datas1)
 # wts_datas <- bind_rows(wts_data, markers_ROI)
 
@@ -346,14 +449,161 @@ wts_datas1 <- cold_hot(wts_datas1)
 #   drop_na()
 
 wts_datas1 %>% 
-  select(CD3_tumor, CD8_tumor, wts) %>% 
+  select(CD3_tumor, CD8_tumor, 
+         CD3_CD8_tumor, CD3_stroma, 
+         CD8_stroma, CD3_CD8_stroma,
+         wts) %>% 
   tbl_summary(by = wts, statistic = list(all_continuous() ~ "{mean} ({sd})"),
               missing = "no", digits = list(all_continuous() ~ 2)) %>% add_p()
 ```
 
 6 patient were "low" for CD3 in initial slides, 7 are now "low" in the wts. etc
 
+## Kappa 
+
+```{r}
+wts_datas2 <- wts_datas1 %>% select(suid, CD3_tumor : CD3_CD8_total) %>% 
+  mutate(suid = str_remove(suid, "ini_|wts_")) %>% 
+  as.data.frame()
+
+library(irr)
+
+kappa_data <- data.frame(matrix(nrow=1, ncol=0))
+
+for(i in 1:length(colnames(wts_datas2))) {
+  
+  ids <- wts_datas2 %>% select(suid)
+
+  if(class(wts_datas2[,i]) == "numeric" | class(wts_datas2[,i]) == "integer") {
+    
+    kappa_df <- cbind(ids, value = wts_datas2[,i])
+    kappa_df <- kappa_df %>%
+      mutate(iteration = "iteration0") %>%
+      group_by(suid) %>%
+      mutate(n = row_number(suid)) %>%
+      ungroup() %>%
+      unite(iteration, iteration:n, sep = "", remove = TRUE, na.rm = TRUE) %>%
+      pivot_wider(names_from = iteration, values_from = value) %>%
+      select(c(starts_with("iteration")))
+
+    kappa <- kappa2(kappa_df, "unweighted")$value
+    kappa_data <- cbind(kappa_data, kappa)
+    
+  }
+
+}
+```
+
+CD3_tumor
+```{r}
+kappa_df <- cbind(ids, value = wts_datas2[,"CD3_tumor"])
+kappa_df <- kappa_df %>%
+      mutate(iteration = "iteration0") %>%
+      group_by(suid) %>%
+      mutate(n = row_number(suid)) %>%
+      ungroup() %>%
+      unite(iteration, iteration:n, sep = "", remove = TRUE, na.rm = TRUE) %>%
+      pivot_wider(names_from = iteration, values_from = value) %>%
+      select(c(starts_with("iteration"))) %>% 
+  rename(roi = iteration01, wts = iteration02)
+print(kappa_df)
+table(kappa_df$roi, kappa_df$wts)
+kappa2(kappa_df, "unweighted")$value
+```
+
+CD8_tumor
+```{r}
+kappa_df <- cbind(ids, value = wts_datas2[,"CD8_tumor"])
+kappa_df <- kappa_df %>%
+      mutate(iteration = "iteration0") %>%
+      group_by(suid) %>%
+      mutate(n = row_number(suid)) %>%
+      ungroup() %>%
+      unite(iteration, iteration:n, sep = "", remove = TRUE, na.rm = TRUE) %>%
+      pivot_wider(names_from = iteration, values_from = value) %>%
+      select(c(starts_with("iteration"))) %>% 
+  rename(roi = iteration01, wts = iteration02)
+print(kappa_df)
+table(kappa_df$roi, kappa_df$wts)
+kappa2(kappa_df, "unweighted")$value
+```
+
+CD3_CD8_tumor
+```{r}
+kappa_df <- cbind(ids, value = wts_datas2[,"CD3_CD8_tumor"])
+kappa_df <- kappa_df %>%
+      mutate(iteration = "iteration0") %>%
+      group_by(suid) %>%
+      mutate(n = row_number(suid)) %>%
+      ungroup() %>%
+      unite(iteration, iteration:n, sep = "", remove = TRUE, na.rm = TRUE) %>%
+      pivot_wider(names_from = iteration, values_from = value) %>%
+      select(c(starts_with("iteration"))) %>% 
+  rename(roi = iteration01, wts = iteration02)
+print(kappa_df)
+table(kappa_df$roi, kappa_df$wts)
+kappa2(kappa_df, "unweighted")$value
+```
+
+CD3_stroma
+```{r}
+kappa_df <- cbind(ids, value = wts_datas2[,"CD3_stroma"])
+kappa_df <- kappa_df %>%
+      mutate(iteration = "iteration0") %>%
+      group_by(suid) %>%
+      mutate(n = row_number(suid)) %>%
+      ungroup() %>%
+      unite(iteration, iteration:n, sep = "", remove = TRUE, na.rm = TRUE) %>%
+      pivot_wider(names_from = iteration, values_from = value) %>%
+      select(c(starts_with("iteration"))) %>% 
+  rename(roi = iteration01, wts = iteration02)
+print(kappa_df)
+table(kappa_df$roi, kappa_df$wts)
+kappa2(kappa_df, "unweighted")$value
+```
+
+CD8_stroma
+```{r}
+kappa_df <- cbind(ids, value = wts_datas2[,"CD8_stroma"])
+kappa_df <- kappa_df %>%
+      mutate(iteration = "iteration0") %>%
+      group_by(suid) %>%
+      mutate(n = row_number(suid)) %>%
+      ungroup() %>%
+      unite(iteration, iteration:n, sep = "", remove = TRUE, na.rm = TRUE) %>%
+      pivot_wider(names_from = iteration, values_from = value) %>%
+      select(c(starts_with("iteration"))) %>% 
+  rename(roi = iteration01, wts = iteration02)
+print(kappa_df)
+table(kappa_df$roi, kappa_df$wts)
+kappa2(kappa_df, "unweighted")$value
+```
+
+CD3_CD8_stroma
+```{r}
+kappa_df <- cbind(ids, value = wts_datas2[,"CD3_CD8_stroma"])
+kappa_df <- kappa_df %>%
+      mutate(iteration = "iteration0") %>%
+      group_by(suid) %>%
+      mutate(n = row_number(suid)) %>%
+      ungroup() %>%
+      unite(iteration, iteration:n, sep = "", remove = TRUE, na.rm = TRUE) %>%
+      pivot_wider(names_from = iteration, values_from = value) %>%
+      select(c(starts_with("iteration"))) %>% 
+  rename(roi = iteration01, wts = iteration02)
+print(kappa_df)
+table(kappa_df$roi, kappa_df$wts)
+kappa2(kappa_df, "unweighted")$value
+```
 
 
+function not working to build the kappa. do it by hand
 
+Kappa are :
+CD3_tumor 0.4171779  
+CD8_tumor 0.6885246  
+CD3_CD8_tumor 0.8938547   
+CD3_stroma 0.379085   
+CD8_stroma 0.4864865   
+CD3_CD8_stroma 0.5026178  
 

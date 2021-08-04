@@ -365,7 +365,7 @@ tbl1 <-
                            percent_CD3_FoxP3_tumor ~ "percent CD3+/FoxP3+",
                            percent_CD11b_tumor ~ "percent CD11b+", percent_CD11b_CD15_tumor ~ "percent CD11b+/CD15+"),
               missing = "no", digits = list(all_continuous() ~ 2)) %>% 
-  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
+  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) %>% add_q()
 tbl2 <-
   markers_ROI %>% 
   select(percent_CD3_stroma.i, percent_CD3_CD8_stroma.i, percent_CD3_FoxP3_stroma.i, 
@@ -380,7 +380,7 @@ tbl2 <-
                            percent_CD3_FoxP3_stroma ~ "percent CD3+/FoxP3+",
                            percent_CD11b_stroma ~ "percent CD11b+", percent_CD11b_CD15_stroma ~ "percent CD11b+/CD15+"),
               missing = "no", digits = list(all_continuous() ~ 2)) %>% 
-  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) 
+  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) %>% add_q() 
 tbl3 <-
   markers_ROI %>% 
   select(percent_CD3_total.i, percent_CD3_CD8_total.i, percent_CD3_FoxP3_total.i, 
@@ -395,7 +395,7 @@ tbl3 <-
                            percent_CD3_FoxP3_total ~ "percent CD3+/FoxP3+",
                            percent_CD11b_total ~ "percent CD11b+", percent_CD11b_CD15_total ~ "percent CD11b+/CD15+"),
               missing = "no", digits = list(all_continuous() ~ 2)) %>% 
-  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) 
+  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) %>% add_q() 
 
 
 tbl5 <-
@@ -412,7 +412,7 @@ tbl5 <-
                            percent_CD3_FoxP3_tumor ~ "percent CD3+/FoxP3+",
                            percent_CD11b_tumor ~ "percent CD11b+", percent_CD11b_CD15_tumor ~ "percent CD11b+/CD15+"),
               missing = "no", digits = list(all_continuous() ~ 2)) %>% 
-  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
+  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) %>% add_q()
 tbl6 <-
   markers_ROI %>% 
   select(percent_CD3_stroma.p, percent_CD3_CD8_stroma.p, percent_CD3_FoxP3_stroma.p, 
@@ -427,7 +427,7 @@ tbl6 <-
                            percent_CD3_FoxP3_stroma ~ "percent CD3+/FoxP3+",
                            percent_CD11b_stroma ~ "percent CD11b+", percent_CD11b_CD15_stroma ~ "percent CD11b+/CD15+"),
               missing = "no", digits = list(all_continuous() ~ 2)) %>% 
-  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
+  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) %>% add_q()
 tbl7 <-
   markers_ROI %>% 
   select(percent_CD3_total.p, percent_CD3_CD8_total.p, percent_CD3_FoxP3_total.p, 
@@ -442,7 +442,7 @@ tbl7 <-
                            percent_CD3_FoxP3_total ~ "percent CD3+/FoxP3+",
                            percent_CD11b_total ~ "percent CD11b+", percent_CD11b_CD15_total ~ "percent CD11b+/CD15+"),
               missing = "no", digits = list(all_continuous() ~ 2)) %>% 
-  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) 
+  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) %>% add_q() 
 
 tbl4 <- tbl_merge(list(tbl1, tbl5), tab_spanner = c("**Intratumoral**", "**Peripheral**"))
 tbl8 <- tbl_merge(list(tbl2, tbl6), tab_spanner = c("**Intratumoral**", "**Peripheral**"))
@@ -679,7 +679,7 @@ tbl1 <-
                            CD3_FoxP3_tumor ~ "percent CD3+/FoxP3+",
                            CD11b_tumor ~ "percent CD11b+", CD11b_CD15_tumor ~ "percent CD11b+/CD15+"),
               missing = "no") %>% 
-  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
+  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) %>% add_q()
 tbl2 <-
   markers_ROI %>% 
   select(CD3_stroma.i, CD3_CD8_stroma.i, CD3_FoxP3_stroma.i, 
@@ -694,7 +694,7 @@ CD11b_stroma = CD11b_stroma.i, CD11b_CD15_stroma = CD11b_CD15_stroma.i) %>%
                            CD3_FoxP3_stroma ~ "percent CD3+/FoxP3+",
                            CD11b_stroma ~ "percent CD11b+", CD11b_CD15_stroma ~ "percent CD11b+/CD15+"),
               missing = "no") %>% 
-  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) 
+  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) %>% add_q() 
 tbl3 <-
   markers_ROI %>% 
   select(CD3_total.i, CD3_CD8_total.i, CD3_FoxP3_total.i, 
@@ -709,7 +709,7 @@ CD11b_total = CD11b_total.i, CD11b_CD15_total = CD11b_CD15_total.i) %>%
                            CD3_FoxP3_total ~ "percent CD3+/FoxP3+",
                            CD11b_total ~ "percent CD11b+", CD11b_CD15_total ~ "percent CD11b+/CD15+"),
               missing = "no") %>% 
-  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) 
+  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) %>% add_q() 
 
 
 tbl5 <-
@@ -726,7 +726,7 @@ CD11b_tumor = CD11b_tumor.p, CD11b_CD15_tumor = CD11b_CD15_tumor.p) %>%
                            CD3_FoxP3_tumor ~ "percent CD3+/FoxP3+",
                            CD11b_tumor ~ "percent CD11b+", CD11b_CD15_tumor ~ "percent CD11b+/CD15+"),
               missing = "no") %>% 
-  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
+  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) %>% add_q()
 tbl6 <-
   markers_ROI %>% 
   select(CD3_stroma.p, CD3_CD8_stroma.p, CD3_FoxP3_stroma.p, 
@@ -741,7 +741,7 @@ CD11b_stroma = CD11b_stroma.p, CD11b_CD15_stroma = CD11b_CD15_stroma.p) %>%
                            CD3_FoxP3_stroma ~ "percent CD3+/FoxP3+",
                            CD11b_stroma ~ "percent CD11b+", CD11b_CD15_stroma ~ "percent CD11b+/CD15+"),
               missing = "no") %>% 
-  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05)
+  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) %>% add_q()
 tbl7 <-
   markers_ROI %>% 
   select(CD3_total.p, CD3_CD8_total.p, CD3_FoxP3_total.p, 
@@ -756,7 +756,7 @@ CD11b_total = CD11b_total.p, CD11b_CD15_total = CD11b_CD15_total.p) %>%
                            CD3_FoxP3_total ~ "percent CD3+/FoxP3+",
                            CD11b_total ~ "percent CD11b+", CD11b_CD15_total ~ "percent CD11b+/CD15+"),
               missing = "no") %>% 
-  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) 
+  add_overall() %>% bold_labels() %>% add_p() %>% bold_p(t = .05) %>% add_q() 
 
 tbl4 <- tbl_merge(list(tbl1, tbl5), tab_spanner = c("**Intratumoral**", "**Peripheral**"))
 tbl8 <- tbl_merge(list(tbl2, tbl6), tab_spanner = c("**Intratumoral**", "**Peripheral**"))
