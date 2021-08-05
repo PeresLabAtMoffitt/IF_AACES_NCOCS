@@ -463,7 +463,16 @@ tbl10
 ```
 <br>
 
-
+```{r}
+pdf(paste0(path, "/Boxplot stroma CD3CD8 peripheral.pdf"))
+markers_ROI %>% 
+  # select(percent_CD3_CD8_stroma.p, race) %>% 
+  ggplot(aes(x= race, y = percent_CD3_CD8_stroma.p)) + 
+  geom_boxplot(fill = "grey") +
+  labs(x = "Race", y = "Percent Positivity") +
+  theme_classic()
+dev.off()
+```
 
 
 ## 2.Category with absent cells
