@@ -620,24 +620,45 @@ df1 <- as.data.frame(markers_ROI[,c("percent_CD3_tumor.i", "percent_CD3_CD8_tumo
                                     "percent_CD11b_tumor.i", "percent_CD11b_CD15_tumor.i",
                                     "percent_CD3_stroma.i", "percent_CD3_CD8_stroma.i", "percent_CD3_FoxP3_stroma.i",
                                     "percent_CD11b_stroma.i", "percent_CD11b_CD15_stroma.i",
-                                    "suid", "race")]) %>% 
-  arrange(race, percent_CD3_stroma.i, percent_CD3_CD8_stroma.i) %>% 
+                                    "suid", "race", "clusters_all_IandP")]) %>% 
+  arrange(clusters_all_IandP, percent_CD3_stroma.i, percent_CD3_CD8_stroma.i) %>% 
   # drop_na(percent_CD3_tumor.i) %>% 
-  unite(suid, c(suid, race), sep = "_", remove = TRUE) %>% 
+  unite(suid, c(suid, race, clusters_all_IandP), sep = "_", remove = TRUE) %>% 
   `row.names<-`(.$suid) %>% 
   select(-suid) 
-# df1 <- as.matrix(df1)
-# df2 <- t(df1)
+
+# scores_median <- median(scores)
+# scores_median_absolute_deviation <- abs(scores - scores_median)
+# scores_median_absolute_deviation
+# median_median_absolute_deviations <- median(scores_median_absolute_deviation)
+# median_median_absolute_deviations
+# scores_mad <- median_median_absolute_deviations * 1.4826
+# scores_mad
+
+
 
 # Create matrix and drop NA
-df2 <- t(scale(t(as.matrix(df1)))) # scale for standardizing the data to make variables comparable
+df2 <- t(scale((as.matrix(df1)))) # scale for standardizing the data to make variables comparable
 df2 <- df2[complete.cases(df2 * 0), , drop=FALSE]
 
 # Create colors for cluster
-condition_colors <- unlist(lapply(rownames(df2), function(x){
+condition_colors <- unlist(lapply(rownames(df1), function(x){
   if(grepl("White", x)) "pink"
   else if(grepl("Black", x)) "grey"
 }))
+condition_colors1 <- unlist(lapply(rownames(df1), function(x){
+  case_when(
+    str_detect(x, "mid-low") ~ "red",
+    str_detect(x, "mid-high") ~ "grey",
+    str_detect(x, "low") ~ "steelblue1",
+    str_detect(x, "mid") ~ "black",
+    str_detect(x, "high") ~ "tan1",
+    TRUE          ~ NA_character_)
+}))
+mycols <- cbind(condition_colors, condition_colors1, deparse.level = 2)
+colnames(mycols)[1] <- "reaceth"
+colnames(mycols)[2] <- "clust"
+
 # Transpose
 df2 <- t(df2)
 ```
@@ -654,7 +675,7 @@ heatmap.2(df2, #main = "kjh",
           # lhei=c(1.1, 10), 
           margins = c(1,13), # bottom, right
           ColSideColors = condition_colors,
-          scale = "none",
+          scale = "column",
           key.par=list(mgp=c(1.5, 0.5, 0), # pos for value, number, axes
                        mar=c(3.5, 1, 2.5, 1) # color key pos down, left, top, right
                        )
@@ -666,6 +687,28 @@ legend(0.83, 0.95, # right, up
 
 No reordering by row
 ```{r}
+library(heatmap.plus)
+
+heatmap.plus(df2, 
+             main = "Heatmap",
+             col = bluered(20),
+             cexRow = 1,
+             margins = c(1, 17), # bottom, right
+             ColSideColors = mycols,
+             scale = "column",
+             Rowv = NA
+
+)
+legend(0.83, 0.95, # right, up
+       legend = c("Recurrence", "No Recurrence"), 
+       fill = c("pink", "grey"), cex = 0.6,
+       bty = "n")
+legend(0.72, 1, # right, up
+       legend = c("low", "mid-low", "mid", "mid-high", "high"),
+       fill = c("steelblue1", "red", "black", "grey", "tan1"), cex = 0.6,
+       bty = "n")
+
+
 heatmap.2(df2, #main = "kjh",
 
           trace = "none", density="none", col=bluered(20), cexRow=1,
@@ -685,6 +728,26 @@ legend(0.83, 0.95, # right, up
 
 No reordering at all
 ```{r}
+
+heatmap.plus(df2, 
+             main = "Heatmap",
+             col = bluered(20),
+             cexRow = 1,
+             margins = c(1, 17), # bottom, right
+             ColSideColors = mycols,
+             scale = "column",
+             Rowv = NA, Colv = NA,
+
+)
+legend(0.83, 0.95, # right, up
+       legend = c("Recurrence", "No Recurrence"), 
+       fill = c("pink", "grey"), cex = 0.6,
+       bty = "n")
+legend(0.72, 1, # right, up
+       legend = c("low", "mid-low", "mid", "mid-high", "high"),
+       fill = c("steelblue1", "red", "black", "grey", "tan1"), cex = 0.6,
+       bty = "n")
+
 heatmap.2(df2, #main = "kjh",
 
           trace = "none", density="none", col=bluered(20), cexRow=1,
