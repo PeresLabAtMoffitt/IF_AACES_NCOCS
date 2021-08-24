@@ -687,7 +687,7 @@ legend(0.83, 0.95, # right, up
 
 No reordering by row
 ```{r}
-library(heatmap.plus)
+library(Heatplus)
 
 heatmap.plus(df2, 
              main = "Heatmap",
@@ -725,6 +725,77 @@ legend(0.83, 0.95, # right, up
        legend = c("White", "Black"), fill = c("pink", "grey"), cex = 0.7,
        bty = "n")
 ```
+
+Try median absolute deviation
+
+```{r}
+df1 <- as.data.frame(markers_ROI[,c("percent_CD3_tumor.i", "percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", 
+                                    "percent_CD11b_tumor.i", "percent_CD11b_CD15_tumor.i",
+                                    "percent_CD3_stroma.i", "percent_CD3_CD8_stroma.i", "percent_CD3_FoxP3_stroma.i",
+                                    "percent_CD11b_stroma.i", "percent_CD11b_CD15_stroma.i",
+                                    "suid", "race", "clusters_all_IandP")]) %>% 
+  summarize(CD3T = median(percent_CD3_tumor.i),
+            CD38T = median(percent_CD3_CD8_tumor.i),
+            CD3FOXT = median(percent_CD3_FoxP3_tumor.i),
+            CD11T = median(percent_CD11b_tumor.i),
+            CD1115T = median(percent_CD11b_CD15_tumor.i),
+            CD3S = median(percent_CD3_stroma.i),
+            CD38S = median(percent_CD3_CD8_stroma.i),
+            CD3FOXS = median(percent_CD3_FoxP3_stroma.i),
+            CD11S = median(percent_CD11b_stroma.i),
+            CD1115S = median(percent_CD11b_CD15_stroma.i),
+            ) %>% 
+  bind_cols(as.data.frame(markers_ROI[,c("percent_CD3_tumor.i", "percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", 
+                                    "percent_CD11b_tumor.i", "percent_CD11b_CD15_tumor.i",
+                                    "percent_CD3_stroma.i", "percent_CD3_CD8_stroma.i", "percent_CD3_FoxP3_stroma.i",
+                                    "percent_CD11b_stroma.i", "percent_CD11b_CD15_stroma.i",
+                                    "suid", "race", "clusters_all_IandP")])) %>% 
+  
+  mutate(percent_CD3_tumor.i = (percent_CD3_tumor.i - median(CD3T, na.rm = TRUE))) %>% 
+  mutate(percent_CD3_CD8_tumor.i = (percent_CD3_CD8_tumor.i - median(CD38T, na.rm = TRUE))) %>% 
+  mutate(percent_CD3_FoxP3_tumor.i = (percent_CD3_FoxP3_tumor.i - median(CD3FOXT, na.rm = TRUE))) %>% 
+  mutate(percent_CD11b_tumor.i = (percent_CD11b_tumor.i - median(CD11T, na.rm = TRUE))) %>% 
+  mutate(percent_CD11b_CD15_tumor.i = (percent_CD11b_CD15_tumor.i - median(CD1115T, na.rm = TRUE))) %>% 
+  mutate(percent_CD3_stroma.i = (percent_CD3_stroma.i - median(CD3S, na.rm = TRUE))) %>% 
+  mutate(percent_CD3_CD8_stroma.i = (percent_CD3_CD8_stroma.i - median(CD38S, na.rm = TRUE))) %>% 
+  mutate(percent_CD3_FoxP3_stroma.i = (percent_CD3_FoxP3_stroma.i - median(CD3FOXS, na.rm = TRUE))) %>% 
+  mutate(percent_CD11b_stroma.i = (percent_CD11b_stroma.i - median(CD11S, na.rm = TRUE))) %>% 
+  mutate(percent_CD11b_CD15_stroma.i = (percent_CD11b_CD15_stroma.i - median(CD1115S, na.rm = TRUE))) %>% 
+  # mutate(across(where(is.numeric)), abs(. - median(CD3, na.rm = TRUE))
+  #        )
+  arrange(clusters_all_IandP, percent_CD3_stroma.i, percent_CD3_CD8_stroma.i) %>%
+  unite(suid, c(suid, race, clusters_all_IandP), sep = "_", remove = TRUE) %>%
+  `row.names<-`(.$suid) %>%
+  select(-c(suid, starts_with("CD")))
+
+df2 <- t(scale((as.matrix(df1)))) # scale for standardizing the data to make variables comparable
+df2 <- df2[complete.cases(df2 * 0), , drop=FALSE]
+
+# Create colors for cluster
+condition_colors <- unlist(lapply(rownames(df1), function(x){
+  if(grepl("White", x)) "pink"
+  else if(grepl("Black", x)) "grey"
+}))
+condition_colors1 <- unlist(lapply(rownames(df1), function(x){
+  case_when(
+    str_detect(x, "mid-low") ~ "red",
+    str_detect(x, "mid-high") ~ "grey",
+    str_detect(x, "low") ~ "steelblue1",
+    str_detect(x, "mid") ~ "black",
+    str_detect(x, "high") ~ "tan1",
+    TRUE          ~ NA_character_)
+}))
+mycols <- cbind(condition_colors, condition_colors1, deparse.level = 2)
+colnames(mycols)[1] <- "reaceth"
+colnames(mycols)[2] <- "clust"
+
+# Transpose
+df2 <- t(df2)
+
+```
+
+
+
 
 No reordering at all
 ```{r}
