@@ -638,7 +638,7 @@ df1 <- as.data.frame(markers_ROI[,c("percent_CD3_tumor.i", "percent_CD3_CD8_tumo
 
 
 # Create matrix and drop NA
-df2 <- t(scale((as.matrix(df1)))) # scale for standardizing the data to make variables comparable
+df2 <- t(scale(t(as.matrix(df1)))) # scale for standardizing the data to make variables comparable
 df2 <- df2[complete.cases(df2 * 0), , drop=FALSE]
 
 # Create colors for cluster
@@ -674,8 +674,8 @@ heatmap.2(df2, #main = "kjh",
           lwid=c(1.2, 10), # decrease width of left dendro
           # lhei=c(1.1, 10), 
           margins = c(1,13), # bottom, right
-          ColSideColors = condition_colors,
-          scale = "column",
+          # ColSideColzors = condition_colors,
+          scale = "row",
           key.par=list(mgp=c(1.5, 0.5, 0), # pos for value, number, axes
                        mar=c(3.5, 1, 2.5, 1) # color key pos down, left, top, right
                        )

@@ -64,6 +64,8 @@ library(psych)
 # library(ggcorrplot)
 library(mclust)
 library(sensemakr)
+library(gplots)
+library(heatmap.plus)
 ```
 
 ```{r load}
@@ -464,14 +466,14 @@ tbl10
 <br>
 
 ```{r}
-pdf(paste0(path, "/Boxplot stroma CD3CD8 peripheral.pdf"))
+# pdf(paste0(path, "/Boxplot stroma CD3CD8 peripheral.pdf"))
 markers_ROI %>% 
   # select(percent_CD3_CD8_stroma.p, race) %>% 
   ggplot(aes(x= race, y = percent_CD3_CD8_stroma.p)) + 
   geom_boxplot(fill = "grey") +
   labs(x = "Race", y = "Percent Positivity") +
   theme_classic()
-dev.off()
+# dev.off()
 ```
 
 
@@ -990,12 +992,258 @@ tbl
 # gt::gtsave(tbl, paste0(path, "/Table 2d Cluster in ROIs.pdf"))
 ```
 
-# Test visualisation abundance in mclust groups
-<!-- ## Immunoscore -->
+## Visualisation abundance in mclust groups
+
+<!-- ### Normalizing with the median -->
+
 ```{r}
+# df1 <- as.data.frame(markers_ROI[,c("percent_CD3_tumor.i", "percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", 
+#                                     "percent_CD11b_tumor.i", "percent_CD11b_CD15_tumor.i",
+#                                     "percent_CD3_stroma.i", "percent_CD3_CD8_stroma.i", "percent_CD3_FoxP3_stroma.i",
+#                                     "percent_CD11b_stroma.i", "percent_CD11b_CD15_stroma.i",
+#                                     "suid", "race", "clusters_all_IandP")]) %>% 
+#   mutate(percent_CD3_tumor.i = (percent_CD3_tumor.i - median(percent_CD3_tumor.i, na.rm = TRUE))) %>% 
+#   mutate(percent_CD3_CD8_tumor.i = (percent_CD3_CD8_tumor.i - median(percent_CD3_CD8_tumor.i, na.rm = TRUE))) %>% 
+#   mutate(percent_CD3_FoxP3_tumor.i = (percent_CD3_FoxP3_tumor.i - median(percent_CD3_FoxP3_tumor.i, na.rm = TRUE))) %>% 
+#   mutate(percent_CD11b_tumor.i = (percent_CD11b_tumor.i - median(percent_CD11b_tumor.i, na.rm = TRUE))) %>% 
+#   mutate(percent_CD11b_CD15_tumor.i = (percent_CD11b_CD15_tumor.i - median(percent_CD11b_CD15_tumor.i, na.rm = TRUE))) %>% 
+#   mutate(percent_CD3_stroma.i = (percent_CD3_stroma.i - median(percent_CD3_stroma.i, na.rm = TRUE))) %>% 
+#   mutate(percent_CD3_CD8_stroma.i = (percent_CD3_CD8_stroma.i - median(percent_CD3_CD8_stroma.i, na.rm = TRUE))) %>% 
+#   mutate(percent_CD3_FoxP3_stroma.i = (percent_CD3_FoxP3_stroma.i - median(percent_CD3_FoxP3_stroma.i, na.rm = TRUE))) %>% 
+#   mutate(percent_CD11b_stroma.i = (percent_CD11b_stroma.i - median(percent_CD11b_stroma.i, na.rm = TRUE))) %>% 
+#   mutate(percent_CD11b_CD15_stroma.i = (percent_CD11b_CD15_stroma.i - median(percent_CD11b_CD15_stroma.i, na.rm = TRUE))) %>% 
+#   # mutate(across(where(is.numeric)), abs(. - median(CD3, na.rm = TRUE))
+#   #        )
+#   arrange(clusters_all_IandP, percent_CD3_stroma.i, percent_CD3_CD8_stroma.i) %>%
+#   unite(suid, c(suid, race, clusters_all_IandP), sep = "_", remove = TRUE) %>%
+#   `row.names<-`(.$suid) %>%
+#   select(-c(suid, starts_with("CD")))
+# 
+# df2 <- t(scale((as.matrix(df1)))) # scale for standardizing the data to make variables comparable
+# df2 <- df2[complete.cases(df2 * 0), , drop=FALSE]
+# 
+# # Create colors for cluster
+# condition_colors <- unlist(lapply(rownames(df1), function(x){
+#   if(grepl("White", x)) "#365D8DFF" # 0D0887FF 31688EFF
+#   else if(grepl("Black", x)) "#FFEA46FF" # F0F921FF
+# }))
+# condition_colors1 <- unlist(lapply(rownames(df1), function(x){
+#   case_when(
+#     str_detect(x, "mid-low") ~ "#721F81FF",
+#     str_detect(x, "mid-high") ~ "#FD9567FF",
+#     str_detect(x, "low") ~ "#000004FF",
+#     str_detect(x, "mid") ~ "#CD4071FF",
+#     str_detect(x, "high") ~ "#FEC98DFF",
+#     TRUE          ~ NA_character_)
+# }))
+# mycols <- cbind(condition_colors, condition_colors1, deparse.level = 2)
+# colnames(mycols)[1] <- "reaceth"
+# colnames(mycols)[2] <- "clust"
+# 
+# 
+# heatmap.plus(df2, 
+#              main = "Heatmap",
+#              col = bluered(20),
+#              cexRow = 1,
+#              margins = c(1, 17), # bottom, right
+#              ColSideColors = mycols,
+#              scale = "column",
+#              Rowv = NA, Colv = NA,
+# )
+```
+
+
+### Using absolute median
+```{r, fig.width=12}
+calculated_mad <- mad(as.matrix(markers_ROI[,c("percent_CD3_tumor.i", "percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", 
+                                 "percent_CD11b_tumor.i", "percent_CD11b_CD15_tumor.i",
+                                 "percent_CD3_stroma.i", "percent_CD3_CD8_stroma.i", "percent_CD3_FoxP3_stroma.i",
+                                 "percent_CD11b_stroma.i", "percent_CD11b_CD15_stroma.i")]))
+
+df1 <- as.data.frame(markers_ROI[,c("percent_CD3_tumor.i", "percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", 
+                                    "percent_CD11b_tumor.i", "percent_CD11b_CD15_tumor.i",
+                                    "percent_CD3_stroma.i", "percent_CD3_CD8_stroma.i", "percent_CD3_FoxP3_stroma.i",
+                                    "percent_CD11b_stroma.i", "percent_CD11b_CD15_stroma.i",
+                                    "suid", "race", "clusters_all_IandP")]) %>% 
+  mutate(percent_CD3_tumor.i = (percent_CD3_tumor.i - median(percent_CD3_tumor.i, na.rm = TRUE))/
+           calculated_mad) %>% 
+  mutate(percent_CD3_CD8_tumor.i = (percent_CD3_CD8_tumor.i - median(percent_CD3_CD8_tumor.i, na.rm = TRUE))/
+           calculated_mad) %>% 
+  mutate(percent_CD3_FoxP3_tumor.i = (percent_CD3_FoxP3_tumor.i - median(percent_CD3_FoxP3_tumor.i, na.rm = TRUE))/
+           calculated_mad) %>% 
+  mutate(percent_CD11b_tumor.i = (percent_CD11b_tumor.i - median(percent_CD11b_tumor.i, na.rm = TRUE))/
+           calculated_mad) %>% 
+  mutate(percent_CD11b_CD15_tumor.i = (percent_CD11b_CD15_tumor.i - median(percent_CD11b_CD15_tumor.i, na.rm = TRUE))/
+           calculated_mad) %>% 
+  mutate(percent_CD3_stroma.i = (percent_CD3_stroma.i - median(percent_CD3_stroma.i, na.rm = TRUE))/
+           calculated_mad) %>% 
+  mutate(percent_CD3_CD8_stroma.i = (percent_CD3_CD8_stroma.i - median(percent_CD3_CD8_stroma.i, na.rm = TRUE))/
+           calculated_mad) %>% 
+  mutate(percent_CD3_FoxP3_stroma.i = (percent_CD3_FoxP3_stroma.i - median(percent_CD3_FoxP3_stroma.i, na.rm = TRUE))/
+           calculated_mad) %>% 
+  mutate(percent_CD11b_stroma.i = (percent_CD11b_stroma.i - median(percent_CD11b_stroma.i, na.rm = TRUE))/
+           calculated_mad) %>% 
+  mutate(percent_CD11b_CD15_stroma.i = (percent_CD11b_CD15_stroma.i - median(percent_CD11b_CD15_stroma.i, na.rm = TRUE))/
+           calculated_mad) %>% 
+  # mutate(across(where(is.numeric)), abs(. - median(CD3, na.rm = TRUE))
+  #        )
+  arrange(clusters_all_IandP, percent_CD3_stroma.i, percent_CD3_CD8_stroma.i) %>%
+  unite(suid, c(suid, race, clusters_all_IandP), sep = "_", remove = TRUE) %>%
+  `row.names<-`(.$suid) %>%
+  select(-c(suid, starts_with("CD")))
+
+# Create colors for cluster
+condition_colors <- unlist(lapply(rownames(df1), function(x){
+  if(grepl("White", x)) "#365D8DFF" # 0D0887FF 31688EFF
+  else if(grepl("Black", x)) "#FFEA46FF" # F0F921FF
+}))
+condition_colors1 <- unlist(lapply(rownames(df1), function(x){
+  case_when(
+    str_detect(x, "mid-low") ~ "#721F81FF",
+    str_detect(x, "mid-high") ~ "#FD9567FF",
+    str_detect(x, "low") ~ "#000004FF",
+    str_detect(x, "mid") ~ "#CD4071FF",
+    str_detect(x, "high") ~ "#FEC98DFF",
+    TRUE          ~ NA_character_)
+}))
+mycols <- cbind(condition_colors, condition_colors1, deparse.level = 2)
+colnames(mycols)[1] <- "reaceth"
+colnames(mycols)[2] <- "clust"
+
+df3 <- as.matrix(df1)
+heatmap.plus(t(df3), 
+             main = "Heatmap",
+             col = bluered(20),
+             cexRow = 1,
+             margins = c(1, 17), # bottom, right
+             ColSideColors = mycols,
+             scale = "none",
+             Rowv = NA, Colv = NA,
+)
+
+heatmap.plus(t(df3), 
+             main = "Heatmap",
+             col = bluered(20),
+             cexRow = 1,
+             margins = c(1, 30), # bottom, right
+             ColSideColors = mycols,
+             scale = "none",
+             Rowv = NA,
+             revC =
+)
+
+legend(0.85, 1, # right, up
+       legend = c("Recurrence", "No Recurrence"), 
+       fill = c("pink", "grey"), cex = 0.6,
+       bty = "n")
+legend(0.7, 1, # right, up
+       legend = c("low", "mid-low", "mid", "mid-high", "high"),
+       fill = c("#440154FF", "#3B528BFF", "#21908CFF", "#5DC863FF", "#FDE725FF"), cex = 0.6,
+       bty = "n")
+```
+
+```{r}
+marker.exp <- ((markers_ROI[,c("suid", "percent_CD3_tumor.i", "percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", 
+                               "percent_CD11b_tumor.i", "percent_CD11b_CD15_tumor.i",
+                               "percent_CD3_stroma.i", "percent_CD3_CD8_stroma.i", "percent_CD3_FoxP3_stroma.i",
+                               "percent_CD11b_stroma.i", "percent_CD11b_CD15_stroma.i",
+                               "race", "clusters_all_IandP")])) %>% 
+  arrange(clusters_all_IandP, percent_CD3_stroma.i, percent_CD3_CD8_stroma.i) %>%
+  unite(suid, c(suid, race, clusters_all_IandP), sep = "_", remove = TRUE) %>%
+  `row.names<-`(.$suid) %>%
+  select(-c(suid, starts_with("CD")))
+
+sqrt.markers <- sqrt(marker.exp[,c(1:length(marker.exp))])
+
+z_sqrt.markers <- sqrt.markers %>% 
+  mutate(mad_percent_CD3_tumor.i = mad((percent_CD3_tumor.i)) + 0.0001
+  ) %>% 
+  mutate(mad_percent_CD3_CD8_tumor.i = mad((percent_CD3_CD8_tumor.i)) + 0.0001
+  ) %>% 
+  mutate(mad_percent_CD3_FoxP3_tumor.i = mad((percent_CD3_FoxP3_tumor.i)) + 0.0001
+  ) %>% 
+  mutate(mad_percent_CD11b_tumor.i = mad((percent_CD11b_tumor.i)) + 0.0001
+  ) %>% 
+  mutate(mad_percent_CD11b_CD15_tumor.i = mad((percent_CD11b_CD15_tumor.i)) + 0.0001
+  ) %>% 
+  mutate(mad_percent_CD3_stroma.i = mad((percent_CD3_stroma.i)) + 0.0001
+  ) %>% 
+  mutate(mad_percent_CD3_CD8_stroma.i = mad((percent_CD3_CD8_stroma.i)) + 0.0001
+  ) %>% 
+  mutate(mad_percent_CD3_FoxP3_stroma.i = mad((percent_CD3_FoxP3_stroma.i)) + 0.0001
+  ) %>% 
+  mutate(mad_percent_CD11b_stroma.i = mad((percent_CD11b_stroma.i)) + 0.0001
+  ) %>% 
+  mutate(mad_percent_CD11b_CD15_stroma.i = mad((percent_CD11b_CD15_stroma.i)) + 0.0001
+  ) %>% 
+  
+  mutate(z_percent_CD3_tumor.i = (percent_CD3_tumor.i - median(percent_CD3_tumor.i, na.rm = TRUE))/
+           mad_percent_CD3_tumor.i) %>% 
+  mutate(z_percent_CD3_CD8_tumor.i = (percent_CD3_CD8_tumor.i - median(percent_CD3_CD8_tumor.i, na.rm = TRUE))/
+           mad_percent_CD3_CD8_tumor.i) %>% 
+  mutate(z_percent_CD3_FoxP3_tumor.i = (percent_CD3_FoxP3_tumor.i - median(percent_CD3_FoxP3_tumor.i, na.rm = TRUE))/
+           mad_percent_CD3_FoxP3_tumor.i) %>% 
+  mutate(z_percent_CD11b_tumor.i = (percent_CD11b_tumor.i - median(percent_CD11b_tumor.i, na.rm = TRUE))/
+           mad_percent_CD11b_tumor.i) %>% 
+  mutate(z_percent_CD11b_CD15_tumor.i = (percent_CD11b_CD15_tumor.i - median(percent_CD11b_CD15_tumor.i, na.rm = TRUE))/
+           mad_percent_CD11b_CD15_tumor.i) %>% 
+  mutate(z_percent_CD3_stroma.i = (percent_CD3_stroma.i - median(percent_CD3_stroma.i, na.rm = TRUE))/
+           mad_percent_CD3_stroma.i) %>% 
+  mutate(z_percent_CD3_CD8_stroma.i = (percent_CD3_CD8_stroma.i - median(percent_CD3_CD8_stroma.i, na.rm = TRUE))/
+           mad_percent_CD3_CD8_stroma.i) %>% 
+  mutate(z_percent_CD3_FoxP3_stroma.i = (percent_CD3_FoxP3_stroma.i - median(percent_CD3_FoxP3_stroma.i, na.rm = TRUE))/
+           mad_percent_CD3_FoxP3_stroma.i) %>% 
+  mutate(z_percent_CD11b_stroma.i = (percent_CD11b_stroma.i - median(percent_CD11b_stroma.i, na.rm = TRUE))/
+           mad_percent_CD11b_stroma.i) %>% 
+  mutate(z_percent_CD11b_CD15_stroma.i = (percent_CD11b_CD15_stroma.i - median(percent_CD11b_CD15_stroma.i, na.rm = TRUE))/
+           mad_percent_CD11b_CD15_stroma.i) %>% 
+  select(c(starts_with("z_")))
+
+df5 <- (t(scale(as.matrix(z_sqrt.markers)))) # scale for standardizing the data to make variables comparable
+df5 <- df5[complete.cases(df5 * 0), , drop=FALSE]
+
+# col = c("#000004FF", "#51127CFF", "#B63679FF", "#FB8861FF", "#FCFDBFFF")
+# breaks <- c(-2, -1, 0, 1, 2, 10)
+# heatmap.plus(df5, 
+#              main = "Heatmap",
+#              breaks = breaks, col = col,
+#              cexRow = 1,
+#              margins = c(1, 17), # bottom, right
+#              ColSideColors = mycols,
+#              scale = "none",
+#              Rowv = NA, Colv = NA,
+#              
+# )
+
+# heatmap.2(df5, breaks = breaks, col = col, trace = "none")
+Heatmap(df5, name = " ",
+        cluster_rows = FALSE, cluster_columns = FALSE)
+
+library(circlize)
+col_fun = colorRamp2(c(-2, 0, 2), c("green", "white", "red"))
+col_fun(seq(-3, 3))
+Heatmap(df5, name = "mat", col = col_fun,
+        cluster_rows = FALSE, cluster_columns = FALSE)
+
+
+column_ho = HeatmapAnnotation(race = c(markers_ROI$race),
+                              clus = (markers_ROI$clusters_all_IandP), 
+                              col = list(foo = c("low" = "red", "high" = "green",
+                                                 "mid" = "blue", "mid-low"= "orange", 
+                                                 "mid_high"= "pink")),
+    na_col = "black")
+Heatmap(df5, name = " ",
+        cluster_rows = FALSE, cluster_columns = FALSE,
+        top_annotation = column_ho)
+
+
+
+
+```
+
+
+```{r, fig.width=12}
 library(ggridges)
-
-
 # # a <- markers_ROI %>% 
 # #   filter(!is.na(immunoscore_2018lancet_patients)) %>% 
 # #   select(immunoscore_2018lancet_patients, 
@@ -1106,7 +1354,6 @@ library(ggridges)
 #   facet_wrap(~ immunoscore_2018lancet_patients, nrow = 1)
 ```
 
-<!-- ## mclust -->
 
 ```{r}
 b <- markers_ROI %>% 
