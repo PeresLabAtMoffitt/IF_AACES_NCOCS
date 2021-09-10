@@ -1216,6 +1216,13 @@ Heatmap(df5, name = " ",
         cluster_rows = FALSE, cluster_columns = FALSE,
         top_annotation = column_ho)
 
+column_ho = HeatmapAnnotation(race = c(marker.exp$race),
+                              col = list(race = c("White" = "#932667FF", "Black" = "grey")),
+    na_col = "black")
+Heatmap(df5, name = " ",
+        cluster_rows = FALSE,
+        top_annotation = column_ho)
+
 ```
 
 #### Peritumoral
@@ -1290,6 +1297,13 @@ column_peri = HeatmapAnnotation(race = c(marker.exp$race),
     na_col = "black")
 Heatmap(df6, name = " ",
         cluster_rows = FALSE, cluster_columns = FALSE,
+        top_annotation = column_peri)
+
+column_peri = HeatmapAnnotation(race = c(marker.exp$race),
+                              col = list(race = c("White" = "#932667FF", "Black" = "grey")),
+    na_col = "black")
+Heatmap(df6, name = " ",
+        cluster_rows = FALSE,
         top_annotation = column_peri)
 
 ```
