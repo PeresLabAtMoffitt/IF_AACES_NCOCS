@@ -195,6 +195,8 @@ tbl <- ROI_global %>%
   select(refage, refage_cat, stage, BMI_recent, BMI_recent_grp,
         smoker, diab,
          dblkstat_CA125, adj,
+        eur_prop, afr_prop, asian_prop,
+        eurpc1, eurpc2, pc1, pc2,
          race) %>% 
   tbl_summary(by = race,
               statistic = list(all_continuous() ~ "{mean} ({sd})"),
@@ -214,6 +216,62 @@ ROI_p <- ROI_global %>%
   filter(intratumoral_i_vs_peripheral_p_ == "Peripheral")
 ```
 <br>
+
+# Ancestry
+
+```{r}
+ROI_global %>% 
+  distinct(suid, .keep_all = TRUE) %>% 
+  pivot_longer(cols = c(ends_with("_prop")), values_to = "ancestry_prop", names_to = "ancestry_group") %>% 
+  ggplot(aes(x= race, y = ancestry_prop)) +
+  geom_boxplot() +
+  theme_classic() +
+  facet_wrap(.~ ancestry_group)
+
+ROI_global %>% 
+  distinct(suid, .keep_all = TRUE) %>% 
+  pivot_longer(cols = c(ends_with("_prop")), values_to = "ancestry_prop", names_to = "ancestry_group") %>% 
+  # filter(!is.na(ancestry_prop)) %>% 
+  ggplot(aes(x= suid, y = ancestry_prop, fill = ancestry_group)) +
+  geom_col(position = "stack")
+
+ROI_global %>% 
+  distinct(suid, .keep_all = TRUE) %>% 
+  pivot_longer(cols = c(ends_with("_prop")), values_to = "ancestry_prop", names_to = "ancestry_group") %>% 
+  ggplot(aes(x= suid, y = ancestry_prop, fill = ancestry_group)) +
+  geom_col(position = "stack") +
+  facet_grid(.~ race, switch = "x", scales = "free", space = "free")+
+  theme_classic()+
+  theme(
+    # panel.spacing.x = unit(0.1, "lines"),
+    axis.text.x = element_blank(),
+    panel.grid = element_blank()
+  )
+
+ROI_global %>% 
+  distinct(suid, .keep_all = TRUE) %>% 
+  pivot_longer(cols = c(ends_with("_prop")), values_to = "ancestry_prop", names_to = "ancestry_group") %>% 
+  # filter(!is.na(ancestry_prop)) %>% 
+  ggplot(aes(x= suid, y = ancestry_prop, fill = ancestry_group)) +
+  geom_col(position = "stack") +
+  # facet_grid(.~ race)+
+  theme_void()+
+  scale_y_continuous(#limits =c(1400, 2000),
+                     breaks = c(0.25, 0.5, 0.75,1),
+                     # labels = c(0, seq(1600, 2000, by = 200)),
+                     expand = c(1, 0, 0, 0))+
+  coord_polar("x", start=0, direction=-1)
+ 
+
+ROI_global %>% 
+  distinct(suid, .keep_all = TRUE) %>% 
+  ggplot(aes(x = eurpc1, y = eurpc2, color = race))+
+  geom_point() +
+  theme_classic()
+
+```
+<br>
+
 
 ***
 
@@ -1421,7 +1479,7 @@ Heatmap(df6, name = " ",
 ```
 
 
-```{r}
+```{r, fig.width=12}
 b <- markers_ROI %>% 
   filter(!is.na(clusters_all_IandP)) %>% 
   select(clusters_all_IandP, 
@@ -3477,6 +3535,7 @@ myplot <- ggsurvplot(myplot, data = clin_surv,
            font.main = c(14, "bold", "black"), font.subtitle = c(6, "plain", "black"),
            xlab = "Time (days)", legend.title = "", 
            legend.labs = c("High", "Intermediate", "Low"),
+           palette = c("#7D2482FF", "#C83E73FF", "#FCD225FF"),
            pval = TRUE,
            conf.int = FALSE,
            xlim = c(0, 8000),

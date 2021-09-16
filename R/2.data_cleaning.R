@@ -1,18 +1,42 @@
 ########################################################################################## I ### Recode clinical data----
+ancestry_data <- ancestry_data %>% 
+  select(-c(ocacid, ocwaaid, site)) %>% 
+  mutate(brca1 = case_when(
+    brca1 == 1              ~ "Carrier",
+    brca1 == 0              ~ "Non Carrier"
+  )) %>% 
+  mutate(brca2 = case_when(
+    brca2 == 1              ~ "Carrier",
+    brca2 == 0              ~ "Non Carrier"
+  )) %>% 
+  mutate(surv_vital = vital_status_fin) %>% 
+  mutate(vitalstatus = case_when(
+    vital_status_fin == 1                               ~ "Deceased",
+    vital_status_fin == 0                               ~ "Alive",
+    TRUE                                               ~ NA_character_
+  )) %>% 
+  mutate(across(ends_with("_eurpc1")|ends_with("_eurpc2"), ~ na_if(., 0))) %>% 
+  mutate(eurpc1 = coalesce(onc_eurpc1, cogs_eurpc1)) %>% 
+  mutate(eurpc2 = coalesce(onc_eurpc2, cogs_eurpc2))
+
+
 clinical_data <- clinical_data %>% 
+  rename(casecon_old = casecon, race_old = race, prvcan_old = prvcan, prbreast_old = prbreast) %>% 
+  left_join(., ancestry_data, 
+            by = "suid") %>% 
   mutate(suid = factor(suid)) %>% 
   mutate(casecon = case_when(
     casecon == 1                                       ~ "Case",
     casecon == 2                                       ~ "Control"
   )) %>% 
-  mutate(vitalstatus = case_when(
+  mutate(vitalstatus_old = case_when(
     vitalstatus_new == 1                               ~ "Alive",
     vitalstatus_new == 2                               ~ "Deceased",
     TRUE                                               ~ NA_character_
   )) %>% 
-  mutate(surv_vital = case_when(
-    vitalstatus == "Alive"                             ~ 0,
-    vitalstatus == "Deceased"                          ~ 1,
+  mutate(surv_vital_old = case_when(
+    vitalstatus_old == "Alive"                         ~ 0,
+    vitalstatus_old == "Deceased"                      ~ 1,
     TRUE                                               ~ NA_real_
   )) %>% 
   mutate(cancersite = case_when(
@@ -249,7 +273,7 @@ clinical_data <- clinical_data %>%
   )) %>% 
   mutate(diab = factor(diab, levels = c("no", "yes"))) %>% 
   # Calculate follow up time as time from interview to follow up
-  mutate(timeint_fu = timelastfu_new - timeint)
+  mutate(timeint_fu = surv_days - timeint)
 
 
 clinical_data$refage_cat <- as.factor(findInterval(clinical_data$refage, c(0,50,60,70,80)))
