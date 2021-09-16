@@ -1,6 +1,7 @@
 plan <- drake_plan(
 
   clinical_data = data_import(fs::path("","Volumes","Peres_Research")),
+  ancestry_data = ancestry_import(fs::path("","Volumes","Peres_Research")),
   tx_data = tx_import(fs::path("","Volumes","Peres_Research")),
   # tx_data_ncocs = tx_import2(fs::path("","Volumes","Peres_Research")),
   #-----------------------------------------------------------------------------------------------------------------
