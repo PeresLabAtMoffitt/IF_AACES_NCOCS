@@ -229,16 +229,31 @@ ROI_global %>%
   facet_wrap(.~ ancestry_group)
 
 ROI_global %>% 
+  filter(!is.na(eur_prop)) %>% 
   distinct(suid, .keep_all = TRUE) %>% 
+  mutate(prop = eur_prop) %>% 
+  mutate(prop1 = eur_prop+asian_prop) %>% 
+  
+  arrange((prop)) %>%
+  # select(suid, eur_prop, afr_prop, asian_prop, prop)
   pivot_longer(cols = c(ends_with("_prop")), values_to = "ancestry_prop", names_to = "ancestry_group") %>% 
-  # filter(!is.na(ancestry_prop)) %>% 
-  ggplot(aes(x= suid, y = ancestry_prop, fill = ancestry_group)) +
+  mutate(ancestry_group = factor(ancestry_group, levels = c("asian_prop", "afr_prop", "eur_prop"))) %>% 
+  # filter(!is.na(ancestry_prop)) %>%
+  ggplot(aes(x= fct_reorder(suid, (prop1)), y = ancestry_prop, 
+             fill = ancestry_group, color = ancestry_group)) +
   geom_col(position = "stack")
 
 ROI_global %>% 
+  filter(!is.na(eur_prop)) %>% 
   distinct(suid, .keep_all = TRUE) %>% 
+  mutate(prop = eur_prop) %>% 
+  mutate(prop1 = eur_prop+asian_prop) %>% 
+  
+  arrange((prop)) %>%
   pivot_longer(cols = c(ends_with("_prop")), values_to = "ancestry_prop", names_to = "ancestry_group") %>% 
-  ggplot(aes(x= suid, y = ancestry_prop, fill = ancestry_group)) +
+  mutate(ancestry_group = factor(ancestry_group, levels = c("asian_prop", "afr_prop", "eur_prop"))) %>% 
+  ggplot(aes(x= fct_reorder(suid, (prop1)), y = ancestry_prop,
+             fill = ancestry_group, color = ancestry_group)) +
   geom_col(position = "stack") +
   facet_grid(.~ race, switch = "x", scales = "free", space = "free")+
   theme_classic()+
@@ -249,10 +264,16 @@ ROI_global %>%
   )
 
 ROI_global %>% 
+  filter(!is.na(eur_prop)) %>% 
   distinct(suid, .keep_all = TRUE) %>% 
+  mutate(prop = eur_prop) %>% 
+  mutate(prop1 = eur_prop+asian_prop) %>% 
+  
+  arrange((prop)) %>%
   pivot_longer(cols = c(ends_with("_prop")), values_to = "ancestry_prop", names_to = "ancestry_group") %>% 
-  # filter(!is.na(ancestry_prop)) %>% 
-  ggplot(aes(x= suid, y = ancestry_prop, fill = ancestry_group)) +
+  mutate(ancestry_group = factor(ancestry_group, levels = c("asian_prop", "afr_prop", "eur_prop"))) %>% 
+  ggplot(aes(x= fct_reorder(suid, (prop1)), y = ancestry_prop,
+             fill = ancestry_group, color = ancestry_group)) +
   geom_col(position = "stack") +
   # facet_grid(.~ race)+
   theme_void()+
@@ -260,7 +281,8 @@ ROI_global %>%
                      breaks = c(0.25, 0.5, 0.75,1),
                      # labels = c(0, seq(1600, 2000, by = 200)),
                      expand = c(1, 0, 0, 0))+
-  coord_polar("x", start=0, direction=-1)
+  coord_polar("x", start=0, direction=-1)+
+  facet_wrap(.~ race)
  
 
 ROI_global %>% 
@@ -271,6 +293,18 @@ ROI_global %>%
 
 ```
 <br>
+
+# BRCA
+```{r}
+ROI_global %>% 
+  distinct(suid, .keep_all = TRUE) %>% 
+  pivot_longer(cols = c("brca1", "brca2"), values_to = "brca_prop", names_to = "brca_group") %>% 
+  filter(!is.na(brca_prop)) %>% 
+  select(brca_prop, brca_group) %>% 
+  ggplot(aes(x= brca_group, fill = brca_prop)) +
+  geom_bar(position =  position_dodge()) +
+  theme_classic()
+```
 
 
 ***
@@ -1551,7 +1585,7 @@ markers_ROI %>%
 
 
 # Table 3. Adjusted hazard ratios and 95% confidence intervals
-## 1% group- absensece /presece
+## 1% group- absence /presence
 <br>
 
 <!-- **Removed 4 patients no BMI** -->
