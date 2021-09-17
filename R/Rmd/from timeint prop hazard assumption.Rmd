@@ -75,6 +75,12 @@ clinical_data <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/
 
 # Rewove patients not matched or lost match
 ROI_global <- left_join(ROI_global, clinical_data, by="suid") %>% drop_na(pair_id) %>% 
+  filter(!image_tag %in% c("Peres_P1_150163  3D_[44113,18531].tif", 
+                           "Peres_P1_43004 A2_[45654,5840].tif",
+                           "Peres_P1_43773 D2_[60849,15244].tif", 
+                         "Peres_P1_AACES 130033_[37754,17929].tif",
+                         "Peres_P1_AACES 130033_[38351,13944].tif"
+                           )) %>% 
   group_by(pair_id) %>% 
   mutate(have_a_match = dense_rank(interaction(suid, pair_id))) %>% 
   group_by(pair_id) %>% 
@@ -85,9 +91,6 @@ ROI_global <- left_join(ROI_global, clinical_data, by="suid") %>% drop_na(pair_i
 
 # markers_match <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/markers_match.rds")
 path <- fs::path("","Volumes","Peres_Research","Christelle Colin-Leitzinger", "IF_AACES_NCOCS", "Disparities manuscript", "Figures")
-
-
-
 ```
 <br>
 <br>
@@ -95,414 +98,17 @@ path <- fs::path("","Volumes","Peres_Research","Christelle Colin-Leitzinger", "I
 ***
 
 ```{r summarize mean}
-markers_ROIi <- ROI_global %>% 
-  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
-  group_by(suid) %>% 
-  summarize(
-    mean_tumor = mean(percent_tumor),
-    mean_stroma = mean(percent_stroma),
-    mean_total = mean(percent_total),
-    # variance_tumor = var(percent_tumor),
-    # variance_stroma = var(percent_stroma),
-    percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells),
-    percent_CD8_tumor = mean(tumor_percent_cd8_opal_570_positive_cells),
-    percent_CD3_CD8_tumor = mean(tumor_percent_cd3plus_cd8plus_positive_cells),
-    percent_FoxP3_tumor = mean(tumor_percent_foxp3_opal_540_positive_cells),
-    percent_CD3_FoxP3_tumor = mean(tumor_percent_cd3plus_foxp3plus_positive_cells),
-    percent_CD11b_tumor = mean(tumor_percent_cd11b_opal_620_positive_cells),
-    percent_CD15_tumor = mean(tumor_percent_cd15_opal_520_positive_cells),
-    percent_CD11b_CD15_tumor = mean(tumor_percent_cd11bplus_cd15plus_positive_cells),
-    percent_CD3_stroma = mean(stroma_percent_cd3_opal_650_positive_cells),
-    percent_CD8_stroma = mean(stroma_percent_cd8_opal_570_positive_cells),
-    percent_CD3_CD8_stroma = mean(stroma_percent_cd3plus_cd8plus_positive_cells),
-    percent_FoxP3_stroma = mean(stroma_percent_foxp3_opal_540_positive_cells),
-    percent_CD3_FoxP3_stroma = mean(stroma_percent_cd3plus_foxp3plus_positive_cells),
-    percent_CD11b_stroma = mean(stroma_percent_cd11b_opal_620_positive_cells),
-    percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
-    percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells),
-    
-    percent_CD3_total = mean(percent_cd3_opal_650_positive_cells),
-    percent_CD8_total = mean(percent_cd8_opal_570_positive_cells),
-    percent_CD3_CD8_total = mean(percent_cd3plus_cd8plus_positive_cells),
-    percent_FoxP3_total = mean(percent_foxp3_opal_540_positive_cells),
-    percent_CD3_FoxP3_total = mean(percent_cd3plus_foxp3plus_positive_cells),
-    percent_CD11b_total = mean(percent_cd11b_opal_620_positive_cells),
-    percent_CD15_total = mean(percent_cd15_opal_520_positive_cells),
-    percent_CD11b_CD15_total = mean(percent_cd11bplus_cd15plus_positive_cells)
-  )
-markers_ROIi$tumor_variation <- markers_ROIi$mean_tumor - mean(ROI_global$percent_tumor)
-markers_ROIi$stroma_variation <- markers_ROIi$mean_stroma - mean(ROI_global$percent_stroma)
-markers_ROIi$total_variation <- markers_ROIi$mean_stroma - mean(ROI_global$percent_stroma)
-#
-markers_ROIp <- ROI_global %>% 
-  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
-  group_by(suid) %>% 
-  summarize(
-    mean_tumor = mean(percent_tumor),
-    mean_stroma = mean(percent_stroma),
-    mean_total = mean(percent_total),
-    # variance_tumor = var(percent_tumor),
-    # variance_stroma = var(percent_stroma),
-    percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells),
-    percent_CD8_tumor = mean(tumor_percent_cd8_opal_570_positive_cells),
-    percent_CD3_CD8_tumor = mean(tumor_percent_cd3plus_cd8plus_positive_cells),
-    percent_FoxP3_tumor = mean(tumor_percent_foxp3_opal_540_positive_cells),
-    percent_CD3_FoxP3_tumor = mean(tumor_percent_cd3plus_foxp3plus_positive_cells),
-    percent_CD11b_tumor = mean(tumor_percent_cd11b_opal_620_positive_cells),
-    percent_CD15_tumor = mean(tumor_percent_cd15_opal_520_positive_cells),
-    percent_CD11b_CD15_tumor = mean(tumor_percent_cd11bplus_cd15plus_positive_cells),
-    percent_CD3_stroma = mean(stroma_percent_cd3_opal_650_positive_cells),
-    percent_CD8_stroma = mean(stroma_percent_cd8_opal_570_positive_cells),
-    percent_CD3_CD8_stroma = mean(stroma_percent_cd3plus_cd8plus_positive_cells),
-    percent_FoxP3_stroma = mean(stroma_percent_foxp3_opal_540_positive_cells),
-    percent_CD3_FoxP3_stroma = mean(stroma_percent_cd3plus_foxp3plus_positive_cells),
-    percent_CD11b_stroma = mean(stroma_percent_cd11b_opal_620_positive_cells),
-    percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
-    percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells),
-    percent_CD3_total = mean(percent_cd3_opal_650_positive_cells),
-    percent_CD8_total = mean(percent_cd8_opal_570_positive_cells),
-    percent_CD3_CD8_total = mean(percent_cd3plus_cd8plus_positive_cells),
-    percent_FoxP3_total = mean(percent_foxp3_opal_540_positive_cells),
-    percent_CD3_FoxP3_total = mean(percent_cd3plus_foxp3plus_positive_cells),
-    percent_CD11b_total = mean(percent_cd11b_opal_620_positive_cells),
-    percent_CD15_total = mean(percent_cd15_opal_520_positive_cells),
-    percent_CD11b_CD15_total = mean(percent_cd11bplus_cd15plus_positive_cells)
-  )
-markers_ROIp$tumor_variation <- markers_ROIp$mean_tumor - mean(ROI_global$percent_tumor)
-markers_ROIp$stroma_variation <- markers_ROIp$mean_stroma - mean(ROI_global$percent_stroma)
-markers_ROIp$total_variation <- markers_ROIp$mean_total - mean(ROI_global$percent_total)
-
-# Join Intratumoral and Peropheral ROI
-markers_ROI <- full_join(markers_ROIi, markers_ROIp,
-                         by= "suid", suffix= c(".i", ".p"))
-markers_ROI <- left_join(markers_ROI, clinical_data, by="suid")
-# clust_markers <- markers_ROI
+markers_ROI <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/markers_ROI.rds")
 ```
 
-```{r new median}
-markers_ROI <- markers_ROI %>% 
-  
-  mutate(CD3_tumor.i = case_when(
-    
-    percent_CD3_tumor.i <= 1      ~ "low",
-    percent_CD3_tumor.i > 1       ~ "high"
-  ), CD3_tumor.i = factor(CD3_tumor.i, levels = c("low","high"))) %>% 
-  mutate(CD3_CD8_tumor.i = case_when(
-    percent_CD3_CD8_tumor.i <= 1      ~ "low",
-    percent_CD3_CD8_tumor.i > 1       ~ "high"
-  ), CD3_CD8_tumor.i = factor(CD3_CD8_tumor.i, levels = c("low","high"))) %>% 
-  mutate(CD3_FoxP3_tumor.i = case_when(
-    percent_CD3_FoxP3_tumor.i <= 1      ~ "low",
-    percent_CD3_FoxP3_tumor.i > 1       ~ "high"
-  ), CD3_FoxP3_tumor.i = factor(CD3_FoxP3_tumor.i, levels = c("low","high"))) %>% 
-  mutate(CD11b_tumor.i = case_when(
-    percent_CD11b_tumor.i == 0      ~ "Absence",
-    percent_CD11b_tumor.i > 0       ~ "Presence"
-  )) %>% 
-  mutate(CD11b_CD15_tumor.i = case_when(
-    percent_CD11b_CD15_tumor.i == 0      ~ "Absence",
-    percent_CD11b_CD15_tumor.i > 0       ~ "Presence"
-  )) %>% 
-  
-  mutate(CD3_stroma.i = case_when(
-    percent_CD3_stroma.i <= 1      ~ "low",
-    percent_CD3_stroma.i > 1       ~ "high"
-  ), CD3_stroma.i = factor(CD3_stroma.i, levels = c("low","high"))) %>% 
-  mutate(CD3_CD8_stroma.i = case_when(
-    percent_CD3_CD8_stroma.i <= 1      ~ "low",
-    percent_CD3_CD8_stroma.i > 1       ~ "high"
-  ), CD3_CD8_stroma.i = factor(CD3_CD8_stroma.i, levels = c("low","high"))) %>% 
-  mutate(CD3_FoxP3_stroma.i = case_when(
-    percent_CD3_FoxP3_stroma.i <= 1      ~ "low",
-    percent_CD3_FoxP3_stroma.i > 1       ~ "high"
-  ), CD3_FoxP3_stroma.i = factor(CD3_FoxP3_stroma.i, levels = c("low","high"))) %>% 
-  mutate(CD11b_stroma.i = case_when(
-    percent_CD11b_stroma.i == 0      ~ "Absence",
-    percent_CD11b_stroma.i > 0       ~ "Presence"
-  )) %>%
-  mutate(CD11b_CD15_stroma.i = case_when(
-    percent_CD11b_CD15_stroma.i == 0      ~ "Absence",
-    percent_CD11b_CD15_stroma.i > 0       ~ "Presence"
-  )) %>% 
-  mutate(CD11b_stroma.i3 = case_when(
-    percent_CD11b_stroma.i <= 1      ~ "low",
-    percent_CD11b_stroma.i > 1       ~ "high"
-  ), CD11b_stroma.i3 = factor(CD11b_stroma.i3, levels = c("low","high"))) %>%
-  mutate(CD11b_CD15_stroma.i3 = case_when(
-    percent_CD11b_CD15_stroma.i <= 1      ~ "low",
-    percent_CD11b_CD15_stroma.i > 1       ~ "high"
-  ), CD11b_CD15_stroma.i3 = factor(CD11b_CD15_stroma.i3, levels = c("low","high"))) %>% 
-  mutate(CD3_total.i = case_when(
-    percent_CD3_total.i <= 1      ~ "low",
-    percent_CD3_total.i > 1       ~ "high"
-  ), CD3_total.i = factor(CD3_total.i, levels = c("low","high"))) %>% 
-  mutate(CD3_CD8_total.i = case_when(
-    percent_CD3_CD8_total.i <= 1      ~ "low",
-    percent_CD3_CD8_total.i > 1       ~ "high"
-  ), CD3_CD8_total.i = factor(CD3_CD8_total.i, levels = c("low","high"))) %>% 
-  mutate(CD3_FoxP3_total.i = case_when(
-    percent_CD3_FoxP3_total.i <= 1      ~ "low",
-    percent_CD3_FoxP3_total.i > 1       ~ "high"
-  ), CD3_FoxP3_total.i = factor(CD3_FoxP3_total.i, levels = c("low","high"))) %>% 
-  mutate(CD11b_total.i = case_when(
-    percent_CD11b_total.i == 0      ~ "Absence",
-    percent_CD11b_total.i > 0       ~ "Presence"
-  )) %>% 
-  mutate(CD11b_CD15_total.i = case_when(
-    percent_CD11b_CD15_total.i == 0      ~ "Absence",
-    percent_CD11b_CD15_total.i > 0       ~ "Presence"
-  )) %>% 
-  mutate(CD11b_total.i3 = case_when(
-    percent_CD11b_total.i <= 1      ~ "low",
-    percent_CD11b_total.i > 1       ~ "high"
-  ), CD11b_total.i3 = factor(CD11b_total.i3, levels = c("low","high"))) %>% 
-  mutate(CD11b_CD15_total.i3 = case_when(
-    percent_CD11b_CD15_total.i <= 1      ~ "low",
-    percent_CD11b_CD15_total.i > 1       ~ "high"
-  ), CD11b_CD15_total.i3 = factor(CD11b_CD15_total.i3, levels = c("low","high"))) %>% 
-  
-  
-  mutate(CD3_tumor.p = case_when(
-    percent_CD3_tumor.p <= 1      ~ "low",
-    percent_CD3_tumor.p > 1       ~ "high"
-  ), CD3_tumor.p = factor(CD3_tumor.p, levels = c("low","high"))) %>% 
-  mutate(CD3_CD8_tumor.p = case_when(
-    percent_CD3_CD8_tumor.p <= 1      ~ "low",
-    percent_CD3_CD8_tumor.p > 1       ~ "high"
-  ), CD3_CD8_tumor.p = factor(CD3_CD8_tumor.p, levels = c("low","high"))) %>% 
-  mutate(CD3_FoxP3_tumor.p = case_when(
-    percent_CD3_FoxP3_tumor.p <= 1      ~ "low",
-    percent_CD3_FoxP3_tumor.p > 1       ~ "high"
-  ), CD3_FoxP3_tumor.p = factor(CD3_FoxP3_tumor.p, levels = c("low","high"))) %>% 
-  mutate(CD11b_tumor.p = case_when(
-    percent_CD11b_tumor.p == 0      ~ "Absence",
-    percent_CD11b_tumor.p > 0       ~ "Presence"
-  )) %>% 
-  mutate(CD11b_CD15_tumor.p = case_when(
-    percent_CD11b_CD15_tumor.p == 0      ~ "Absence",
-    percent_CD11b_CD15_tumor.p > 0       ~ "Presence"
-  )) %>% 
-  mutate(CD11b_tumor.p3 = case_when(
-    percent_CD11b_tumor.p <= 1      ~ "low",
-    percent_CD11b_tumor.p > 1         ~ "high"
-  ), CD11b_tumor.p3 = factor(CD11b_tumor.p3, levels = c("low","high"))) %>% 
-  mutate(CD11b_CD15_tumor.p3 = case_when(
-    percent_CD11b_CD15_tumor.p <= 1      ~ "low",
-    percent_CD11b_CD15_tumor.p > 1       ~ "high"
-  ), CD11b_CD15_tumor.p3 = factor(CD11b_CD15_tumor.p3, levels = c("low","high"))) %>% 
-  mutate(CD3_stroma.p = case_when(
-    percent_CD3_stroma.p <= 1      ~ "low",
-    percent_CD3_stroma.p > 1       ~ "high"
-  ), CD3_stroma.p = factor(CD3_stroma.p, levels = c("low","high"))) %>% 
-  mutate(CD3_CD8_stroma.p = case_when(
-    percent_CD3_CD8_stroma.p <= 1      ~ "low",
-    percent_CD3_CD8_stroma.p > 1       ~ "high"
-  ), CD3_CD8_stroma.p = factor(CD3_CD8_stroma.p, levels = c("low","high"))) %>% 
-  mutate(CD3_FoxP3_stroma.p = case_when(
-    percent_CD3_FoxP3_stroma.p <= 1      ~ "low",
-    percent_CD3_FoxP3_stroma.p > 1       ~ "high"
-  ), CD3_FoxP3_stroma.p = factor(CD3_FoxP3_stroma.p, levels = c("low","high"))) %>% 
-  mutate(CD11b_stroma.p = case_when(
-    percent_CD11b_stroma.p == 0      ~ "Absence",
-    percent_CD11b_stroma.p > 0       ~ "Presence"
-  )) %>% 
-  mutate(CD11b_CD15_stroma.p = case_when(
-    percent_CD11b_CD15_stroma.p == 0      ~ "Absence",
-    percent_CD11b_CD15_stroma.p > 0       ~ "Presence"
-  )) %>% 
-    mutate(CD11b_stroma.p3 = case_when(
-    percent_CD11b_stroma.p <= 1      ~ "low",
-    percent_CD11b_stroma.p > 1       ~ "high"
-  ), CD11b_stroma.p3 = factor(CD11b_stroma.p3, levels = c("low","high"))) %>% 
-  mutate(CD11b_CD15_stroma.p3 = case_when(
-    percent_CD11b_CD15_stroma.p <= 1      ~ "low",
-    percent_CD11b_CD15_stroma.p > 1       ~ "high"
-  ), CD11b_CD15_stroma.p3 = factor(CD11b_CD15_stroma.p3, levels = c("low","high"))) %>% 
-  mutate(CD3_total.p = case_when(
-    percent_CD3_total.p <= 1      ~ "low",
-    percent_CD3_total.p > 1       ~ "high"
-  ), CD3_total.p = factor(CD3_total.p, levels = c("low","high"))) %>% 
-  mutate(CD3_CD8_total.p = case_when(
-    percent_CD3_CD8_total.p <= 1      ~ "low",
-    percent_CD3_CD8_total.p > 1       ~ "high"
-  ), CD3_CD8_total.p = factor(CD3_CD8_total.p, levels = c("low","high"))) %>% 
-  mutate(CD3_FoxP3_total.p = case_when(
-    percent_CD3_FoxP3_total.p <= 1      ~ "low",
-    percent_CD3_FoxP3_total.p > 1       ~ "high"
-  ), CD3_FoxP3_total.p = factor(CD3_FoxP3_total.p, levels = c("low","high"))) %>% 
-  mutate(CD11b_total.p = case_when(
-    percent_CD11b_total.p == 0      ~ "Absence",
-    percent_CD11b_total.p > 0       ~ "Presence"
-  )) %>% 
-  mutate(CD11b_CD15_total.p = case_when(
-    percent_CD11b_CD15_total.p == 0      ~ "Absence",
-    percent_CD11b_CD15_total.p > 0       ~ "Presence"
-  )) %>% 
-  mutate(CD11b_total.p3 = case_when(
-    percent_CD11b_total.p <= 1      ~ "low",
-    percent_CD11b_total.p > 1       ~ "high"
-  ), CD11b_total.p3 = factor(CD11b_total.p3, levels = c("low","high"))) %>% 
-  mutate(CD11b_CD15_total.p3 = case_when(
-    percent_CD11b_CD15_total.p <= 1      ~ "low",
-    percent_CD11b_CD15_total.p > 1       ~ "high"
-  ), CD11b_CD15_total.p3 = factor(CD11b_CD15_total.p3, levels = c("low","high"))) 
-```
-
-
-```{r immunoscore per patients mean}
-markers_ROI <- markers_ROI %>% 
-  mutate(percentile_score_CD3_i = ntile(percent_CD3_total.i, 100) ) %>% 
-  mutate(percentile_score_CD3_p = ntile(percent_CD3_total.p, 100) ) %>% 
-  mutate(percentile_score_CD8_i = ntile(percent_CD8_total.i, 100) ) %>% 
-  mutate(percentile_score_CD8_p = ntile(percent_CD8_total.p, 100) ) 
-
-markers_ROI <- markers_ROI %>%
-  mutate(percentile_score_mean = rowMeans( markers_ROI[c("percentile_score_CD3_i", "percentile_score_CD3_p", 
-                                                    "percentile_score_CD8_i", "percentile_score_CD8_p")] ))
-markers_ROI <- markers_ROI %>%
-  mutate(immunoscore_patients = case_when(
-    percentile_score_mean <= 10        ~ 0,
-    percentile_score_mean <= 25        ~ 1,
-    percentile_score_mean <= 70        ~ 2,
-    percentile_score_mean <= 95        ~ 3,
-    percentile_score_mean > 95         ~ 4 
-  )) %>% 
-  mutate(immunoscore_patients = factor(immunoscore_patients)) %>% 
-  mutate(immunoscore_2018lancet_patients = case_when(
-    percentile_score_mean <= 25        ~ "Low",
-    percentile_score_mean <= 70        ~ "Intermediate",
-    percentile_score_mean > 70         ~ "High"
-    )) %>% 
-  mutate(immunoscore_2018lancet_patients = factor(immunoscore_2018lancet_patients, levels = c("Low", "Intermediate", "High"))) 
-```
-
-
-```{r removing double stain from single stain count}
-markers_ROI <- markers_ROI %>% 
-  mutate(percent_CD3_total.i = percent_CD3_total.i - percent_CD3_CD8_total.i - percent_CD3_FoxP3_total.i) %>% 
-  mutate(percent_CD8_total.i = percent_CD8_total.i - percent_CD3_CD8_total.i) %>% 
-  mutate(percent_FoxP3_total.i = percent_FoxP3_total.i - percent_CD3_FoxP3_total.i) %>% 
-  mutate(percent_CD11b_total.i = percent_CD11b_total.i - percent_CD11b_CD15_total.i) %>% 
-  mutate(percent_CD15_total.i = percent_CD15_total.i - percent_CD11b_CD15_total.i) %>% 
-  
-  mutate(percent_CD3_tumor.i = percent_CD3_tumor.i - percent_CD3_CD8_tumor.i - percent_CD3_FoxP3_tumor.i) %>% 
-  mutate(percent_CD8_tumor.i = percent_CD8_tumor.i - percent_CD3_CD8_tumor.i) %>% 
-  mutate(percent_FoxP3_tumor.i = percent_FoxP3_tumor.i - percent_CD3_FoxP3_tumor.i) %>% 
-  mutate(percent_CD11b_tumor.i = percent_CD11b_tumor.i - percent_CD11b_CD15_tumor.i) %>% 
-  mutate(percent_CD15_tumor.i = percent_CD15_tumor.i - percent_CD11b_CD15_tumor.i) %>% 
-  
-  mutate(percent_CD3_stroma.i = percent_CD3_stroma.i - percent_CD3_CD8_stroma.i - percent_CD3_FoxP3_stroma.i) %>% 
-  mutate(percent_CD8_stroma.i = percent_CD8_stroma.i - percent_CD3_CD8_stroma.i) %>% 
-  mutate(percent_FoxP3_stroma.i = percent_FoxP3_stroma.i - percent_CD3_FoxP3_stroma.i) %>% 
-  mutate(percent_CD11b_stroma.i = percent_CD11b_stroma.i - percent_CD11b_CD15_stroma.i) %>% 
-  mutate(percent_CD15_stroma.i = percent_CD15_stroma.i - percent_CD11b_CD15_stroma.i) %>% 
-  
-  mutate(percent_CD3_total.p = percent_CD3_total.p - percent_CD3_CD8_total.p - percent_CD3_FoxP3_total.p) %>% 
-  mutate(percent_CD8_total.p = percent_CD8_total.p - percent_CD3_CD8_total.p) %>% 
-  mutate(percent_FoxP3_total.p = percent_FoxP3_total.p - percent_CD3_FoxP3_total.p) %>% 
-  mutate(percent_CD11b_total.p = percent_CD11b_total.p - percent_CD11b_CD15_total.p) %>% 
-  mutate(percent_CD15_total.p = percent_CD15_total.p - percent_CD11b_CD15_total.p) %>% 
-  
-  mutate(percent_CD3_tumor.p = percent_CD3_tumor.p - percent_CD3_CD8_tumor.p - percent_CD3_FoxP3_tumor.p) %>% 
-  mutate(percent_CD8_tumor.p = percent_CD8_tumor.p - percent_CD3_CD8_tumor.p) %>% 
-  mutate(percent_FoxP3_tumor.p = percent_FoxP3_tumor.p - percent_CD3_FoxP3_tumor.p) %>% 
-  mutate(percent_CD11b_tumor.p = percent_CD11b_tumor.p - percent_CD11b_CD15_tumor.p) %>% 
-  mutate(percent_CD15_tumor.p = percent_CD15_tumor.p - percent_CD11b_CD15_tumor.p) %>% 
-  
-  mutate(percent_CD3_stroma.p = percent_CD3_stroma.p - percent_CD3_CD8_stroma.p - percent_CD3_FoxP3_stroma.p) %>% 
-  mutate(percent_CD8_stroma.p = percent_CD8_stroma.p - percent_CD3_CD8_stroma.p) %>% 
-  mutate(percent_FoxP3_stroma.p = percent_FoxP3_stroma.p - percent_CD3_FoxP3_stroma.p) %>% 
-  mutate(percent_CD11b_stroma.p = percent_CD11b_stroma.p - percent_CD11b_CD15_stroma.p) %>% 
-  mutate(percent_CD15_stroma.p = percent_CD15_stroma.p - percent_CD11b_CD15_stroma.p)
-```
-<br>
-
-
-```{r clustering}
-set.seed(1234)
-
-### Cluster for stroma/tumor in the intratumoral/peritumoral ROIs (include single and double staining, overall are excluded)
-clust_markers <- markers_ROI %>% 
-  filter(!is.na(markers_ROI$percent_CD3_CD8_tumor.i) & !is.na(markers_ROI$percent_CD3_CD8_tumor.p)) %>% 
-  select(suid, c("percent_CD3_tumor.i" : "percent_CD11b_CD15_stroma.i", "percent_CD3_tumor.p" : "percent_CD11b_CD15_stroma.p"))
-
-clust <- Mclust(clust_markers[,c(2:ncol(clust_markers))])
-
-clust_markers$clusters_all_IandP <- clust$classification
-# clust_markers$clusters_all_IandP <- factor(clust_markers$clusters_all_IandP,
-#                                            levels = c(1, 3, 2),
-#                                            labels = c("low", "mid", "high"))
-clust_markers$clusters_all_IandP <- factor(clust_markers$clusters_all_IandP,
-                                           levels = c(1, 2, 3, 4, 5),
-                                           labels = c("mid", "high", "mid-low", "mid-high", "low"))
-clust_markers <- clust_markers %>% mutate(clusters_all_IandP = factor(clusters_all_IandP, levels = c("low", "mid-low", "mid", "mid-high", "high")))
-
-# clust_markers %>% 
-# tidyr::gather(key = "markers_cat", value = "value",
-#               c("percent_CD3_tumor.i":"percent_CD11b_CD15_stroma.i")) %>% 
-#   select(suid, clusters_all_IandP, markers_cat, value) %>% 
-#   ggplot(aes(x=suid, y=value, group=markers_cat,  color=markers_cat))+
-#   geom_boxplot()+
-#   facet_grid(.~ clusters_all_IandP)
-markers_ROI <- full_join(markers_ROI, clust_markers %>% select(suid, clusters_all_IandP), by = "suid")
-
-
-### Cluster for tumor intratumoral all double positive "percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", "percent_CD11b_CD15_tumor.i"
-clust_markers <- markers_ROI %>% filter(!is.na(markers_ROI$percent_CD3_CD8_tumor.i ))
-clust <- 
-  Mclust(clust_markers[,c("percent_CD3_CD8_tumor.i", "percent_CD3_FoxP3_tumor.i", "percent_CD11b_CD15_tumor.i")])
-
-clust_markers$dbl_pos <- clust$classification
-clust_markers$dbl_pos <- factor(clust_markers$dbl_pos,
-                                           levels = c(1, 2, 3),
-                                           labels = c("low", "high", "mid"))
-clust_markers <- clust_markers %>% mutate(dbl_pos = factor(dbl_pos, levels = c("low", "mid", "high")))
-
-### Cluster for tumor intratumoral CD3-CD8
-clust <- Mclust(clust_markers$percent_CD3_CD8_tumor.i)
-
-clust_markers$clusters_CD3CD8 <- clust$classification
-clust_markers$clusters_CD3CD8 <- factor(clust_markers$clusters_CD3CD8,
-                                           levels = c(1, 2, 3, 4, 5),
-                                           labels = c("low", "mid-low", "mid", "mid-high", "high"))
-
-### Cluster for tumor intratumoral CD3-FoxP3
-clust <- Mclust(clust_markers$percent_CD3_FoxP3_tumor.i)
-
-clust_markers$clusters_CD3FoxP3 <- clust$classification
-clust_markers$clusters_CD3FoxP3 <- factor(clust_markers$clusters_CD3FoxP3,
-                                           levels = c(1, 2, 3),
-                                           labels = c("low", "mid", "high"))
-
-### Cluster for tumor intratumoral FoxP3 because it can be expressed by tumor cell
-clust <- Mclust(clust_markers$percent_FoxP3_tumor.i)
-
-clust_markers$clusters_FoxP3_ <- clust$classification
-clust_markers$clusters_FoxP3_ <- factor(clust_markers$clusters_FoxP3_,
-                                           levels = c(1, 2, 3, 4),
-                                           labels = c("low", "mid", "mid-high", "high"))
-
-### Cluster for tumor intratumoral CD11b/CD15 
-clust <- Mclust(clust_markers$percent_CD11b_CD15_tumor.i)
-
-clust_markers$clusters_CD11bCD15 <- clust$classification
-clust_markers$clusters_CD11bCD15 <- factor(clust_markers$clusters_CD11bCD15,
-                                           levels = c(1, 7, 8),
-                                           labels = c("low", "high", "mid"))
-clust_markers <- clust_markers %>% mutate(clusters_CD11bCD15 = factor(clusters_CD11bCD15, levels = c("low", "mid", "high")))
-
-markers_ROI <- full_join(markers_ROI, clust_markers %>% select(suid, dbl_pos, clusters_CD3CD8, clusters_CD3FoxP3, clusters_FoxP3_, clusters_CD11bCD15), by = "suid")
-
-```
-<br>
 
 # Table 3. Adjusted hazard ratios and 95% confidence intervals
 The count of cells double stained (for example CD3+CD8+) **ARE** subtracted from the single stain count (CD3 alone and CD8 alone) to avoid overlapping if we want to use them to cluster.  
 
 ## 1% group- absence /presence
 ## Whole population
-## Intra
-## Overall
+### Intra
+### Overall
 ```{r}
 markers_ROI_o <- markers_ROI %>% 
   rename(CD3 = CD3_total.i, CD3_CD8 = CD3_CD8_total.i,
@@ -531,7 +137,7 @@ coxph(Surv(time = markers_ROI$timeint_fu,
                  
 ```
 
-## Tumor
+### Tumor
 
 ```{r}
 markers_ROI_t <- markers_ROI %>% 
@@ -561,7 +167,7 @@ coxph(Surv(time = markers_ROI$timeint_fu,
                  
 ```
 
-## Stroma
+### Stroma
 
 ```{r}
 markers_ROI_s <- markers_ROI %>% 
@@ -593,7 +199,7 @@ coxph(Surv(time = markers_ROI$timeint_fu,
 ```
 
 ## Periph
-## Overall
+### Overall
 ```{r}
 markers_ROI_o <- markers_ROI %>% 
   rename(CD3 = CD3_total.p, CD3_CD8 = CD3_CD8_total.p,
@@ -622,7 +228,7 @@ coxph(Surv(time = markers_ROI$timeint_fu,
                  
 ```
 
-## Tumor
+### Tumor
 ```{r}
 markers_ROI_t <- markers_ROI %>% 
   rename(CD3 = CD3_tumor.p, CD3_CD8 = CD3_CD8_tumor.p,
@@ -651,7 +257,7 @@ coxph(Surv(time = markers_ROI$timeint_fu,
                  
 ```
 
-## Stroma
+### Stroma
 ```{r}
 markers_ROI_s <- markers_ROI %>% 
   rename(CD3 = CD3_stroma.p, CD3_CD8 = CD3_CD8_stroma.p,
@@ -756,7 +362,7 @@ ROI_global <- ROI_global %>%
 ```
 
 ## Intra
-## Overall
+### Overall
 ```{r Table % cluster option}
 markers_ROIclust_o <- ROI_global %>%
   filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
@@ -825,7 +431,7 @@ ggsurvplot(myplot, data = clin_surv,
 )
 ```
 
-## Tumor
+### Tumor
 ```{r}
 markers_ROIclust_t <- ROI_global %>% 
     filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
@@ -890,7 +496,7 @@ ggsurvplot(myplot, data = clin_surv,
 )
 ```
 
-## Stroma
+### Stroma
 ```{r}
 markers_ROIclust_s <- ROI_global %>% 
     filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
@@ -957,7 +563,7 @@ ggsurvplot(myplot, data = clin_surv,
 ```
 
 ## Periph
-## Overall
+### Overall
 ```{r}
 markers_ROIclust_o <- ROI_global %>% 
     filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
@@ -1021,7 +627,7 @@ ggsurvplot(myplot, data = clin_surv,
 )
 ```
 
-## Tumor
+### Tumor
 ```{r}
 markers_ROIclust_t <- ROI_global %>% 
       filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
@@ -1086,7 +692,7 @@ ggsurvplot(myplot, data = clin_surv,
 )
 ```
 
-## Stroma
+### Stroma
 ```{r}
 markers_ROIclust_s <- ROI_global %>% 
       filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 

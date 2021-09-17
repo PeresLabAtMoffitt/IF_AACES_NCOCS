@@ -1067,6 +1067,7 @@ clust_markers <- clust_markers %>% mutate(clusters_CD11bCD15 = factor(clusters_C
 
 markers_ROI <- full_join(markers_ROI, clust_markers %>% select(suid, dbl_pos, clusters_CD3CD8, clusters_CD3FoxP3, clusters_FoxP3_, clusters_CD11bCD15), by = "suid")
 
+# write_rds(markers_ROI, "markers_ROI.rds")
 ```
 <br>
 
