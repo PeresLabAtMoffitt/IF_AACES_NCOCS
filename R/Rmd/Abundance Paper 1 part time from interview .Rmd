@@ -2147,6 +2147,47 @@ tbl18 <- tbl_stack(list(tbl12, tbl15), group_header = c("Intratumoral", "Periphe
 tbl18
 # gt::gtsave(tbl18, paste0(path, "/Table 3. Adjusted hazard ratios and 95% confidence intervals in Stroma ROIs cluster option.pdf"))
 ```
+<br>
+
+
+# HR adjusted by brca1
+## Overall pop restricted to those who have brca1 info
+## Overall intratumoral
+```{r}
+markers_ROIclust_o <- ROI_global %>%
+  filter(!is.na(brca1)) %>%
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
+  rename(CD11b_CD15 = CD11b_CD15_total)
+
+coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b_CD15 + brca1 + stage + refage + race, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+```
+## Tumor intratumoral
+```{r}
+markers_ROIclust_t <- ROI_global %>% 
+    filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
+  rename(CD11b_CD15 = CD11b_CD15_tumor)
+
+coxph(Surv(time = markers_ROIclust_t$timeint_fu, 
+                   event = markers_ROIclust_t$surv_vital) ~ CD11b_CD15 + brca1 + stage + refage + race, cluster = suid, data =  markers_ROIclust_t) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+```
+## Stroma peripheral
+```{r}
+markers_ROIclust_s <- ROI_global %>% 
+  filter(!str_detect(suid, paste0(remove_id, collapse = "|")), 
+         intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
+  rename(CD3_CD8 = CD3_CD8_stroma)
+
+coxph(Surv(time = markers_ROIclust_s$timeint_fu, 
+                   event = markers_ROIclust_s$surv_vital) ~ CD3_CD8 + brca1 + stage + refage + race, cluster = suid, data =  markers_ROIclust_s) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD3_CD8) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+```
+<br>
 
 ## In White (I can bind W/B later if you want them side by side)
 ```{r Table % cluster option white}
@@ -2358,6 +2399,47 @@ tbl18 <- tbl_stack(list(tbl12, tbl15), group_header = c("Intratumoral", "Periphe
 tbl18
 # gt::gtsave(tbl18, paste0(path, "/Table 3. Adjusted hazard ratios and 95% confidence intervals in Stroma ROIs cluster option.pdf"))
 ```
+<br>
+
+
+# HR adjusted by brca1
+## White pop restricted to those who have brca1 info
+## Overall intratumoral
+```{r}
+markers_ROIclust_o <- ROI_global %>%
+  filter(!is.na(brca1)) %>%
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral", race == "White") %>% 
+  rename(CD11b_CD15 = CD11b_CD15_total)
+
+coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b_CD15 + brca1 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+```
+## Tumor intratumoral
+```{r}
+markers_ROIclust_t <- ROI_global %>% 
+    filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral", race == "White") %>% 
+  rename(CD11b_CD15 = CD11b_CD15_tumor)
+
+coxph(Surv(time = markers_ROIclust_t$timeint_fu, 
+                   event = markers_ROIclust_t$surv_vital) ~ CD11b_CD15 + brca1 + stage + refage, cluster = suid, data =  markers_ROIclust_t) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+```
+## Stroma peripheral
+```{r}
+markers_ROIclust_s <- ROI_global %>% 
+  filter(!str_detect(suid, paste0(remove_id, collapse = "|")), 
+         intratumoral_i_vs_peripheral_p_ == "Peripheral", race == "White") %>% 
+  rename(CD3_CD8 = CD3_CD8_stroma)
+
+coxph(Surv(time = markers_ROIclust_s$timeint_fu, 
+                   event = markers_ROIclust_s$surv_vital) ~ CD3_CD8 + brca1 + stage + refage, cluster = suid, data =  markers_ROIclust_s) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD3_CD8) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+```
+<br>
 
 ## In Black
 ```{r Table % cluster option black}
@@ -2569,6 +2651,47 @@ tbl18 <- tbl_stack(list(tbl12, tbl15), group_header = c("Intratumoral", "Periphe
 tbl18
 # gt::gtsave(tbl18, paste0(path, "/Table 3. Adjusted hazard ratios and 95% confidence intervals in Stroma ROIs cluster option.pdf"))
 ```
+<br>
+
+
+# HR adjusted by brca1
+## Black pop restricted to those who have brca1 info
+## Overall intratumoral
+```{r}
+markers_ROIclust_o <- ROI_global %>%
+  filter(!is.na(brca1)) %>%
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral", race == "Black") %>% 
+  rename(CD11b_CD15 = CD11b_CD15_total)
+
+coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b_CD15 + brca1 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+```
+## Tumor intratumoral
+```{r}
+markers_ROIclust_t <- ROI_global %>% 
+    filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral", race == "Black") %>% 
+  rename(CD11b_CD15 = CD11b_CD15_tumor)
+
+coxph(Surv(time = markers_ROIclust_t$timeint_fu, 
+                   event = markers_ROIclust_t$surv_vital) ~ CD11b_CD15 + brca1 + stage + refage, cluster = suid, data =  markers_ROIclust_t) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+```
+## Stroma peripheral
+```{r}
+markers_ROIclust_s <- ROI_global %>% 
+  filter(!str_detect(suid, paste0(remove_id, collapse = "|")), 
+         intratumoral_i_vs_peripheral_p_ == "Peripheral", race == "Black") %>% 
+  rename(CD3_CD8 = CD3_CD8_stroma)
+
+coxph(Surv(time = markers_ROIclust_s$timeint_fu, 
+                   event = markers_ROIclust_s$surv_vital) ~ CD3_CD8 + brca1 + stage + refage, cluster = suid, data =  markers_ROIclust_s) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD3_CD8) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+```
+<br>
 <br>
 
 
