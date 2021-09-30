@@ -3488,8 +3488,68 @@ myplot
 # myplot
 # # dev.off()
 ```
-
 <br>
+
+# Adjusted KM Low/High group
+## White
+### Intratumoral CD3
+```{r}
+clin_surv <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
+  filter(race == "White") %>% 
+  as.data.frame()
+
+fit2 <- coxph(Surv(time = timeint_fu, event = surv_vital) ~ CD3_total + stage + refage, cluster = suid, data = clin_surv)
+ggadjustedcurves(fit2, data = clin_surv, 
+                 method = "average", 
+                 variable = "CD3_total",
+                 palette = c("grey27", "grey77"), 
+                 xlim = c(0, 8000))
+```
+### Peripheral CD3
+```{r}
+clin_surv <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
+  filter(race == "White") %>% 
+  as.data.frame()
+
+fit2 <- coxph(Surv(time = timeint_fu, event = surv_vital) ~ CD3_total + stage + refage, cluster = suid, data = clin_surv)
+ggadjustedcurves(fit2, data = clin_surv, 
+                 method = "average", 
+                 variable = "CD3_total",
+                 palette = c("grey27", "grey77"), 
+                 xlim = c(0, 8000))
+```
+## Black
+### Intratumoral CD3
+```{r}
+clin_surv <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
+  filter(race == "Black") %>% 
+  as.data.frame()
+
+fit2 <- coxph(Surv(time = timeint_fu, event = surv_vital) ~ CD3_total + stage + refage, cluster = suid, data = clin_surv)
+ggadjustedcurves(fit2, data = clin_surv, 
+                 method = "average", 
+                 variable = "CD3_total",
+                 palette = c("grey27", "grey77"), 
+                 xlim = c(0, 8000))
+```
+### Peripheral CD3
+```{r}
+clin_surv <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
+  filter(race == "Black") %>% 
+  as.data.frame()
+
+fit2 <- coxph(Surv(time = timeint_fu, event = surv_vital) ~ CD3_total + stage + refage, cluster = suid, data = clin_surv)
+ggadjustedcurves(fit2, data = clin_surv, 
+                 method = "average", 
+                 variable = "CD3_total",
+                 palette = c("grey27", "grey77"), 
+                 xlim = c(0, 8000))
+```
+
 
 # HR Cluster
 `r emo::ji("pad")` Note to remember. The cluster were built on the data with the averaged measurement. I am not using the cluster option in the coxph even though I saw a really slight change in CI values but not in p value.  
