@@ -3490,9 +3490,38 @@ myplot
 ```
 <br>
 
-# Adjusted KM Low/High group
+# Adjusted KM Low/High group "Surv ~ CD3_total + stage + refage, cluster = suid"
+## Overall
+### Intratumoral total CD3
+```{r}
+clin_surv <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
+  as.data.frame()
+
+fit2 <- coxph(Surv(time = timeint_fu, event = surv_vital) ~ CD3_total + stage + refage, cluster = suid, data = clin_surv)
+ggadjustedcurves(fit2, data = clin_surv, 
+                 method = "average", 
+                 variable = "CD3_total",
+                 palette = c("grey27", "grey77"), 
+                 xlim = c(0, 8000))
+```
+
+### Peripheral total CD3
+```{r}
+clin_surv <- ROI_global %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
+  as.data.frame()
+
+fit2 <- coxph(Surv(time = timeint_fu, event = surv_vital) ~ CD3_total + stage + refage, cluster = suid, data = clin_surv)
+ggadjustedcurves(fit2, data = clin_surv, 
+                 method = "average", 
+                 variable = "CD3_total",
+                 palette = c("grey27", "grey77"), 
+                 xlim = c(0, 8000))
+```
+
 ## White
-### Intratumoral CD3
+### Intratumoral total CD3
 ```{r}
 clin_surv <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
@@ -3506,7 +3535,8 @@ ggadjustedcurves(fit2, data = clin_surv,
                  palette = c("grey27", "grey77"), 
                  xlim = c(0, 8000))
 ```
-### Peripheral CD3
+
+### Peripheral total CD3
 ```{r}
 clin_surv <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
@@ -3520,8 +3550,9 @@ ggadjustedcurves(fit2, data = clin_surv,
                  palette = c("grey27", "grey77"), 
                  xlim = c(0, 8000))
 ```
+
 ## Black
-### Intratumoral CD3
+### Intratumoral total CD3
 ```{r}
 clin_surv <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
@@ -3535,7 +3566,8 @@ ggadjustedcurves(fit2, data = clin_surv,
                  palette = c("grey27", "grey77"), 
                  xlim = c(0, 8000))
 ```
-### Peripheral CD3
+
+### Peripheral total CD3
 ```{r}
 clin_surv <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
