@@ -3490,15 +3490,15 @@ myplot
 ```
 <br>
 
-# Adjusted KM Low/High group "Surv ~ CD3_total + stage + refage, cluster = suid"
-## Overall
+# Adjusted KM Low/High group 
+## Overall "Surv ~ CD3_total + stage + refage + race, cluster = suid"
 ### Intratumoral total CD3
 ```{r}
 clin_surv <- ROI_global %>% 
   filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral") %>% 
   as.data.frame()
 
-fit2 <- coxph(Surv(time = timeint_fu, event = surv_vital) ~ CD3_total + stage + refage, cluster = suid, data = clin_surv)
+fit2 <- coxph(Surv(time = timeint_fu, event = surv_vital) ~ CD3_total + stage + refage + race, cluster = suid, data = clin_surv)
 ggadjustedcurves(fit2, data = clin_surv, 
                  method = "average", 
                  variable = "CD3_total",
@@ -3512,7 +3512,7 @@ clin_surv <- ROI_global %>%
   filter(intratumoral_i_vs_peripheral_p_ == "Peripheral") %>% 
   as.data.frame()
 
-fit2 <- coxph(Surv(time = timeint_fu, event = surv_vital) ~ CD3_total + stage + refage, cluster = suid, data = clin_surv)
+fit2 <- coxph(Surv(time = timeint_fu, event = surv_vital) ~ CD3_total + stage + refage + race, cluster = suid, data = clin_surv)
 ggadjustedcurves(fit2, data = clin_surv, 
                  method = "average", 
                  variable = "CD3_total",
@@ -3520,7 +3520,7 @@ ggadjustedcurves(fit2, data = clin_surv,
                  xlim = c(0, 8000))
 ```
 
-## White
+## White "Surv ~ CD3_total + stage + refage, cluster = suid"
 ### Intratumoral total CD3
 ```{r}
 clin_surv <- ROI_global %>% 
@@ -3551,7 +3551,7 @@ ggadjustedcurves(fit2, data = clin_surv,
                  xlim = c(0, 8000))
 ```
 
-## Black
+## Black "Surv ~ CD3_total + stage + refage, cluster = suid"
 ### Intratumoral total CD3
 ```{r}
 clin_surv <- ROI_global %>% 
