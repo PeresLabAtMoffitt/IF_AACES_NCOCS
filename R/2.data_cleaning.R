@@ -169,7 +169,9 @@ clinical_data <- clinical_data %>%
   )) %>% 
   mutate(married = case_when(
     married == 1                                        ~ "single/never married",
-    married == 2                                        ~ "married/living as married"
+    married == 2                                        ~ "married/living as married",
+    married == 3                                        ~ "divorced/separated",
+    married == 4                                        ~ "widowed"
   )) %>% 
   mutate_at(c("pregever", "nulliparous", "hyster", "hyster1yr", "hyster2yr", "oophor", 
               "oophor1yr", "tubelig", "tubelig1yr", "ocever", "breastfedever", 

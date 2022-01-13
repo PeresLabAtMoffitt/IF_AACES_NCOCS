@@ -309,6 +309,44 @@ ROI_global %>%
 
 ***
 
+# RESPONSE survival curve by race for this dataset
+```{r}
+clin_surv <- ROI_global %>% 
+  distinct(suid, .keep_all = TRUE)
+mysurv <- Surv(time = clin_surv$timeint_fu, event = clin_surv$surv_vital)
+myplot <- survfit(mysurv~clin_surv$race)
+
+# pdf(paste0(path, "/Survivals/Immune cell clusters/OS CD3 grp matched pop.pdf"), width = 8, height = 7)
+myplot <- ggsurvplot(myplot, data = clin_surv,
+           title = "Survival analysis on matched population", #subtitle = "Grouping based on intratumoral overall CD3+ cells",
+           font.main = c(14, "bold", "black"), font.subtitle = c(6, "plain", "black"),
+           xlab = "Time (days)", legend.title = "", 
+           legend.labs = c("Black", "White"),
+           # palette = c("grey27", "grey77"),
+           pval = TRUE,
+           conf.int = FALSE,
+           xlim = c(0, 8000),
+           # Add risk table
+           tables.height = 0.2,
+           risk.table.title = "Risk table",
+           risk.table = TRUE,
+           risk.table.y.text = FALSE,
+           risk.table.fontsize = 4,
+           tables.theme = theme_survminer(base_size = 5,
+                                          font.main = c(16, "bold", "black"),
+                                          font.x = c(14, "bold", "black"),
+                                          font.y = c(16, "bold", "transparent"),
+                                          font.tickslab = c(14, "bold", "black"))
+)
+myplot$plot <- myplot$plot +
+  scale_x_continuous(breaks = c(seq(0, 8000, 2000)))
+myplot
+```
+
+
+
+***
+
 # Figure 1
 
 <!-- **Leave 4 patients no BMI**   -->
@@ -2653,6 +2691,142 @@ tbl18
 ```
 <br>
 
+***
+
+# RESPONSE survival association in black women by study
+## In AACES
+```{r}
+markers_ROIclust_o <- ROI_global %>%
+    # filter(!str_detect(suid, remove_id_bmi)) %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral" & race == "Black" & site == "AAS") %>% 
+  rename(CD3 = CD3_total, CD3_CD8 = CD3_CD8_total,
+         CD3_FoxP3 = CD3_FoxP3_total, 
+         CD11b = CD11b_total, CD11b_CD15 = CD11b_CD15_total)
+  
+tbl1 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD3 + stage + refage, cluster = suid, data =  markers_ROIclust_o)  %>% 
+  tbl_regression(exponentiate = TRUE,
+                 include = CD3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+tbl2 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD3_CD8 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD3_CD8) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+# tbl3 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+#                    event = markers_ROIclust_o$surv_vital) ~ CD3_FoxP3 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+#   tbl_regression(exponentiate = TRUE,
+#                  include = CD3_FoxP3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+tbl4 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+tbl5 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b_CD15 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+
+tbl10 <- tbl_stack(list(tbl1, tbl2, tbl4, tbl5))
+
+markers_ROIclust_o <- ROI_global %>% 
+    # filter(!str_detect(suid, remove_id_bmi)) %>% 
+  filter(!str_detect(suid, paste0(remove_id, collapse = "|")), 
+         intratumoral_i_vs_peripheral_p_ == "Peripheral", race == "Black" & site == "AAS") %>% 
+  rename(CD3 = CD3_total, CD3_CD8 = CD3_CD8_total,
+         CD3_FoxP3 = CD3_FoxP3_total, 
+         CD11b = CD11b_total, CD11b_CD15 = CD11b_CD15_total)
+  
+tbl1 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD3 + stage + refage, cluster = suid, data =  markers_ROIclust_o)  %>% 
+  tbl_regression(exponentiate = TRUE,
+                 include = CD3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+tbl2 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD3_CD8 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD3_CD8) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+# tbl3 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+#                    event = markers_ROIclust_o$surv_vital) ~ CD3_FoxP3 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+#   tbl_regression(exponentiate = TRUE,
+#                  include = CD3_FoxP3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+tbl4 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+tbl5 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b_CD15 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+
+tbl13 <- tbl_stack(list(tbl1, tbl2, tbl4, tbl5))
+
+tbl_stack(list(tbl10, tbl13), group_header = c("Intratumoral", "Peripheral")) %>% as_gt()
+```
+
+## In NCOCS
+```{r}
+markers_ROIclust_o <- ROI_global %>%
+    # filter(!str_detect(suid, remove_id_bmi)) %>% 
+  filter(intratumoral_i_vs_peripheral_p_ == "Intratumoral" & race == "Black" & site == "NCO") %>% 
+  rename(CD3 = CD3_total, CD3_CD8 = CD3_CD8_total,
+         CD3_FoxP3 = CD3_FoxP3_total, 
+         CD11b = CD11b_total, CD11b_CD15 = CD11b_CD15_total)
+  
+tbl1 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD3 + stage + refage, cluster = suid, data =  markers_ROIclust_o)  %>% 
+  tbl_regression(exponentiate = TRUE,
+                 include = CD3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+tbl2 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD3_CD8 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD3_CD8) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+# tbl3 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+#                    event = markers_ROIclust_o$surv_vital) ~ CD3_FoxP3 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+#   tbl_regression(exponentiate = TRUE,
+#                  include = CD3_FoxP3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+tbl4 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+tbl5 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b_CD15 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+
+tbl10 <- tbl_stack(list(tbl1, tbl2, tbl4, tbl5))
+
+markers_ROIclust_o <- ROI_global %>% 
+    # filter(!str_detect(suid, remove_id_bmi)) %>% 
+  filter(!str_detect(suid, paste0(remove_id, collapse = "|")), 
+         intratumoral_i_vs_peripheral_p_ == "Peripheral", race == "Black" & site == "NCO") %>% 
+  rename(CD3 = CD3_total, CD3_CD8 = CD3_CD8_total,
+         CD3_FoxP3 = CD3_FoxP3_total, 
+         CD11b = CD11b_total, CD11b_CD15 = CD11b_CD15_total)
+  
+tbl1 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD3 + stage + refage, cluster = suid, data =  markers_ROIclust_o)  %>% 
+  tbl_regression(exponentiate = TRUE,
+                 include = CD3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+tbl2 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD3_CD8 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD3_CD8) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+# tbl3 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+#                    event = markers_ROIclust_o$surv_vital) ~ CD3_FoxP3 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+#   tbl_regression(exponentiate = TRUE,
+#                  include = CD3_FoxP3) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+tbl4 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+tbl5 <- coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b_CD15 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+
+tbl13 <- tbl_stack(list(tbl1, tbl2, tbl4, tbl5))
+
+tbl_stack(list(tbl10, tbl13), group_header = c("Intratumoral", "Peripheral")) %>% as_gt()
+```
+
+***
 
 # HR adjusted by brca1
 ## Black pop restricted to those who have brca1 info
