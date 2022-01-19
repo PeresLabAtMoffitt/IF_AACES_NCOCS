@@ -623,6 +623,16 @@ ROI_global <- ROI_global %>%
 
 ```
 
+HR Race
+```{r}
+a <- markers_ROI %>% 
+  mutate(race = factor(race, levels = c("White", "Black")))
+
+coxph(Surv(time = a$timeint_fu, 
+                   event = a$surv_vital) ~ race + stage + refage, cluster = suid, data =  a)  %>% 
+  tbl_regression(exponentiate = TRUE) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+```
+
 ***
 
 # RESPONSE survival association in black women by study
