@@ -125,7 +125,7 @@ bind_rows(ROI_global %>%
             mutate(excluded = "excluded")) %>% 
   select(refage, refage_cat, stage, BMI_recent, BMI_recent_grp,
         smoker, diab,
-         dblkstat_CA125, adj, excluded) %>% 
+         dblkstat_CA125, adj, excluded, site) %>% 
   tbl_summary(by = excluded,
               statistic = list(all_continuous() ~ "{mean} ({sd})"),
               label = list(refage ~ "Age at diagnosis", refage_cat ~ "Age at diagnosis category",
