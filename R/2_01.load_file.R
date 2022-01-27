@@ -28,15 +28,15 @@ tx_data_ncocs <- read_csv(paste0(data_path,
 #-----------------------------------------------------------------------------------------------------------------
 ROI_tumor <-
   readxl::read_xlsx(paste0(path,
-      "/K99_R00/Image analysis data/Immune marker count data/Peres P1 ROI Analysis with location_updated 1-24-2020.xlsx"
+      "/K99_R00/Image analysis data/Immune marker count data/Peres P1 ROI Set 1 Index 2 July 2021.xlsx"
     ), sheet = "Tumor", .name_repair = fct_name_repair)
 ROI_stroma <-
   readxl::read_xlsx(paste0(path,
-      "/K99_R00/Image analysis data/Immune marker count data/Peres P1 ROI Analysis with location_updated 1-24-2020.xlsx"
+      "/K99_R00/Image analysis data/Immune marker count data/Peres P1 ROI Set 1 Index 2 July 2021.xlsx"
   ), sheet = "Stroma", .name_repair = fct_name_repair)
 ROI_total <-
   readxl::read_xlsx(paste0(path,
-                           "/K99_R00/Image analysis data/Immune marker count data/Peres P1 ROI Analysis with location_updated 1-24-2020.xlsx"
+      "/K99_R00/Image analysis data/Immune marker count data/Peres P1 ROI Set 1 Index 2 July 2021.xlsx"
   ), sheet = "Peres P1 Total ROI", .name_repair = fct_name_repair)
 #-----------------------------------------------------------------------------------------------------------------
 # No need to read core removed (already removed from data)

@@ -1,12 +1,15 @@
 # Import library
 
-library(tidyverse)
+library(tidyverse); library(janitor)
 
 
 ############################################################################## I ### Load new ROIs data----
 path <- fs::path("","Volumes","Peres_Research")
 fct_name_repair <- function(colnms) {
-  tolower(gsub("[ ():]", "_", colnms))
+  tolower(
+    gsub("\\-", "minus", 
+         (gsub("\\+", "plus", colnms))
+         ))
 }
 #-----------------------------------------------------------------------------------------------------------------
 aaces_clinical <- 
@@ -21,70 +24,44 @@ ncocs_clinical <-
 ROI_tumor <-
   readxl::read_xlsx(
     paste0(path,
-           "/K99_R00/Image analysis data//AACES MCC18207 mIF Data/L.Peres_P1_AACES MCC18207_ROI_Results.xlsx"
-  ), sheet = "Tumor (PCK+)", .name_repair = fct_name_repair)
+           "/K99_R00/Image analysis data//AACES MCC18207 mIF Data/L.Peres_P1_AACES MCC18207_ROI_Results-2022-1.xlsx"
+  ), sheet = "Tumor (PCK+)",
+  .name_repair = fct_name_repair) %>% 
+  janitor::clean_names()
 ROI_stroma <-
   readxl::read_xlsx(
     paste0(path,
-           "/K99_R00/Image analysis data//AACES MCC18207 mIF Data/L.Peres_P1_AACES MCC18207_ROI_Results.xlsx"
-  ), sheet = "Stroma (PCK-)", .name_repair = fct_name_repair)
+           "/K99_R00/Image analysis data//AACES MCC18207 mIF Data/L.Peres_P1_AACES MCC18207_ROI_Results-2022-1.xlsx"
+  ), sheet = "Stroma (PCK-)",
+  .name_repair = fct_name_repair) %>% 
+  janitor::clean_names()
 ROI_total <-
   readxl::read_xlsx(
     paste0(path,
-           "/K99_R00/Image analysis data//AACES MCC18207 mIF Data/L.Peres_P1_AACES MCC18207_ROI_Results.xlsx"
-    ), sheet = "AACES MCC18207 ROI Counts", .name_repair = fct_name_repair)
+           "/K99_R00/Image analysis data//AACES MCC18207 mIF Data/L.Peres_P1_AACES MCC18207_ROI_Results-2022-1.xlsx"
+    ), sheet = "AACES MCC18207 ROI Counts",
+    .name_repair = fct_name_repair) %>% 
+  janitor::clean_names() %>% 
+  `colnames<-`(c(paste0("total_", colnames(.))))
 
 
-############################################################################## II ### Cleaning new ROIs data----
-ROI_tumor$suid <- str_match(ROI_tumor$image_tag, 
-                            "(Peres_P1_AACES.|Peres_P1_AACEES.|Peres_P1_OV|Peres_P1.|)([:digit:]*)")[,3]
-ROI_stroma$suid <- str_match(ROI_stroma$image_tag, 
-                             "(Peres_P1_AACES.|Peres_P1_AACEES.|Peres_P1_OV|Peres_P1.|)([:digit:]*)")[,3]
-
-ROI_tumor <- ROI_tumor %>% 
-  mutate(image_tag1 = str_remove_all(image_tag, "-"),
-         suid = str_match(image_tag1, 
-                           "(L.Peres_P1_OV|L.Peres_P1_)([:digit:]*)")[,3]) %>% 
-  select(image_tag, image_tag1, suid, everything())
-
-ROI_stroma <- ROI_stroma %>% 
-  mutate(image_tag1 = str_remove_all(image_tag, "-"),
-         suid = str_match(image_tag1, 
-                          "(L.Peres_P1_OV|L.Peres_P1_)([:digit:]*)")[,3]) %>% 
-  select(image_tag, image_tag1, suid, everything())
-
-ROI_total <- ROI_total %>% 
-  mutate(image_tag1 = str_remove_all(image_tag, "-"),
-         suid = str_match(image_tag1, 
-                          "(L.Peres_P1_OV|L.Peres_P1_)([:digit:]*)")[,3]) %>% 
-  select(image_tag, image_tag1, suid, everything())
-
-
-str_match(ROI_tumor$image_tag, 
-          "(L.Peres_P1_)([:digit:]*)")[,3]
-
-
-# 110334? or 110334-3
-# 16-1213??
-L.Peres_P1_OV16-1084
-
-############################################################################## III ### Cleaning clinical data----
-clinical_data <- bind_rows(aaces_clinical, ncocs_clinical)
-
-
-mutate(suid = factor(suid)) %>% 
+############################################################################## II ### Cleaning clinical data----
+case_ctrl_data <- bind_rows(aaces_clinical, ncocs_clinical) %>% 
+  # remove variable not for thidata
+  select(suid, everything(), -casematch) %>% 
+  mutate(suid = factor(suid)) %>% 
   mutate(casecon = case_when(
     casecon == 1                                       ~ "Case",
     casecon == 2                                       ~ "Control"
   )) %>% 
-  mutate(vitalstatus_old = case_when(
-    vitalstatus_new == 1                               ~ "Alive",
-    vitalstatus_new == 2                               ~ "Deceased",
+  mutate(vitalstatus = case_when(
+    vitalstatus == 1                                   ~ "Alive",
+    vitalstatus == 2                                   ~ "Deceased",
     TRUE                                               ~ NA_character_
   )) %>% 
-  mutate(surv_vital_old = case_when(
-    vitalstatus_old == "Alive"                         ~ 0,
-    vitalstatus_old == "Deceased"                      ~ 1,
+  mutate(os_event = case_when(
+    vitalstatus == "Alive"                             ~ 0,
+    vitalstatus == "Deceased"                          ~ 1,
     TRUE                                               ~ NA_real_
   )) %>% 
   mutate(cancersite = case_when(
@@ -95,7 +72,7 @@ mutate(suid = factor(suid)) %>%
     cancersite == 5                                    ~ "Ovarian, tubal or peritoneal, can't distinguish",
     TRUE                                               ~ NA_character_
   )) %>% 
-  mutate_at(c("timelastfu_new", "morphology", "hysteryear", "oophoryear", "tubeligyear",
+  mutate_at(c("timelastfu", "morphology", "hysteryear", "oophoryear", "tubeligyear",
               "anyfhdur", "eonlydur", "epdur"), 
             ~ case_when(
               . %in% c("8888","9998", "9999")          ~ NA_real_,
@@ -323,36 +300,251 @@ mutate(suid = factor(suid)) %>%
   )) %>% 
   mutate(diab = factor(diab, levels = c("no", "yes"))) %>% 
   # Calculate follow up time as time from interview to follow up
-  mutate(timeint_fu = surv_days - timeint)
+  mutate(os_time = timelastfu - timeint) %>% 
+  mutate(refage_cat = case_when(
+    refage < 50                      ~ "<50",
+    refage >= 50 &
+      refage < 60                    ~ "50-59",
+    refage >= 60 &
+      refage < 70                    ~ "60-69",
+    refage >= 70 &
+      refage < 80                    ~ "70-79",
+    refage >= 80                     ~ "≥80"
+  )) %>% 
+  mutate(BMI_recent_grp = case_when(
+    BMI_recent < 25                  ~ "<25",
+    BMI_recent >= 25 &
+      BMI_recent < 30                ~ "25-29",
+    BMI_recent >= 30 &
+      BMI_recent < 35                ~ "30-35",
+    BMI_recent >= 35                 ~ "≥35"
+  )) %>% 
+  mutate(BMI_YA_grp = case_when(
+    BMI_YA < 20                      ~ "<20",
+    BMI_YA >= 20 &
+      BMI_YA < 25                    ~ "20-24",
+    BMI_YA >= 25                     ~ "≥25"
+  ))
+
+saveRDS(case_ctrl_data, file = "case_ctrl_data.rds")
 
 
-clinical_data$refage_cat <- as.factor(findInterval(clinical_data$refage, c(0,50,60,70,80)))
-levels(clinical_data$refage_cat) <-  
-  c("<50", "50-59", "60-69", "70-79", ">80")
-
-clinical_data$BMI_recent_grp <- as.factor(findInterval(clinical_data$BMI_recent, c(0, 25, 30, 35)))
-levels(clinical_data$BMI_recent_grp) <-
-  c("<25", "25-29", "30-35", ">=35")
-
-
-clinical_data$BMI_YA_grp <- as.factor(findInterval(clinical_data$BMI_YA, c(0, 20, 25)))
-levels(clinical_data$BMI_YA_grp) <-  
-  c("<20","20-24",">=25")
-clinical_data$BMI_YA_grp <- factor(clinical_data$BMI_YA_grp, levels = c("20-24", "<20", ">=25"))
-
-######################################################################################## Ib ### Add paired_id to clinical----
-# Add paired_id to clinical----
-cases_match <- cases_match %>% mutate(suid = as.character(suid))
-clinical_data <- full_join(cases_match, 
-                           clinical_data,
-                           by= "suid")
-
-saveRDS(clinical_data, file = "clinical_data.rds")
+############################################################################## III ### Cleaning full case ctrl ROIs data----
+# ROI_tumor <- ROI_tumor %>% 
+#   mutate(image_tag1 = #str_remove_all(image_tag, "-"),
+#            str_replace(image_tag, "16-", "16"),
+#          suid = str_match(image_tag1, 
+#                           "(L.Peres_P1_OV|L.Peres_P1_)([:digit:]*)")[,3]) %>% 
+#   select(image_tag, image_tag1, suid, everything())
+# 
+# ROI_stroma <- ROI_stroma %>% 
+#   mutate(image_tag1 = str_replace(image_tag, "16-", "16"),
+#          suid = str_match(image_tag1, 
+#                           "(L.Peres_P1_OV|L.Peres_P1_)([:digit:]*)")[,3]) %>% 
+#   select(image_tag, image_tag1, suid, everything())
+# 
+# ROI_total <- ROI_total %>% 
+#   mutate(image_tag1 = str_replace(image_tag, "16-", "16"),
+#          suid = str_match(image_tag1, 
+#                           "(L.Peres_P1_OV|L.Peres_P1_)([:digit:]*)")[,3]) %>% 
+#   select(image_tag, image_tag1, suid, everything())
 
 
+# str_match(ROI_tumor$image_tag, 
+#           "(L.Peres_P1_)([:digit:]*)")[,3]
+# 
+# 
+# # 110334? or 110334-3
+# # 16-1213??
+# L.Peres_P1_OV16-1084
+
+a <- full_join(case_ctrl_data, ROI_total) %>% select(suid, image_tag, everything())
+
+full_ROI <- 
+  full_join(ROI_tumor, ROI_stroma,
+            by = "image_tag") %>% 
+  full_join(., ROI_total,
+            by = c("image_tag" = "total_image_tag")) %>% 
+  mutate(image_tag = str_replace(image_tag, "16-", "16"),
+         suid = str_match(image_tag,
+                          "(L.Peres_P1_OV|L.Peres_P1_)([:digit:]*)")[,3]) %>%
+  `colnames<-`(str_remove(colnames(.), "positive_")) %>% 
+  select(image_tag, suid, annotation = total_annotation, 
+         total_cells = total_total_cells, everything()) %>% 
+  # mutate(suid = as.character(suid)) %>% 
+  # Calculate percent of tumor cell
+  mutate(percent_tumor = round((tumor_total_cells / total_cells)*100, 2) 
+  ) %>% 
+  # Calculate percent of stromal cell
+  mutate(percent_stroma = round((stroma_total_cells / total_cells)*100, 2) 
+  ) %>% 
+  # Calculate percent of stromal cell
+  mutate(percent_total = round((total_cells / total_cells)*100, 2) 
+  ) %>% 
+  mutate_at(("annotation"), ~ case_when(
+    annotation == "P"                     ~ "Peripheral",
+    annotation == "I"                     ~ "Intratumoral",
+    annotation == "S"                     ~ "Stromal")
+  ) %>% 
+  mutate(slide_type = "ROI")
+
+# full_ROI <- full_ROI %>% 
+#   mutate(across(everything(), .fns = ~ replace_na(., 0)))
+
+markers_full <- full_ROI %>% 
+  # filter(annotation == "Intratumoral") %>% 
+  group_by(suid, annotation) %>% 
+  mutate(across(where(is.numeric), .fns = ~ mean(.)))
+
+
+# markers_full_i <- full_ROI %>% 
+#   # filter(annotation == "Intratumoral") %>% 
+#   group_by(suid, annotation) %>% 
+#   summarize(
+#     mean_tumor = mean(percent_tumor),
+#     mean_stroma = mean(percent_stroma),
+#     mean_total = mean(percent_total),
+#     # variance_tumor = var(percent_tumor),
+#     # variance_stroma = var(percent_stroma),
+#     percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells),
+#     percent_CD8_tumor = mean(tumor_percent_cd8_opal_570_positive_cells),
+#     percent_CD3_CD8_tumor = mean(tumor_percent_cd3plus_cd8plus_positive_cells),
+#     percent_FoxP3_tumor = mean(tumor_percent_foxp3_opal_540_positive_cells),
+#     percent_CD3_FoxP3_tumor = mean(tumor_percent_cd3plus_foxp3plus_positive_cells),
+#     percent_CD11b_tumor = mean(tumor_percent_cd11b_opal_620_positive_cells),
+#     percent_CD15_tumor = mean(tumor_percent_cd15_opal_520_positive_cells),
+#     percent_CD11b_CD15_tumor = mean(tumor_percent_cd11bplus_cd15plus_positive_cells),
+#     percent_CD3_stroma = mean(stroma_percent_cd3_opal_650_positive_cells),
+#     percent_CD8_stroma = mean(stroma_percent_cd8_opal_570_positive_cells),
+#     percent_CD3_CD8_stroma = mean(stroma_percent_cd3plus_cd8plus_positive_cells),
+#     percent_FoxP3_stroma = mean(stroma_percent_foxp3_opal_540_positive_cells),
+#     percent_CD3_FoxP3_stroma = mean(stroma_percent_cd3plus_foxp3plus_positive_cells),
+#     percent_CD11b_stroma = mean(stroma_percent_cd11b_opal_620_positive_cells),
+#     percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
+#     percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells),
+#     
+#     percent_CD3_total = mean(percent_cd3_opal_650_positive_cells),
+#     percent_CD8_total = mean(percent_cd8_opal_570_positive_cells),
+#     percent_CD3_CD8_total = mean(percent_cd3plus_cd8plus_positive_cells),
+#     percent_FoxP3_total = mean(percent_foxp3_opal_540_positive_cells),
+#     percent_CD3_FoxP3_total = mean(percent_cd3plus_foxp3plus_positive_cells),
+#     percent_CD11b_total = mean(percent_cd11b_opal_620_positive_cells),
+#     percent_CD15_total = mean(percent_cd15_opal_520_positive_cells),
+#     percent_CD11b_CD15_total = mean(percent_cd11bplus_cd15plus_positive_cells)
+#   )
+# markers_fulli$tumor_variation <- markers_fulli$mean_tumor - mean(full_ROI$percent_tumor)
+# markers_fulli$stroma_variation <- markers_fulli$mean_stroma - mean(full_ROI$percent_stroma)
+# markers_fulli$total_variation <- markers_fulli$mean_stroma - mean(full_ROI$percent_stroma)
+# #
+# markers_fullp <- full_ROI %>% 
+#   filter(annotation == "Peripheral") %>% 
+#   group_by(suid) %>% 
+#   summarize(
+#     mean_tumor = mean(percent_tumor),
+#     mean_stroma = mean(percent_stroma),
+#     mean_total = mean(percent_total),
+#     # variance_tumor = var(percent_tumor),
+#     # variance_stroma = var(percent_stroma),
+#     percent_CD3_tumor = mean(tumor_percent_cd3_opal_650_positive_cells),
+#     percent_CD8_tumor = mean(tumor_percent_cd8_opal_570_positive_cells),
+#     percent_CD3_CD8_tumor = mean(tumor_percent_cd3plus_cd8plus_positive_cells),
+#     percent_FoxP3_tumor = mean(tumor_percent_foxp3_opal_540_positive_cells),
+#     percent_CD3_FoxP3_tumor = mean(tumor_percent_cd3plus_foxp3plus_positive_cells),
+#     percent_CD11b_tumor = mean(tumor_percent_cd11b_opal_620_positive_cells),
+#     percent_CD15_tumor = mean(tumor_percent_cd15_opal_520_positive_cells),
+#     percent_CD11b_CD15_tumor = mean(tumor_percent_cd11bplus_cd15plus_positive_cells),
+#     percent_CD3_stroma = mean(stroma_percent_cd3_opal_650_positive_cells),
+#     percent_CD8_stroma = mean(stroma_percent_cd8_opal_570_positive_cells),
+#     percent_CD3_CD8_stroma = mean(stroma_percent_cd3plus_cd8plus_positive_cells),
+#     percent_FoxP3_stroma = mean(stroma_percent_foxp3_opal_540_positive_cells),
+#     percent_CD3_FoxP3_stroma = mean(stroma_percent_cd3plus_foxp3plus_positive_cells),
+#     percent_CD11b_stroma = mean(stroma_percent_cd11b_opal_620_positive_cells),
+#     percent_CD15_stroma = mean(stroma_percent_cd15_opal_520_positive_cells),
+#     percent_CD11b_CD15_stroma = mean(stroma_percent_cd11bplus_cd15plus_positive_cells),
+#     percent_CD3_total = mean(percent_cd3_opal_650_positive_cells),
+#     percent_CD8_total = mean(percent_cd8_opal_570_positive_cells),
+#     percent_CD3_CD8_total = mean(percent_cd3plus_cd8plus_positive_cells),
+#     percent_FoxP3_total = mean(percent_foxp3_opal_540_positive_cells),
+#     percent_CD3_FoxP3_total = mean(percent_cd3plus_foxp3plus_positive_cells),
+#     percent_CD11b_total = mean(percent_cd11b_opal_620_positive_cells),
+#     percent_CD15_total = mean(percent_cd15_opal_520_positive_cells),
+#     percent_CD11b_CD15_total = mean(percent_cd11bplus_cd15plus_positive_cells)
+#   )
+# markers_fullp$tumor_variation <- markers_fullp$mean_tumor - mean(full_ROI$percent_tumor)
+# markers_fullp$stroma_variation <- markers_fullp$mean_stroma - mean(full_ROI$percent_stroma)
+# markers_fullp$total_variation <- markers_fullp$mean_total - mean(full_ROI$percent_total)
+# 
+# # Join Intratumoral and Peropheral ROI
+# markers_full <- full_join(markers_fulli, markers_fullp,
+#                          by= "suid", suffix= c(".i", ".p"))
 
 
 
+######################################################################################## IV ### Create tertile group with immune cells----
+# markers_full <- markers_full %>% 
+#   
+#   mutate(CD3_tumor.i = case_when(
+#     
+#     percent_CD3_tumor.i <= 1      ~ "low",
+#     percent_CD3_tumor.i > 1       ~ "high"
+#   ), CD3_tumor.i = factor(CD3_tumor.i, levels = c("low","high")))
+  
+
+
+
+# markers_full <- markers_full %>% 
+#   group_by(annotation)
+
+marker_name <- c("tumor_percent_foxp3_opal_540_cells",
+                 "tumor_percent_cd3_opal_650_cells", "tumor_percent_cd8_opal_570_cells",                
+                 "tumor_percent_cd11b_opal_620_cells", "tumor_percent_cd15_opal_520_cells",               
+                 "tumor_percent_cd3plus_foxp3plus_cells", "tumor_percent_cd3plus_cd8plus_cells",             
+                 "tumor_percent_cd11bplus_cd15plus_cells", "tumor_percent_cd3plus_cd8minus_foxp3minus_cells", 
+                 "tumor_percent_cd11bplus_cd15minus_cells",
+                 "stroma_percent_foxp3_opal_540_cells", "stroma_percent_cd3_opal_650_cells",               
+                 "stroma_percent_cd8_opal_570_cells", "stroma_percent_cd11b_opal_620_cells",             
+                 "stroma_percent_cd15_opal_520_cells", "stroma_percent_cd3plus_foxp3plus_cells",          
+                 "stroma_percent_cd3plus_cd8plus_cells", "stroma_percent_cd11bplus_cd15plus_cells",         
+                 "stroma_percent_cd3plus_cd8minus_foxp3minus_cells", "stroma_percent_cd11bplus_cd15minus_cells",
+                 "total_percent_foxp3_opal_540_cells", "total_percent_cd3_opal_650_cells",                
+                 "total_percent_cd8_opal_570_cells", "total_percent_cd11b_opal_620_cells",              
+                 "total_percent_cd15_opal_520_cells", "total_percent_cd3plus_foxp3plus_cells",           
+                 "total_percent_cd3plus_cd8plus_cells", "total_percent_cd11bplus_cd15plus_cells",          
+                 "total_percent_cd3plus_cd8minus_foxp3minus_cells", "total_percent_cd11bplus_cd15minus_cells"
+                 )
+
+# marker_name <- t(colnames(markers_full[ , grepl( "_percent" , names( markers_full ) ) ]))
+# 
+# 
+#        
+# paste0(colnames(markers_full), collapse = ", ")
+       
+       
+       
+       
+
+for (i in marker_name) {
+  
+  col_name <-
+    str_match(marker_name, "percent_(.*?)(_opal|_cells)")[, 2]
+  marker_type <-
+    str_match(marker_name, "(.*?)_")[, 2]
+  
+  markers_full[[paste0(col_name, "_", marker_type, "_grp")]] <-  case_when(
+    i <= 1      ~ "low",
+    i > 1       ~ "high"
+  )
+}
+colnames(markers_full)
+
+
+
+
+
+
+
+# saveRDS(full_ROI, file = "full_ROI.rds")
+# saveRDS(markers_full, file = "markers.rds")
 
 
 # End cleaning

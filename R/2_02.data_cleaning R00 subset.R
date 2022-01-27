@@ -13,7 +13,7 @@ ancestry_data <- ancestry_data %>%
   mutate(vitalstatus = case_when(
     vital_status_fin == 1                               ~ "Deceased",
     vital_status_fin == 0                               ~ "Alive",
-    TRUE                                               ~ NA_character_
+    TRUE                                                ~ NA_character_
   )) %>% 
   mutate(across(ends_with("_eurpc1")|ends_with("_eurpc2"), ~ na_if(., 0))) %>% 
   mutate(eurpc1 = coalesce(onc_eurpc1, cogs_eurpc1)) %>% 
@@ -275,21 +275,45 @@ clinical_data <- clinical_data %>%
   )) %>% 
   mutate(diab = factor(diab, levels = c("no", "yes"))) %>% 
   # Calculate follow up time as time from interview to follow up
-  mutate(timeint_fu = surv_days - timeint)
+  mutate(timeint_fu = surv_days - timeint) %>% 
+  mutate(refage_cat = case_when(
+    refage < 50                      ~ "<50",
+    refage >= 50 &
+      refage < 60                    ~ "50-59",
+    refage >= 60 &
+      refage < 70                    ~ "60-69",
+    refage >= 70 &
+      refage < 80                    ~ "70-79",
+    refage >= 80                     ~ "≥80"
+  )) %>% 
+  mutate(BMI_recent_grp = case_when(
+    BMI_recent < 25                  ~ "<25",
+    BMI_recent >= 25 &
+      BMI_recent < 30                ~ "25-29",
+    BMI_recent >= 30 &
+      BMI_recent < 35                ~ "30-35",
+    BMI_recent >= 35                 ~ "≥35"
+  )) %>% 
+  mutate(BMI_YA_grp = case_when(
+    BMI_YA < 20                      ~ "<20",
+    BMI_YA >= 20 &
+      BMI_YA < 25                    ~ "20-24",
+    BMI_YA >= 25                     ~ "≥25"
+  ))
 
 
-clinical_data$refage_cat <- as.factor(findInterval(clinical_data$refage, c(0,50,60,70,80)))
-levels(clinical_data$refage_cat) <-  
-  c("<50", "50-59", "60-69", "70-79", ">80")
-
-clinical_data$BMI_recent_grp <- as.factor(findInterval(clinical_data$BMI_recent, c(0, 25, 30, 35)))
-levels(clinical_data$BMI_recent_grp) <-
-  c("<25", "25-29", "30-35", ">=35")
-
-
-clinical_data$BMI_YA_grp <- as.factor(findInterval(clinical_data$BMI_YA, c(0, 20, 25)))
-levels(clinical_data$BMI_YA_grp) <-  
-  c("<20","20-24",">=25")
+# clinical_data$refage_cat <- as.factor(findInterval(clinical_data$refage, c(0,50,60,70,80)))
+# levels(clinical_data$refage_cat) <-  
+#   c("<50", "50-59", "60-69", "70-79", ">80")
+# 
+# clinical_data$BMI_recent_grp <- as.factor(findInterval(clinical_data$BMI_recent, c(0, 25, 30, 35)))
+# levels(clinical_data$BMI_recent_grp) <-
+#   c("<25", "25-29", "30-35", ">=35")
+# 
+# 
+# clinical_data$BMI_YA_grp <- as.factor(findInterval(clinical_data$BMI_YA, c(0, 20, 25)))
+# levels(clinical_data$BMI_YA_grp) <-  
+#   c("<20","20-24",">=25")
 clinical_data$BMI_YA_grp <- factor(clinical_data$BMI_YA_grp, levels = c("20-24", "<20", ">=25"))
 
 # a <- clinical_data[c("BMI_YA", "BMI_YA_grp")]
@@ -298,9 +322,7 @@ clinical_data$BMI_YA_grp <- factor(clinical_data$BMI_YA_grp, levels = c("20-24",
 
 
 ######################################################################################## Ia ### Add paired_id to clinical----
-tx_data <- tx_data %>% mutate(suid = as.character(suid)) #%>% 
-  # mutate(across(.cols = where(is.numeric), .fns = ~ na_if(., 88))) %>% 
-  # mutate(across(.cols = where(is.numeric), .fns = ~ na_if(., 99)))
+tx_data <- tx_data %>% mutate(suid = as.character(suid))
 
 clinical_data <- right_join(tx_data, clinical_data, by = "suid") %>% 
   mutate(dblkstat_CA125 = case_when(
