@@ -70,15 +70,13 @@ library(sensemakr)
 
 ROI_global <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/ROI_global.rds")
 clinical_data <- readRDS("/Users/colinccm/Documents/GitHub/Peres/IF_AACES_NCOCS/clinical_data.rds")
+# Remove images that were not stained properly
+ROIimage_remove <- 
+  read_csv("~/Documents/GitHub/Peres/IF_case_ctrl_AACES_NCOCS/Remove images that were not stained properly in batch1.csv")
 
 # Rewove patients not matched or lost match
 ROI_global <- left_join(ROI_global, clinical_data, by="suid") %>% drop_na(pair_id) %>% 
-  filter(!image_tag %in% c("Peres_P1_150163  3D_[44113,18531].tif", 
-                           "Peres_P1_43004 A2_[45654,5840].tif",
-                           "Peres_P1_43773 D2_[60849,15244].tif", 
-                         "Peres_P1_AACES 130033_[37754,17929].tif",
-                         "Peres_P1_AACES 130033_[38351,13944].tif"
-                           )) %>% 
+  filter(!image_tag %in% c(ROIimage_remove$remove_images_that_were_not_stained_properly)) %>%
   group_by(pair_id) %>% 
   mutate(have_a_match = dense_rank(interaction(suid, pair_id))) %>% 
   group_by(pair_id) %>% 
