@@ -666,6 +666,52 @@ tbl15 <- tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5))
 tbl16 <- tbl_stack(list(tbl10, tbl13), group_header = c("Intratumoral", "Peripheral")) %>% as_gt()
 tbl16
 ```
+PH assumption
+```{r}
+markers_ROI_o <- markers_ROI %>% 
+  rename(CD3 = CD3_total.i, CD3_CD8 = CD3_CD8_total.i,
+         CD3_FoxP3 = CD3_FoxP3_total.i, 
+         CD11b = CD11b_total.i, CD11b_CD15 = CD11b_CD15_total.i)
+  
+coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD3 + stage + refage + race, data =  markers_ROI_o) %>%
+  cox.zph()
+coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD3_CD8 + stage + refage + race, data =  markers_ROI_o) %>%
+  cox.zph()
+coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD3_FoxP3 + stage + refage + race, data =  markers_ROI_o) %>%
+  cox.zph()
+coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD11b + stage + refage + race, data =  markers_ROI_o) %>%
+  cox.zph()
+coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD11b_CD15 + stage + refage + race, data =  markers_ROI_o) %>%
+  cox.zph()
+
+
+markers_ROI_o <- markers_ROI %>% 
+  rename(CD3 = CD3_total.p, CD3_CD8 = CD3_CD8_total.p,
+         CD3_FoxP3 = CD3_FoxP3_total.p, 
+         CD11b = CD11b_total.p, CD11b_CD15 = CD11b_CD15_total.p)
+  
+coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD3 + stage + refage + race, data =  markers_ROI_o) %>%
+  cox.zph()
+coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD3_CD8 + stage + refage + race, data =  markers_ROI_o) %>%
+  cox.zph()
+coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD3_FoxP3 + stage + refage + race, data =  markers_ROI_o) %>%
+  cox.zph()
+coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD11b + stage + refage + race, data =  markers_ROI_o) %>%
+  cox.zph()
+coxph(Surv(time = markers_ROI_o$timeint_fu, 
+                   event = markers_ROI_o$surv_vital) ~ CD11b_CD15 + stage + refage + race, data =  markers_ROI_o) %>%
+  cox.zph()
+```
+
 
 ## Tumor
 ```{r}
@@ -2489,5 +2535,43 @@ tbl18
 ```
 
 
+# HR adjusted by brca1
+## Overall pop restricted to those who have brca1 info
+## Overall intratumoral
+```{r}
+markers_ROIclust_o <- markers_ROI %>%
+  filter(!is.na(brca1)) %>%
+  rename(CD11b_CD15 = CD11b_CD15_total.i)
 
+coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b_CD15 + brca1 + stage + refage + race, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+```
+
+## In White
+```{r}
+markers_ROIclust_o <- markers_ROI %>%
+  filter(!is.na(brca1)) %>%
+  filter(race == "White") %>% 
+  rename(CD11b_CD15 = CD11b_CD15_total.i)
+
+coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b_CD15 + brca1 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+```
+
+## In Black
+```{r}
+markers_ROIclust_o <- markers_ROI %>%
+  filter(!is.na(brca1)) %>%
+  filter(race == "Black") %>% 
+  rename(CD11b_CD15 = CD11b_CD15_total.i)
+
+coxph(Surv(time = markers_ROIclust_o$timeint_fu, 
+                   event = markers_ROIclust_o$surv_vital) ~ CD11b_CD15 + brca1 + stage + refage, cluster = suid, data =  markers_ROIclust_o) %>%
+  tbl_regression(exponentiate = TRUE,
+                 include = CD11b_CD15) %>% bold_p(t = .05) %>% add_nevent(location = "level") %>% add_n(location = "level")
+```
 
